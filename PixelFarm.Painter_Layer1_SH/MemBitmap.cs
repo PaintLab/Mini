@@ -24,7 +24,7 @@ using PixelFarm.Drawing.Internal;
 using PixelFarm.CpuBlit.VertexProcessing;
 namespace PixelFarm.CpuBlit
 {
-     
+
 
     /// <summary>
     /// agg buffer's pixel format
@@ -123,12 +123,13 @@ namespace PixelFarm.CpuBlit
 
                         _tempToBeRemovedList.Clear();
 
-                        s_stbuilder.AppendLine("remaing : " + _registerMemBmpList.Count);
+                        s_stbuilder.AppendLine("remaining : " + _registerMemBmpList.Count);
                         s_stbuilder.AppendLine("---");
                         s_stbuilder.AppendLine();
 
                         //
-                        System.Diagnostics.Debug.Write(s_stbuilder.ToString());
+                        //[TEMP]
+                        //System.Diagnostics.Debug.Write(s_stbuilder.ToString());
                         //
                         s_stbuilder.Length = 0;//clear
                         s_tim1.Enabled = true;
@@ -145,8 +146,8 @@ namespace PixelFarm.CpuBlit
         }
     }
 #endif
-   
-    
+
+
     /// <summary>
     /// 32 bpp native memory bitmap
     /// </summary>
@@ -212,6 +213,12 @@ namespace PixelFarm.CpuBlit
         }
         public override void Dispose()
         {
+#if DEBUG
+            if (_dbugNote == "fontAtlas")
+            {
+
+            }
+#endif
             if (_pixelBuffer != IntPtr.Zero && !_pixelBufferFromExternalSrc)
             {
                 System.Runtime.InteropServices.Marshal.FreeHGlobal(_pixelBuffer);
@@ -280,7 +287,7 @@ namespace PixelFarm.CpuBlit
             }
             return bmp;
         }
-        public static unsafe MemBitmap CreateFromCopy(int width, int height, IntPtr totalBuffer, int totalLen, bool doFlipY = false)
+        public static MemBitmap CreateFromCopy(int width, int height, IntPtr totalBuffer, int totalLen, bool doFlipY = false)
         {
 
             var bmp = new MemBitmap(width, height);
@@ -288,7 +295,10 @@ namespace PixelFarm.CpuBlit
             bmp._dbugNote = "MemBitmap.CreateFromCopy";
 #endif
             //System.Runtime.InteropServices.Marshal.Copy(totalBuffer, bmp._pixelBuffer, 0, totalLen);
-            MemMx.memcpy((byte*)(bmp._pixelBuffer), (byte*)totalBuffer, totalLen);
+            unsafe
+            {
+                MemMx.memcpy((byte*)(bmp._pixelBuffer), (byte*)totalBuffer, totalLen);
+            }
             //if (doFlipY)
             //{
             //    //flip vertical Y  
@@ -425,9 +435,9 @@ namespace PixelFarm.CpuBlit
                   (byte)(pixelValue));
             }
         }
-        
+
     }
 
-     
+
 
 }

@@ -58,6 +58,10 @@ namespace PixelFarm.Drawing
         CW//2
     }
 
+    public class DrawingInstructions
+    {
+
+    }
     public sealed class VertexStore
     {
 
@@ -353,7 +357,7 @@ namespace PixelFarm.Drawing
         {
             //for copy from src to this instance
 #if DEBUG
-            System.Diagnostics.Debug.WriteLine("vxs_3_dbugId=" + dbugId);
+            //System.Diagnostics.Debug.WriteLine("vxs_3_dbugId=" + dbugId);
 #endif
 
             _vertices_count = src._vertices_count;

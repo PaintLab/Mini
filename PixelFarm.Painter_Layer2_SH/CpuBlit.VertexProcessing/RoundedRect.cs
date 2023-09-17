@@ -67,16 +67,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         }
 
-        public RoundedRect(Q1RectD bounds, double r)
-            : this(bounds.Left, bounds.Bottom, bounds.Right, bounds.Top, r)
-        {
-        }
-
-        public RoundedRect(Q1Rect bounds, double r)
-            : this(bounds.Left, bounds.Bottom, bounds.Right, bounds.Top, r)
-        {
-        }
-
+       
         public void SetRect(double left, double bottom, double right, double top)
         {
             _bounds = new Q1RectD(left, bottom, right, top);
@@ -135,8 +126,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             get => _arc.ApproximateScale;
             set => _arc.ApproximateScale = value;
         }
+
         IEnumerable<VertexData> GetVertexIter()
         {
+
             _arc.UseStartEndLimit = true;
             _arc.Init(_bounds.Left + _leftBottomRadius.x, _bounds.Bottom + _leftBottomRadius.y, _leftBottomRadius.x, _leftBottomRadius.y, Math.PI, Math.PI + Math.PI * 0.5);
             _arc.SetStartEndLimit(_bounds.Left, _bounds.Bottom + _leftBottomRadius.y,
@@ -213,6 +206,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             yield return new VertexData(VertexCmd.Close, (int)EndVertexOrientation.CCW, 0);
             yield return new VertexData(VertexCmd.NoMore);
         }
+
+       
 
         public VertexStore MakeVxs(VertexStore output)
         {

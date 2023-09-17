@@ -6,25 +6,25 @@ namespace System
     //public delegate R Func<T, R>(T t1);
     //public delegate R Func<T1, T2, R>(T1 t1, T2 t2);
     //public delegate R Func<T1, T2, T3, R>(T1 t1, T2 t2, T3 t3);
-#if !NETSTANDARD
-    public delegate void Action<in T1, in T2>(T1 arg1, T2 arg2);
-    public delegate void Action<in T1, in T2, in T3>(T1 arg1, T2 arg2, T3 arg3);
-    public delegate void Action<in T1, in T2, in T3, in T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-    public delegate void Action<in T1, in T2, in T3, in T4, in T5>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
-    public delegate void Action<in T1, in T2, in T3, in T4, in T5, in T6>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
-    public delegate void Action<in T1, in T2, in T3, in T4, in T5, in T6, in T7>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
-    public delegate void Action<in T1, in T2, in T3, in T4, in T5, in T6, in T7, in T8>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8);
+//#if !NETSTANDARD
+//    public delegate void Action<in T1, in T2>(T1 arg1, T2 arg2);
+//    public delegate void Action<in T1, in T2, in T3>(T1 arg1, T2 arg2, T3 arg3);
+//    public delegate void Action<in T1, in T2, in T3, in T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+//    public delegate void Action<in T1, in T2, in T3, in T4, in T5>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+//    public delegate void Action<in T1, in T2, in T3, in T4, in T5, in T6>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
+//    public delegate void Action<in T1, in T2, in T3, in T4, in T5, in T6, in T7>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
+//    public delegate void Action<in T1, in T2, in T3, in T4, in T5, in T6, in T7, in T8>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8);
 
-    public delegate TResult Func<out TResult>();
-    public delegate TResult Func<in T, out TResult>(T arg);
-    public delegate TResult Func<in T1, in T2, out TResult>(T1 arg1, T2 arg2);
-    public delegate TResult Func<in T1, in T2, in T3, out TResult>(T1 arg1, T2 arg2, T3 arg3);
-    public delegate TResult Func<in T1, in T2, in T3, in T4, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-    public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
-    public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, in T6, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
-    public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, in T6, in T7, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
-    public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, in T6, in T7, in T8, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8);
-#endif
+//    public delegate TResult Func<out TResult>();
+//    public delegate TResult Func<in T, out TResult>(T arg);
+//    public delegate TResult Func<in T1, in T2, out TResult>(T1 arg1, T2 arg2);
+//    public delegate TResult Func<in T1, in T2, in T3, out TResult>(T1 arg1, T2 arg2, T3 arg3);
+//    public delegate TResult Func<in T1, in T2, in T3, in T4, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+//    public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+//    public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, in T6, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
+//    public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, in T6, in T7, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
+//    public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, in T6, in T7, in T8, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8);
+//#endif
 }
 
 namespace System.Runtime.InteropServices
@@ -43,90 +43,90 @@ namespace System.Runtime.CompilerServices
 
 namespace System.Collections.Generic
 {
-    public class HashSet<T> : IEnumerable<T>, ICollection<T>
-    {
-        //for .NET 2.0
-        Dictionary<int, T> _dic = new Dictionary<int, T>();
-        public HashSet() { }
-        public HashSet(IEnumerable<T> org)
-        {
-            foreach (T t in org)
-            {
-                Add(t);
-            }
-        }
-        public bool Add(T data)
-        {
-            int hashCode = data.GetHashCode();
-            if (_dic.ContainsKey(hashCode))
-            {
-                return false;
-            }
-            _dic[hashCode] = data;
-            return true;
-        }
-        public bool Remove(T data)
-        {
-            return _dic.Remove(data.GetHashCode());
-        }
-        public bool Contains(T data)
-        {
-            return _dic.ContainsKey(data.GetHashCode());
-        }
-        public void Clear()
-        {
-            _dic.Clear();
-        }
+    //public class HashSet<T> : IEnumerable<T>, ICollection<T>
+    //{
+    //    //for .NET 2.0
+    //    Dictionary<int, T> _dic = new Dictionary<int, T>();
+    //    public HashSet() { }
+    //    public HashSet(IEnumerable<T> org)
+    //    {
+    //        foreach (T t in org)
+    //        {
+    //            Add(t);
+    //        }
+    //    }
+    //    public bool Add(T data)
+    //    {
+    //        int hashCode = data.GetHashCode();
+    //        if (_dic.ContainsKey(hashCode))
+    //        {
+    //            return false;
+    //        }
+    //        _dic[hashCode] = data;
+    //        return true;
+    //    }
+    //    public bool Remove(T data)
+    //    {
+    //        return _dic.Remove(data.GetHashCode());
+    //    }
+    //    public bool Contains(T data)
+    //    {
+    //        return _dic.ContainsKey(data.GetHashCode());
+    //    }
+    //    public void Clear()
+    //    {
+    //        _dic.Clear();
+    //    }
 
-        public IEnumerator<T> GetEnumerator()
-        {
-            foreach (T t in _dic.Values)
-            {
-                yield return t;
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            foreach (T t in _dic.Values)
-            {
-                yield return t;
-            }
-        }
+    //    public IEnumerator<T> GetEnumerator()
+    //    {
+    //        foreach (T t in _dic.Values)
+    //        {
+    //            yield return t;
+    //        }
+    //    }
+    //    IEnumerator IEnumerable.GetEnumerator()
+    //    {
+    //        foreach (T t in _dic.Values)
+    //        {
+    //            yield return t;
+    //        }
+    //    }
 
-        void ICollection<T>.Add(T item)
-        {
-            Add(item);
-        }
+    //    void ICollection<T>.Add(T item)
+    //    {
+    //        Add(item);
+    //    }
 
-        public void CopyTo(T[] array, int arrayIndex)
-        {
+    //    public void CopyTo(T[] array, int arrayIndex)
+    //    {
 
-            int ii = arrayIndex;
-            foreach (T t in _dic.Values)
-            {
-                array[ii] = t;
-                ++ii;
-            }
-        }
-        public int Count => _dic.Count;
+    //        int ii = arrayIndex;
+    //        foreach (T t in _dic.Values)
+    //        {
+    //            array[ii] = t;
+    //            ++ii;
+    //        }
+    //    }
+    //    public int Count => _dic.Count;
 
-        public bool IsReadOnly => false;
+    //    public bool IsReadOnly => false;
 
-        public void UnionWith(IEnumerable<T> another)
-        {
-            foreach (T a in another)
-            {
-                Add(a);
-            }
-        }
-        public void UnionWith(HashSet<T> another)
-        {
-            foreach (T a in another)
-            {
-                Add(a);
-            }
-        }
-    }
+    //    public void UnionWith(IEnumerable<T> another)
+    //    {
+    //        foreach (T a in another)
+    //        {
+    //            Add(a);
+    //        }
+    //    }
+    //    public void UnionWith(HashSet<T> another)
+    //    {
+    //        foreach (T a in another)
+    //        {
+    //            Add(a);
+    //        }
+    //    }
+    //}
 
     public static class MyLinq
     {

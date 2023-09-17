@@ -13,19 +13,14 @@
 // warranty, and with no claim as to its suitability for any purpose.
 //
 //----------------------------------------------------------------------------
- 
+
 
 
 using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
-   
 
-    public enum TargetBuffer
-    {
-        ColorBuffer,
-        MaskBuffer
-    }
+
     /// <summary>
     /// this class provides drawing method on specific drawboard,
     /// (0,0) is on left-lower corner for every implementaion
@@ -33,27 +28,29 @@ namespace PixelFarm.Drawing
     public abstract class Painter
     {
         //who implement this class
-        //1. AggPainter 
-        //2. GdiPlusPainter 
-        //3. GLPainter
 
-
-        public abstract float OriginX { get; }
-        public abstract float OriginY { get; }
+        public abstract void GetOrigin(out float ox, out float oy);
         public abstract void SetOrigin(float ox, float oy);
+
         public abstract PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer CoordTransformer { get; set; }
 
         public abstract RenderQuality RenderQuality { get; set; }
 
         public abstract int Width { get; }
         public abstract int Height { get; }
-        public abstract Rectangle ClipBox { get; set; }
+
+        public abstract void GetClipBox(out int x1, out int y1, out int x2, out int y2);
         public abstract void SetClipBox(int x1, int y1, int x2, int y2);
+
         /// <summary>
         /// we DO NOT store vxs
         /// </summary>
         /// <param name="vxs"></param>
         public abstract void SetClipRgn(VertexStore vxs);
+        public abstract void SetClipRgn(RenderVx maskRenderVx);
+        public abstract void SetClipRgn(Image maskImg);
+
+
         public abstract TargetBuffer TargetBuffer { get; set; }
         public abstract FillingRule FillingRule { get; set; }
 
@@ -97,6 +94,10 @@ namespace PixelFarm.Drawing
         public abstract void DrawImage(Image img);
         public abstract void DrawImage(Image img, in AffineMat mat);
         public abstract void DrawImage(Image img, double left, double top, CpuBlit.VertexProcessing.ICoordTransformer coordTx);
+        public abstract void DrawImage(Image image, in RectangleF destRect, in RectangleF srcRect);
+        public abstract void DrawImage(Image image, float[] destPosArr, RectangleF[] srcRect);
+        public abstract void DrawImage(Image image, int x, int y);
+        public abstract void DrawImage(Image image, in RectangleF destRect);
 
         public abstract void ApplyFilter(IImageFilter imgFilter);
         ////////////////////////////////////////////////////////////////////////////
@@ -111,54 +112,69 @@ namespace PixelFarm.Drawing
         //---------------------------------------
 
 
+        //---------------------------------------
+        public abstract Region CurrentRegion { get; set; }
+        public abstract Region CreateRegion(VertexStore vxs);
+        public abstract Region CreateRegion(Image img);
+        //---------------------------------------
+
         public abstract RenderVx CreateRenderVx(VertexStore vxs);
-        public abstract RenderVxFormattedString CreateRenderVx(string textspan);
-        public abstract RenderVxFormattedString CreateRenderVx(char[] textspanBuff, int startAt, int len);
+
+
         public abstract void FillRenderVx(Brush brush, RenderVx renderVx);
         public abstract void FillRenderVx(RenderVx renderVx);
         public abstract void DrawRenderVx(RenderVx renderVx);
         public abstract void Render(RenderVx renderVx);
-
-        //////////////////////////////////////////////////////////////////////////////
+        public abstract Color TextBackgroundColorHint { get; set; }
+        //-----
+        public abstract RenderVxFormattedString CreateRenderVx(IFormattedGlyphPlanList formattedGlyphPlans);
+        public abstract RenderVxFormattedString CreateRenderVx(string textspan);
+        public abstract RenderVxFormattedString CreateRenderVx(char[] textspanBuff, int startAt, int len);
+        public abstract RenderVxFormattedString CreateRenderVx(int[] utf32, int startAt, int len);
         //text,string
         //TODO: review text drawing funcs 
 
         public abstract RequestFont CurrentFont { get; set; }
+
         public abstract void DrawString(
            string text,
            double x,
            double y);
         public abstract void DrawString(RenderVxFormattedString renderVx, double x, double y);
+
+        public abstract Color CurrentTextColor { get; set; }
+        public abstract TextDrawingTech TextDrawingTech { get; set; }
+        public abstract void DrawText(char[] buffer, int x, int y);
+        public abstract void DrawText(char[] buffer, Rectangle logicalTextBox, int textAlignment);
+        public abstract void DrawText(char[] buffer, int startAt, int len, Rectangle logicalTextBox, int textAlignment);
+
+        /// <summary>
+        /// create formatted string base on current font,font-size, font style
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <returns></returns>
+        public abstract RenderVxFormattedString CreateFormattedString(char[] buffer, int startAt, int len, bool delay);
+        public abstract RenderVxFormattedString CreateFormattedString(int[] buffer, int startAt, int len, bool delay);
+        public abstract void DrawRenderVx(RenderVx renderVx, float x, float y);
+
+        //---------------
+        public abstract RenderSurface CreateNewRenderSurface(int w, int h);
+        public abstract class ViewState { }
+        public abstract ViewState EnterNewSurface(RenderSurface backbuffer);
+        public abstract void ExitCurrentSurface(ViewState state);
     }
 
 
-    public interface IDashGenerator
+    public static class PainterExtensionMethods
     {
-
-    }
-    public enum LineCap
-    {
-        Butt,
-        Square,
-        Round
-    }
-
-    public enum LineJoin
-    {
-        Miter,
-        MiterRevert,
-        Round,
-        Bevel,
-        MiterRound
-
-        //TODO: implement svg arg join
-    }
-
-    public enum InnerJoin
-    {
-        Bevel,
-        Miter,
-        Jag,
-        Round
+        public static void SetClipRect(this Painter p, in Rectangle cliprect)
+        {
+            p.SetClipBox(cliprect.Left, cliprect.Top, cliprect.Right, cliprect.Bottom);
+        }
+        public static Rectangle GetClipRect(this Painter p)
+        {
+            p.GetClipBox(out int x1, out int y1, out int x2, out int y2);
+            return new Rectangle(x1, y1, x2 - x1, y2 - y1);
+        }
     }
 }

@@ -3,7 +3,6 @@
 using System;
 namespace PixelFarm.Drawing
 {
-    public delegate void LoadImageFunc(ImageBinder binder); 
 
     public class ImageBinder : Image
     {
@@ -13,25 +12,22 @@ namespace PixelFarm.Drawing
         /// </summary>
         PixelFarm.Drawing.Image _localImg;
         bool _isLocalImgOwner;
-        LoadImageFunc _lazyLoadImgFunc;
+        Action<ImageBinder> _lazyLoadImgFunc;
         int _previewImgWidth = 16; //default ?
         int _previewImgHeight = 16;
-        bool _isAtlasImg;
+
 #if DEBUG
         static int dbugTotalId;
         public int dbugId = dbugTotalId++;
 #endif
 
         protected ImageBinder() { }
-
         public ImageBinder(string imgSource, bool isMemBmpOwner = false)
         {
             ImageSource = imgSource;
             _isLocalImgOwner = isMemBmpOwner; //if true=> this binder will release a local cahed img
         }
-
-
-        public ImageBinder(PixelFarm.Drawing.Image img, bool isMemBmpOwner = false)
+        public ImageBinder(PixelFarm.Drawing.Image img, bool isImgOwner = false)
         {
 #if DEBUG
             if (img == null)
@@ -40,9 +36,7 @@ namespace PixelFarm.Drawing
             }
 #endif
             //binder to image
-            _localImg = img;
-            _isLocalImgOwner = isMemBmpOwner; //if true=> this binder will release a local cahed img
-            this.State = BinderState.Loaded;
+            SetLocalImage(img, false);
         }
 
         public event System.EventHandler ImageChanged;
@@ -90,7 +84,8 @@ namespace PixelFarm.Drawing
         /// <summary>
         /// read already loaded img
         /// </summary>
-        public PixelFarm.Drawing.Image LocalImage => _localImg;
+        public virtual PixelFarm.Drawing.Image LocalImage => _localImg;
+
         public override void ReleaseRawBufferHead(IntPtr ptr)
         {
             if (_localImg != null)
@@ -143,12 +138,16 @@ namespace PixelFarm.Drawing
         public virtual void SetLocalImage(PixelFarm.Drawing.Image image, bool raiseEvent = true)
         {
             //set image to this binder
+#if DEBUG
+            if (image is ImageBinder)
+            {
+
+            }
+#endif
             if (image != null)
             {
                 _localImg = image;
                 this.State = BinderState.Loaded;
-
-
                 if (raiseEvent)
                 {
                     RaiseImageChanged();
@@ -173,7 +172,7 @@ namespace PixelFarm.Drawing
         /// set lazy img loader
         /// </summary>
         /// <param name="lazyLoadFunc"></param>
-        public void SetImageLoader(LoadImageFunc lazyLoadFunc)
+        public void SetImageLoader(Action<ImageBinder> lazyLoadFunc)
         {
             _lazyLoadImgFunc = lazyLoadFunc;
         }
@@ -188,7 +187,7 @@ namespace PixelFarm.Drawing
 #endif
 
         //
-        public static readonly ImageBinder NoImage = new NoImageImageBinder();
+
         public virtual bool IsAtlasImage => false;
 
         public override bool IsReferenceImage => true;
@@ -204,6 +203,7 @@ namespace PixelFarm.Drawing
                 this.State = BinderState.Blank;
             }
         }
+        public static readonly ImageBinder NoImage = new NoImageImageBinder();
     }
 
     public enum BinderState : byte
@@ -216,5 +216,5 @@ namespace PixelFarm.Drawing
         Blank
     }
 
-     
+
 }

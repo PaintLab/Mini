@@ -12,12 +12,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Basic\ColorEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic\CombineMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic\DashStyle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Drawing\Enums.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Drawing\IImageFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\ImageBinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\LenAndLenUnit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic\Region.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic\RenderVx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\TextBufferSpan.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\TextSpanMeasureResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit.VertexProcessing\BoundingRect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit.VertexProcessing\CurveFlattener.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit.VertexProcessing\LineWalker.cs" />
@@ -37,11 +37,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit\ColorRGBAf.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit\MemBitmapExt.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CpuBlit\PathWriter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Drawing.Internal\MicroPainter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\Brushes_Pens.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\ClipingTechnique.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Drawing\DrawBoard.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Drawing\ITextPrinter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Drawing\RenderSurface.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\Painter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\RequestFont.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\TextBaseline.cs" />

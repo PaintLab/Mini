@@ -5,11 +5,15 @@ using System.Collections.Generic;
 
 namespace PixelFarm.Drawing
 {
+    public interface IDashGenerator
+    {
+
+    }
+
     public abstract class Brush : System.IDisposable
     {
         public abstract BrushKind BrushKind { get; }
         public abstract void Dispose();
-
         public abstract object InnerBrush { get; set; }
     }
 
