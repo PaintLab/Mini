@@ -12,11 +12,11 @@ namespace PaintFx
 {
     public struct Scanline
     {
-        public int X { get; private set; }
+        public int X { get; }
 
-        public int Y { get; private set; }
+        public int Y { get; }
 
-        public int Length { get; private set; }
+        public int Length { get; }
 
         public override int GetHashCode()
         {
@@ -28,9 +28,8 @@ namespace PaintFx
 
         public override bool Equals(object obj)
         {
-            if (obj is Scanline)
+            if (obj is Scanline rhs)
             {
-                Scanline rhs = (Scanline)obj;
                 return X == rhs.X && Y == rhs.Y && Length == rhs.Length;
             }
             else

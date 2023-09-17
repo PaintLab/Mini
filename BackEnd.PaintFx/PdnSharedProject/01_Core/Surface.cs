@@ -1521,11 +1521,11 @@ namespace PaintFx
 
                             for (int srcY = srcTopInt + 1; srcY < srcBottomInt; ++srcY)
                             {
-                                double a = srcLeftPtr->A;
-                                blueSum += srcLeftPtr->B * srcLeftWeight * a;
-                                greenSum += srcLeftPtr->G * srcLeftWeight * a;
-                                redSum += srcLeftPtr->R * srcLeftWeight * a;
-                                alphaSum += srcLeftPtr->A * srcLeftWeight;
+                                double a2 = srcLeftPtr->A * srcLeftWeight;
+                                blueSum += srcLeftPtr->B * a2;
+                                greenSum += srcLeftPtr->G * a2;
+                                redSum += srcLeftPtr->R * a2;
+                                alphaSum += a2;
                                 srcLeftPtr = (ColorBgra*)((byte*)srcLeftPtr + source.Stride);
                             }
 
@@ -1533,11 +1533,11 @@ namespace PaintFx
                             ColorBgra* srcRightPtr = source.GetPointAddressUnchecked(srcRightInt, srcTopInt + 1);
                             for (int srcY = srcTopInt + 1; srcY < srcBottomInt; ++srcY)
                             {
-                                double a = srcRightPtr->A;
-                                blueSum += srcRightPtr->B * srcRightWeight * a;
-                                greenSum += srcRightPtr->G * srcRightWeight * a;
-                                redSum += srcRightPtr->R * srcRightWeight * a;
-                                alphaSum += srcRightPtr->A * srcRightWeight;
+                                double a2 = srcRightPtr->A * srcRightWeight;
+                                blueSum += srcRightPtr->B * a2;
+                                greenSum += srcRightPtr->G * a2;
+                                redSum += srcRightPtr->R * a2;
+                                alphaSum += a2;
                                 srcRightPtr = (ColorBgra*)((byte*)srcRightPtr + source.Stride);
                             }
 
@@ -1545,11 +1545,11 @@ namespace PaintFx
                             ColorBgra* srcTopPtr = source.GetPointAddressUnchecked(srcLeftInt + 1, srcTopInt);
                             for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                             {
-                                double a = srcTopPtr->A;
-                                blueSum += srcTopPtr->B * srcTopWeight * a;
-                                greenSum += srcTopPtr->G * srcTopWeight * a;
-                                redSum += srcTopPtr->R * srcTopWeight * a;
-                                alphaSum += srcTopPtr->A * srcTopWeight;
+                                double a2 = srcTopPtr->A * srcTopWeight;
+                                blueSum += srcTopPtr->B * a2;
+                                greenSum += srcTopPtr->G * a2;
+                                redSum += srcTopPtr->R * a2;
+                                alphaSum += a2;
                                 ++srcTopPtr;
                             }
 
@@ -1557,11 +1557,11 @@ namespace PaintFx
                             ColorBgra* srcBottomPtr = source.GetPointAddressUnchecked(srcLeftInt + 1, srcBottomInt);
                             for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                             {
-                                double a = srcBottomPtr->A;
-                                blueSum += srcBottomPtr->B * srcBottomWeight * a;
-                                greenSum += srcBottomPtr->G * srcBottomWeight * a;
-                                redSum += srcBottomPtr->R * srcBottomWeight * a;
-                                alphaSum += srcBottomPtr->A * srcBottomWeight;
+                                double a2 = srcBottomPtr->A * srcBottomWeight;
+                                blueSum += srcBottomPtr->B * a2;
+                                greenSum += srcBottomPtr->G * a2;
+                                redSum += srcBottomPtr->R * a2;
+                                alphaSum += a2;
                                 ++srcBottomPtr;
                             }
 
@@ -1576,40 +1576,51 @@ namespace PaintFx
                                     blueSum += (double)srcPtr->B * a;
                                     greenSum += (double)srcPtr->G * a;
                                     redSum += (double)srcPtr->R * a;
-                                    alphaSum += (double)srcPtr->A;
+                                    alphaSum += a;
                                     ++srcPtr;
                                 }
                             }
 
                             // four corner pixels
-                            ColorBgra srcTL = source.GetPoint(srcLeftInt, srcTopInt);
-                            double srcTLA = srcTL.A;
-                            blueSum += srcTL.B * (srcTopWeight * srcLeftWeight) * srcTLA;
-                            greenSum += srcTL.G * (srcTopWeight * srcLeftWeight) * srcTLA;
-                            redSum += srcTL.R * (srcTopWeight * srcLeftWeight) * srcTLA;
-                            alphaSum += srcTL.A * (srcTopWeight * srcLeftWeight);
+                            {
+                                //  left,top
+                                ColorBgra c = source.GetPoint(srcLeftInt, srcTopInt);
+                                double a2 = c.A * (srcTopWeight * srcLeftWeight);
+                                blueSum += c.B * a2;
+                                greenSum += c.G * a2;
+                                redSum += c.R * a2;
+                                alphaSum += a2;
+                            }
 
-                            ColorBgra srcTR = source.GetPoint(srcRightInt, srcTopInt);
-                            double srcTRA = srcTR.A;
-                            blueSum += srcTR.B * (srcTopWeight * srcRightWeight) * srcTRA;
-                            greenSum += srcTR.G * (srcTopWeight * srcRightWeight) * srcTRA;
-                            redSum += srcTR.R * (srcTopWeight * srcRightWeight) * srcTRA;
-                            alphaSum += srcTR.A * (srcTopWeight * srcRightWeight);
 
-                            ColorBgra srcBL = source.GetPoint(srcLeftInt, srcBottomInt);
-                            double srcBLA = srcBL.A;
-                            blueSum += srcBL.B * (srcBottomWeight * srcLeftWeight) * srcBLA;
-                            greenSum += srcBL.G * (srcBottomWeight * srcLeftWeight) * srcBLA;
-                            redSum += srcBL.R * (srcBottomWeight * srcLeftWeight) * srcBLA;
-                            alphaSum += srcBL.A * (srcBottomWeight * srcLeftWeight);
+                            {
+                                // right,top
+                                ColorBgra c = source.GetPoint(srcRightInt, srcTopInt);
+                                double a2 = c.A * (srcTopWeight * srcRightWeight);
+                                blueSum += c.B * a2;
+                                greenSum += c.G * a2;
+                                redSum += c.R * a2;
+                                alphaSum += a2;
+                            }
 
-                            ColorBgra srcBR = source.GetPoint(srcRightInt, srcBottomInt);
-                            double srcBRA = srcBR.A;
-                            blueSum += srcBR.B * (srcBottomWeight * srcRightWeight) * srcBRA;
-                            greenSum += srcBR.G * (srcBottomWeight * srcRightWeight) * srcBRA;
-                            redSum += srcBR.R * (srcBottomWeight * srcRightWeight) * srcBRA;
-                            alphaSum += srcBR.A * (srcBottomWeight * srcRightWeight);
-
+                            {
+                                // left,bottom
+                                ColorBgra c = source.GetPoint(srcLeftInt, srcBottomInt);
+                                double a2 = c.A * (srcBottomWeight * srcLeftWeight);
+                                blueSum += c.B * a2;
+                                greenSum += c.G * a2;
+                                redSum += c.R * a2;
+                                alphaSum += a2;
+                            }
+                            {
+                                // right,bottom
+                                ColorBgra c = source.GetPoint(srcRightInt, srcBottomInt);
+                                double a2 = c.A * (srcBottomWeight * srcRightWeight);
+                                blueSum += c.B * a2;
+                                greenSum += c.G * a2;
+                                redSum += c.R * a2;
+                                alphaSum += a2;
+                            }
                             double area = (srcRight - srcLeft) * (srcBottom - srcTop);
 
                             double alpha = alphaSum / area;

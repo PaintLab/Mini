@@ -471,8 +471,6 @@ namespace PaintFx
             public ColorBgra ColorInLow
             {
                 get => _colorInLow;
-
-
                 set
                 {
                     if (value.R == 255)
