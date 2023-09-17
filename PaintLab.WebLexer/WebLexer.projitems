@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CssLexer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)dbugLexerReport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MyXmlLexer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MyXmlParserBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextSnapshot.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XmlLexer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XmlLexer_debug.cs" />
