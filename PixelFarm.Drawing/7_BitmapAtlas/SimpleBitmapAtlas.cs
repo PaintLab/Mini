@@ -17,9 +17,20 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 #endif
         public SimpleBitmapAtlas()
         {
+#if DEBUG
+            if (dbugId == 63)
+            {
+
+            }
+#endif
 
         }
-
+#if DEBUG
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+#endif
         public TextureKind TextureKind { get; set; }
 
         public readonly struct UnicodeRange
@@ -39,19 +50,24 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 #endif
         }
 
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public int Width { get; internal set; }
+        public int Height { get; internal set; }
 
-        public string FontName { get; set; }
-        public float SizeInPts { get; set; }
-        
-        public List<uint> ScriptTags { get; set; } = new List<uint>();
+        public string FontName { get; internal set; }
+        public string FontSubFamilyName { get; internal set; }
+        public float SizeInPts { get; internal set; }
+
+        public List<uint> ScriptTags { get; internal set; } = new List<uint>();
         //------------
         public Dictionary<ushort, AtlasItem> ItemDict => _atlasItems;
         public Dictionary<string, ushort> ImgUrlDict { get; set; }
 
         internal void AddAtlasItem(AtlasItem item)
         {
+            if (_atlasItems.ContainsKey(item.UniqueUint16Name))
+            {
+
+            }
             _atlasItems.Add(item.UniqueUint16Name, item);
         }
         public bool UseSharedImage { get; set; }

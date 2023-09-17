@@ -28,7 +28,8 @@ using PixelFarm.CpuBlit.PixelProcessing;
 //
 namespace PixelFarm.CpuBlit
 {
-    public sealed partial class AggRenderSurface
+
+    public sealed partial class AggPainterCore
     {
         MemBitmap _destBmp;
 
@@ -47,7 +48,7 @@ namespace PixelFarm.CpuBlit
         internal event EventHandler DstBitmapAttached;
         internal event EventHandler DstBitmapDetached;
 
-        public AggRenderSurface()
+        public AggPainterCore()
         {
             //1. attach dst bmp before use this
             //2. you can detach this surface and attach to another bmp surface
@@ -92,6 +93,7 @@ namespace PixelFarm.CpuBlit
             DstBitmapDetached?.Invoke(this, EventArgs.Empty);
         }
         //
+
         public int Width => _destWidth;
         public int Height => _destHeight;
         public MemBitmap DestBitmap => _destBmp;
@@ -145,7 +147,15 @@ namespace PixelFarm.CpuBlit
         }
 
         public ImageInterpolationQuality ImageInterpolationQuality { get; set; }
+        public void Clear(Color color, int left, int top, int width, int height)
+        {
+            BitmapBlenderBase destImage = this.DestBitmapBlender;
+#if DEBUG
+            if (destImage.BitDepth != 32) throw new NotSupportedException();
+#endif
 
+            MemBitmapExt.Clear(destImage.GetBufferPtr(), color, left, top, width, height);
+        }
         public void Clear(Color color)
         {
 
@@ -154,103 +164,7 @@ namespace PixelFarm.CpuBlit
             if (destImage.BitDepth != 32) throw new NotSupportedException();
 #endif
 
-            MemBitmapExt.Clear(destImage.GetBufferPtr(), color);
-
-            //unsafe
-            //{                
-            //    int* buffer = (int*)tmp.Ptr;
-            //    int len32 = tmp.LengthInBytes / 4;
-
-            //    switch (destImage.BitDepth)
-            //    {
-            //        default: throw new NotSupportedException();
-            //        case 32:
-            //            {
-            //                //------------------------------
-            //                //fast clear buffer
-            //                //skip clipping ****
-            //                //TODO: reimplement clipping***
-            //                //------------------------------ 
-            //                if (color == Color.White)
-            //                {
-            //                    //fast cleat with white color
-            //                    int n = len32;
-            //                    unsafe
-            //                    {
-            //                        //fixed (void* head = &buffer[0])
-            //                        {
-            //                            uint* head_i32 = (uint*)buffer;
-            //                            for (int i = n - 1; i >= 0; --i)
-            //                            {
-            //                                *head_i32 = 0xffffffff; //white (ARGB)
-            //                                head_i32++;
-            //                            }
-            //                        }
-            //                    }
-            //                }
-            //                else if (color == Color.Black)
-            //                {
-            //                    //fast clear with black color
-            //                    int n = len32;
-            //                    unsafe
-            //                    {
-            //                        //fixed (void* head = &buffer[0])
-            //                        {
-            //                            uint* head_i32 = (uint*)buffer;
-            //                            for (int i = n - 1; i >= 0; --i)
-            //                            {
-            //                                *head_i32 = 0xff000000; //black (ARGB)
-            //                                head_i32++;
-            //                            }
-            //                        }
-            //                    }
-            //                }
-            //                else if (color == Color.Empty)
-            //                {
-            //                    int n = len32;
-            //                    unsafe
-            //                    {
-            //                        //fixed (void* head = &buffer[0])
-            //                        {
-            //                            uint* head_i32 = (uint*)buffer;
-            //                            for (int i = n - 1; i >= 0; --i)
-            //                            {
-            //                                *head_i32 = 0x00000000; //empty
-            //                                head_i32++;
-            //                            }
-            //                        }
-            //                    }
-            //                }
-            //                else
-            //                {
-            //                    //other color
-            //                    //#if WIN32
-            //                    //                            uint colorARGB = (uint)((color.alpha << 24) | ((color.red << 16) | (color.green << 8) | color.blue));
-            //                    //#else
-            //                    //                            uint colorARGB = (uint)((color.alpha << 24) | ((color.blue << 16) | (color.green << 8) | color.red));
-            //                    //#endif
-
-            //                    //ARGB
-            //                    uint colorARGB = (uint)((color.alpha << CO.A_SHIFT) | ((color.red << CO.R_SHIFT) | (color.green << CO.G_SHIFT) | color.blue << CO.B_SHIFT));
-            //                    int n = len32;
-            //                    unsafe
-            //                    {
-            //                        //fixed (void* head = &buffer[0])
-            //                        {
-            //                            uint* head_i32 = (uint*)buffer;
-            //                            for (int i = n - 1; i >= 0; --i)
-            //                            {
-            //                                *head_i32 = colorARGB;
-            //                                head_i32++;
-            //                            }
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //            break;
-            //    }
-            //}
-
+            MemBitmapExt.Clear(destImage.GetBufferPtr(), color, destImage.Width, destImage.Height);
         }
 
 
@@ -264,7 +178,10 @@ namespace PixelFarm.CpuBlit
         {
             //reset rasterizer before render each vertextSnap 
             //-----------------------------
+           
             _sclineRas.Reset();
+             
+
             ICoordTransformer transform = this.CurrentTransformMatrix;
             if (!transform.IsIdentity)
             {
@@ -334,7 +251,7 @@ namespace PixelFarm.CpuBlit
 
 
 
-    partial class AggRenderSurface
+    partial class AggPainterCore
     {
 
 

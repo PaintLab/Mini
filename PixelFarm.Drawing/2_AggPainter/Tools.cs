@@ -42,17 +42,17 @@ namespace PixelFarm.CpuBlit
             if (!Temp<AggPainter>.IsInit())
             {
                 Temp<AggPainter>.SetNewHandler(
-                    () => new AggPainter(new AggRenderSurface()),
+                    () => new AggPainter(new AggPainterCore()),
                     p =>
                     {
-                        p.RenderSurface.DetachDstBitmap();
+                        p.Core.DetachDstBitmap();
                         p.Reset();
                     }
                     );
             }
 
             var tmpPainter = Temp<AggPainter>.Borrow(out painter);
-            painter.RenderSurface.AttachDstBitmap(bmp);
+            painter.Core.AttachDstBitmap(bmp);
             return tmpPainter;
         }
         public static TempContext<ShapeBuilder> BorrowShapeBuilder(out ShapeBuilder shapeBuilder)
@@ -361,32 +361,30 @@ namespace PixelFarm.CpuBlit
 
     }
 
-    public static class AggRenderSurfaceExtensions
+    public static class AggPainterCoreExtensions
     {
 
-        public static void Rectangle(this AggRenderSurface gx, double left, double bottom, double right, double top, Color color, double strokeWidth = 1)
+        public static void Rectangle(this AggPainterCore pcx, double left, double bottom, double right, double top, Color color, double strokeWidth = 1)
         {
-
             using (Tools.BorrowStroke(out var stroke))
             using (Tools.BorrowRect(out var rect))
             using (Tools.BorrowVxs(out var v1, out var v2))
             {
                 stroke.Width = strokeWidth;
                 rect.SetRect(left + .5, bottom + .5, right - .5, top - .5);
-                gx.Render(stroke.MakeVxs(rect.MakeVxs(v1), v2), color);
+                pcx.Render(stroke.MakeVxs(rect.MakeVxs(v1), v2), color);
             }
-
         }
         
 
-        public static void FillRectangle(this AggRenderSurface gx,
+        public static void FillRectangle(this AggPainterCore pcx,
             Vector2 leftBottom,
             Vector2 rightTop, Color fillColor)
         {
-            gx.FillRectangle(leftBottom.x, leftBottom.y, rightTop.x, rightTop.y, fillColor);
+            pcx.FillRectangle(leftBottom.x, leftBottom.y, rightTop.x, rightTop.y, fillColor);
         }
 
-        public static void FillRectangle(this AggRenderSurface gx, double left,
+        public static void FillRectangle(this AggPainterCore pcx, double left,
             double bottom, double right, double top, Color fillColor)
         {
             if (right < left || top < bottom)
@@ -398,23 +396,23 @@ namespace PixelFarm.CpuBlit
             using (Tools.BorrowVxs(out var v1))
             {
                 rect.SetRect(left, bottom, right, top);
-                gx.Render(rect.MakeVxs(v1), fillColor);
+                pcx.Render(rect.MakeVxs(v1), fillColor);
             }
 
         }
-        public static void Circle(this AggRenderSurface g, double x, double y, double radius, Color color)
+        public static void Circle(this AggPainterCore pcx, double x, double y, double radius, Color color)
         {
             using (Tools.BorrowEllipse(out var ellipse))
             using (Tools.BorrowVxs(out var v1))
             {
                 ellipse.Set(x, y, radius, radius);
-                g.Render(ellipse.MakeVxs(v1), color);
+                pcx.Render(ellipse.MakeVxs(v1), color);
             }
 
         }
-        public static void Circle(this AggRenderSurface g, Vector2 origin, double radius, Color color)
+        public static void Circle(this AggPainterCore pcx, Vector2 origin, double radius, Color color)
         {
-            Circle(g, origin.x, origin.y, radius, color);
+            Circle(pcx, origin.x, origin.y, radius, color);
         }
 
 

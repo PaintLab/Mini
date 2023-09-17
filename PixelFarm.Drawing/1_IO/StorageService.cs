@@ -43,20 +43,20 @@ namespace PixelFarm.Platforms
     public static class InMemStorage
     {
         //when T is an owner of module        
-        static Dictionary<string, byte[]> _data = new Dictionary<string, byte[]>();
+        static readonly Dictionary<string, byte[]> s_data = new Dictionary<string, byte[]>();
 
         public static void AddData(string name, byte[] buffer)
         {
-            _data.Add(name, buffer);
+            s_data.Add(name, buffer);
         }
-        
+
         public static bool TryGetBuffer(string name, out byte[] buffer)
         {
-            return _data.TryGetValue(name, out buffer);
+            return s_data.TryGetValue(name, out buffer);
         }
         public static void Clear()
         {
-            _data.Clear();
+            s_data.Clear();
         }
     }
 

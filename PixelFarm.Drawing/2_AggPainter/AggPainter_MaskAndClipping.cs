@@ -11,7 +11,7 @@ namespace PixelFarm.CpuBlit
 
     partial class AggPainter
     {
-        AggRenderSurface _aggsx_mask;
+        AggPainterCore _pcx_mask;
 
         TargetBufferName _targetBufferName;
         bool _enableBuiltInMaskComposite;
@@ -22,6 +22,35 @@ namespace PixelFarm.CpuBlit
         PixelBlenderPerColorComponentWithMask _maskPixelBlenderPerCompo;
         ClipingTechnique _currentClipTech;
 
+        void ClearClipRgn()
+        {
+            //remove clip rgn if exists**
+            switch (_currentClipTech)
+            {
+                case ClipingTechnique.ClipMask:
+                    this.EnableBuiltInMaskComposite = false;
+                    this.TargetBufferName = TargetBufferName.AlphaMask;//swicth to mask buffer
+                    this.Clear(Color.Black);
+                    this.TargetBufferName = TargetBufferName.Default;
+
+                    break;
+                case ClipingTechnique.ClipSimpleRect:
+
+                    this.SetClipBox(0, 0, this.Width, this.Height);
+                    break;
+            }
+
+            _currentClipTech = ClipingTechnique.None;
+        }
+
+        public override void SetClipRgn(RenderVx maskRenderVx)
+        {
+            throw new NotImplementedException();
+        }
+        public override void SetClipRgn(Image maskImg)
+        {
+            throw new NotImplementedException();
+        }
         /// <summary>
         /// we DO NOT store vxs
         /// </summary>
@@ -55,7 +84,7 @@ namespace PixelFarm.CpuBlit
                     Brush prevBrush = CurrentBrush;
 
                     this.FillColor = Color.White;
-                    _aggsx.Render(vxs, FillColor);
+                    _pcx.Render(vxs, FillColor);
 
                     //fill vxs with white color (on black bg)
 
@@ -69,38 +98,20 @@ namespace PixelFarm.CpuBlit
             }
             else
             {
-                //remove clip rgn if exists**
-                switch (_currentClipTech)
-                {
-                    case ClipingTechnique.ClipMask:
-                        this.EnableBuiltInMaskComposite = false;
-                        this.TargetBufferName = TargetBufferName.AlphaMask;//swicth to mask buffer
-                        this.Clear(Color.Black);
-                        this.TargetBufferName = TargetBufferName.Default;
-
-                        break;
-                    case ClipingTechnique.ClipSimpleRect:
-
-                        this.SetClipBox(0, 0, this.Width, this.Height);
-                        break;
-                }
-
-                _currentClipTech = ClipingTechnique.None;
+                ClearClipRgn();
             }
         }
-        public override Rectangle ClipBox
+
+        public override void GetClipBox(out int x1, out int y1, out int x2, out int y2)
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            //TODO: review here again!
+            throw new NotSupportedException();
+            //x1 = 0; y1 = 0;
+            //x2 = 0; y2 = 0;
         }
-        //public override RectInt ClipBox
-        //{
-        //    get => _aggsx.GetClippingRect();
-        //    set => _aggsx.SetClippingRect(value);
-        //}
         public override void SetClipBox(int x1, int y1, int x2, int y2)
         {
-            _aggsx.SetClippingRect(new Q1Rect(x1, y1, x2, y2));
+            _pcx.SetClippingRect(new Q1Rect(x1, y1, x2, y2));
         }
         //---------------------------------------------------------------
 
@@ -108,22 +119,23 @@ namespace PixelFarm.CpuBlit
         {
             //create when need and
             //after _aggsx_0 is attach to the surface
-            if (_aggsx_mask != null)
+            GetOrigin(out float ox, out float oy);
+            if (_pcx_mask != null)
             {
                 //also set the canvas origin for the aggsx_mask
-                _aggsx_mask.SetScanlineRasOrigin(this.OriginX, this.OriginY);
+                _pcx_mask.SetScanlineRasOrigin(ox, oy);
                 return;//***
             }
             //----------
             //same size as primary _aggsx_0 
 
-            _alphaBitmap = new MemBitmap(_aggsx_0.Width, _aggsx_0.Height);
-
-            _aggsx_mask = new AggRenderSurface() { PixelBlender = new PixelBlenderBGRA() };
-            _aggsx_mask.AttachDstBitmap(_alphaBitmap);
-            _aggsx_mask.SetScanlineRasOrigin(this.OriginX, this.OriginY); //also set the canvas origin for the aggsx_mask
+            _alphaBitmap = new MemBitmap(_pcx_0.Width, _pcx_0.Height);
+            //create painter core and attach to the bitmap
+            _pcx_mask = new AggPainterCore() { PixelBlender = new PixelBlenderBGRA() };
+            _pcx_mask.AttachDstBitmap(_alphaBitmap);
+            _pcx_mask.SetScanlineRasOrigin(ox, oy); //also set the canvas origin for the aggsx_mask
 #if DEBUG
-            _aggsx_mask.dbugName = "mask";
+            _pcx_mask.dbugName = "mask";
             _alphaBitmap._dbugNote = "AggPrinter.SetupMaskPixelBlender";
 #endif
             _maskPixelBlender = new PixelBlenderWithMask();
@@ -134,10 +146,10 @@ namespace PixelFarm.CpuBlit
         }
         void DetachMaskPixelBlender()
         {
-            if (_aggsx_mask != null)
+            if (_pcx_mask != null)
             {
-                _aggsx_mask.DetachDstBitmap();
-                _aggsx_mask = null;
+                _pcx_mask.DetachDstBitmap();
+                _pcx_mask = null;
 
                 _maskPixelBlender = null; //remove blender
                 _maskPixelBlenderPerCompo = null;
@@ -154,18 +166,18 @@ namespace PixelFarm.CpuBlit
             //
             _targetBufferName = value;
 
-            if (_aggsx.DestBitmap != null)
+            if (_pcx.DestBitmap != null)
             {
                 switch (value)
                 {
                     default: throw new NotSupportedException();
                     case TargetBufferName.Default:
                         //default 
-                        _aggsx = _aggsx_0; //*** 
+                        _pcx = _pcx_0; //*** 
                         break;
                     case TargetBufferName.AlphaMask:
                         SetupMaskPixelBlender();
-                        _aggsx = _aggsx_mask;//*** 
+                        _pcx = _pcx_mask;//*** 
                         break;
                 }
 
@@ -265,21 +277,16 @@ namespace PixelFarm.CpuBlit
 
         public override void FillRegion(VertexStore vxs)
         {
-            
 
             this.SetClipRgn(vxs);
 
-            float ox = this.OriginX;
-            float oy = this.OriginY;
-
+            GetOrigin(out float ox, out float oy);
             Q1RectD bounds = vxs.GetBoundingRect();
             SetOrigin((float)(ox + bounds.Left), (float)(oy + bounds.Bottom));
 
             FillRect(0, 0, bounds.Width, bounds.Height);
 
-
-
-            SetClipRgn(null);
+            SetClipRgn(null as VertexStore);
             SetOrigin(ox, oy);
         }
         public override void DrawRegion(VertexStore vxs)

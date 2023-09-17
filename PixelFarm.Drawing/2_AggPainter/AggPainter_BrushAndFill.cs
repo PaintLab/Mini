@@ -69,8 +69,8 @@ namespace PixelFarm.CpuBlit
 
         public override bool UseLcdEffectSubPixelRendering
         {
-            get => _aggsx.UseSubPixelLcdEffect;
-            set => _aggsx.UseSubPixelLcdEffect = value;
+            get => _pcx.UseSubPixelLcdEffect;
+            set => _pcx.UseSubPixelLcdEffect = value;
         }
 
         public override void FillRenderVx(Brush brush, RenderVx renderVx)
@@ -101,7 +101,7 @@ namespace PixelFarm.CpuBlit
         /// <param name="spanGen"></param>
         public void Fill(VertexStore vxs, ISpanGenerator spanGen)
         {
-            _aggsx.Render(vxs, spanGen);
+            _pcx.Render(vxs, spanGen);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace PixelFarm.CpuBlit
                         break;
                     case BrushKind.CircularGradient:
                         {
-                          
+
                             Q1RectD bounds = vxs.GetBoundingRect();
                             RadialGradientSpanGen radialSpanGen = ResolveRadialGrBrush((RadialGradientBrush)br);
                             //radialSpanGen.SetOrigin(0, 0);//TODO: review this offset 
@@ -160,20 +160,20 @@ namespace PixelFarm.CpuBlit
                         break;
                     case BrushKind.Solid:
                         {
-                            _aggsx.Render(vxs, ((SolidBrush)_curBrush).Color);
+                            _pcx.Render(vxs, ((SolidBrush)_curBrush).Color);
                         }
                         break;
                     default:
                         {
 
-                            _aggsx.Render(vxs, _fillColor);
+                            _pcx.Render(vxs, _fillColor);
                         }
                         break;
                 }
             }
             else
             {
-                _aggsx.Render(vxs, _fillColor);
+                _pcx.Render(vxs, _fillColor);
             }
         }
         PolygonGradientBrush ResolvePolygonGradientBrush(Drawing.PolygonGradientBrush polygonGrBrush)
@@ -194,7 +194,9 @@ namespace PixelFarm.CpuBlit
                 out brush._outputCoords,
                 out brush._vertexCount);
 
-            brush.SpanOrigin = new Point((int)OriginX, (int)OriginY);
+            GetOrigin(out float ox, out float oy);
+
+            brush.SpanOrigin = new Point((int)ox, (int)oy);//TODO: cast?, use Math.Round() instead
             brush.BuildCacheVertices(_gouraudVertBuilder);
 
             polygonGrBrush.InnerBrush = brush; //cache this brush
@@ -211,10 +213,7 @@ namespace PixelFarm.CpuBlit
             //1. switch to mask layer 
             SetClipRgn(vxs);
 
-
-            float ox = OriginX;
-            float oy = OriginY;
-
+            GetOrigin(out float ox, out float oy);
             Point newOrg = new Point((int)(bounds.Left + ox), (int)(bounds.Bottom + oy));
 
 
@@ -234,7 +233,7 @@ namespace PixelFarm.CpuBlit
                 this.Fill(brush.CurrentVxs, _rgbaGourandSpanGen);
             }
 
-            SetClipRgn(null);
+            SetClipRgn(null as VertexStore);
 
 
             SetOrigin(ox, oy);
@@ -259,7 +258,7 @@ namespace PixelFarm.CpuBlit
                          width / 2,
                          height / 2,
                          _ellipseGenNSteps);
-                _aggsx.Render(ellipseTool.MakeVxs(v1), _fillColor);
+                _pcx.Render(ellipseTool.MakeVxs(v1), _fillColor);
             }
         }
         static LinearGradientSpanGen ResolveLinearGrBrush(LinearGradientBrush linearGr)
@@ -356,9 +355,8 @@ namespace PixelFarm.CpuBlit
                             {
                                 //we use mask technique (simlar to texture brush)  
 
-                                float ox = OriginX;
-                                float oy = OriginY;
 
+                                GetOrigin(out float ox, out float oy);
                                 PolygonGradientBrush brush = ResolvePolygonGradientBrush((Drawing.PolygonGradientBrush)br);
 
                                 //TODO: add gamma here...
@@ -374,7 +372,7 @@ namespace PixelFarm.CpuBlit
                                     this.Fill(brush.CurrentVxs, _rgbaGourandSpanGen);
                                 }
 
-                                SetClipRgn(null);
+                                SetClipRgn(null as VertexStore);
 
 
                                 SetOrigin(ox, oy); //restore
@@ -382,19 +380,19 @@ namespace PixelFarm.CpuBlit
                             break;
                         case BrushKind.Solid:
                             {
-                                _aggsx.Render(rectTool.MakeVxs(v1), ((SolidBrush)br).Color);
+                                _pcx.Render(rectTool.MakeVxs(v1), ((SolidBrush)br).Color);
                             }
                             break;
                         default:
                             {
-                                _aggsx.Render(rectTool.MakeVxs(v1), _fillColor);
+                                _pcx.Render(rectTool.MakeVxs(v1), _fillColor);
                             }
                             break;
                     }
                 }
                 else
                 {
-                    _aggsx.Render(rectTool.MakeVxs(v1), _fillColor);
+                    _pcx.Render(rectTool.MakeVxs(v1), _fillColor);
                 }
             }
         }

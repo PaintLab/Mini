@@ -21,24 +21,25 @@ namespace PixelFarm.CpuBlit
             bool useSubPix = UseLcdEffectSubPixelRendering;
             //before render an image we turn off vxs subpixel rendering
             this.UseLcdEffectSubPixelRendering = false;
-            _aggsx.UseSubPixelLcdEffect = false;
+            _pcx.UseSubPixelLcdEffect = false;
 
             if (_orientation == RenderSurfaceOriginKind.LeftTop)
             {
                 //place left upper corner at specific x y                    
-                _aggsx.Render(memBmp, left, this.Height - (top + memBmp.Height));
+                _pcx.Render(memBmp, left, this.Height - (top + memBmp.Height));
             }
             else
             {
                 //left-bottom as original
                 //place left-lower of the img at specific (x,y)
-                _aggsx.Render(memBmp, left, top);
+                _pcx.Render(memBmp, left, top);
             }
 
             //restore...
             this.UseLcdEffectSubPixelRendering = useSubPix;
-            _aggsx.UseSubPixelLcdEffect = useSubPix;
+            _pcx.UseSubPixelLcdEffect = useSubPix;
         }
+
         void DrawBitmap(MemBitmap memBmp, double left, double top, int srcX, int srcY, int srcW, int srcH)
         {
 
@@ -50,13 +51,13 @@ namespace PixelFarm.CpuBlit
             if (_orientation == RenderSurfaceOriginKind.LeftTop)
             {
                 //place left upper corner at specific x y                    
-                _aggsx.Render(memBmp, left, this.Height - (top + memBmp.Height), srcX, srcY, srcW, srcH);
+                _pcx.Render(memBmp, left, this.Height - (top + memBmp.Height), srcX, srcY, srcW, srcH);
             }
             else
             {
                 //left-bottom as original
                 //place left-lower of the img at specific (x,y)
-                _aggsx.Render(memBmp, left, top, srcX, srcY, srcW, srcH);
+                _pcx.Render(memBmp, left, top, srcX, srcY, srcW, srcH);
             }
 
             //restore...
@@ -86,6 +87,11 @@ namespace PixelFarm.CpuBlit
                 DrawBitmap(memBmp, left, top);
             }
         }
+        public override void DrawImage(Image image, in RectangleF destRect, in RectangleF srcRect)
+        {
+            //TODO: review here
+            throw new NotImplementedException();
+        }
         public override void DrawImage(Image img)
         {
             if (!(img is MemBitmap memBmp))
@@ -94,15 +100,22 @@ namespace PixelFarm.CpuBlit
                 return;
             }
 
-
             //-------------------------------
             bool useSubPix = UseLcdEffectSubPixelRendering; //save, restore later... 
-                                                   //before render an image we turn off vxs subpixel rendering
+                                                            //before render an image we turn off vxs subpixel rendering
             this.UseLcdEffectSubPixelRendering = false;
 
-            _aggsx.Render(memBmp);
+            _pcx.Render(memBmp);
             //restore...
             this.UseLcdEffectSubPixelRendering = useSubPix;
+        }
+        public override void DrawImage(Image image, in RectangleF destRect)
+        {
+            throw new NotImplementedException();
+        }
+        public override void DrawImage(Image image, int x, int y)
+        {
+            throw new NotImplementedException();
         }
         public override void DrawImage(Image img, in AffineMat aff)
         {
@@ -113,14 +126,14 @@ namespace PixelFarm.CpuBlit
             }
 
             bool useSubPix = UseLcdEffectSubPixelRendering; //save, restore later... 
-                                                   //before render an image we turn off vxs subpixel rendering
+                                                            //before render an image we turn off vxs subpixel rendering
             this.UseLcdEffectSubPixelRendering = false;
 
-            _aggsx.Render(memBmp, aff);
+            _pcx.Render(memBmp, aff);
             //restore...
             this.UseLcdEffectSubPixelRendering = useSubPix;
-
         }
+
         public override void DrawImage(Image img, double left, double top, ICoordTransformer coordTx)
         {
             //draw img with transform coord
@@ -132,20 +145,21 @@ namespace PixelFarm.CpuBlit
             }
 
             bool useSubPix = UseLcdEffectSubPixelRendering; //save, restore later... 
-                                                   //before render an image we turn off vxs subpixel rendering
+                                                            //before render an image we turn off vxs subpixel rendering
             this.UseLcdEffectSubPixelRendering = false;
 
             if (coordTx is Affine aff)
             {
-                if (this.OriginX != 0 || this.OriginY != 0)
+                GetOrigin(out float ox, out float oy);
+                if (ox != 0 || oy != 0)
                 {
-                    coordTx = aff * Affine.NewTranslation(this.OriginX, this.OriginY);
+                    coordTx = aff * Affine.NewTranslation(ox, oy);
                 }
             }
 
             //_aggsx.SetScanlineRasOrigin(OriginX, OriginY);
 
-            _aggsx.Render(memBmp, coordTx);
+            _pcx.Render(memBmp, coordTx);
 
             //_aggsx.SetScanlineRasOrigin(xx, yy);
             //restore...
@@ -156,9 +170,12 @@ namespace PixelFarm.CpuBlit
             //check if we can use this imgFilter
             if (!(imgFilter is PixelFarm.CpuBlit.PixelProcessing.ICpuBlitImgFilter cpuBlitImgFx)) return;
             // 
-            cpuBlitImgFx.SetTarget(_aggsx.DestBitmapBlender);
+            cpuBlitImgFx.SetTarget(_pcx.DestBitmapBlender);
             imgFilter.Apply();
         }
-
+        public override void DrawImage(Image image, float[] dstArr, RectangleF[] srcRect)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

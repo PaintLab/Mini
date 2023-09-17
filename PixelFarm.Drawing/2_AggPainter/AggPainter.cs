@@ -11,10 +11,9 @@ namespace PixelFarm.CpuBlit
     public partial class AggPainter : Painter
     {
 
-        AggRenderSurface _aggsx; //target rendering surface   
-        AggRenderSurface _aggsx_0; //primary render surface
+        AggPainterCore _pcx; //target rendering surface   
+        AggPainterCore _pcx_0; //primary render surface
 
-        //--------------------  
         SmoothingMode _smoothingMode;
 
         RenderSurfaceOriginKind _orientation;
@@ -22,27 +21,35 @@ namespace PixelFarm.CpuBlit
         float _fillOpacity = 1;
         bool _hasFillOpacity = false;
 
-        public AggPainter(AggRenderSurface aggsx)
+        public AggPainter(AggPainterCore pcx)
         {
             //painter paint to target surface
             _orientation = RenderSurfaceOriginKind.LeftBottom;
             //----------------------------------------------------
-            _aggsx = _aggsx_0 = aggsx; //set this as default *** 
+            _pcx = _pcx_0 = pcx; //set this as default *** 
 
-            _aggsx_0.DstBitmapAttached += (s, e) =>
+            _pcx_0.DstBitmapAttached += (s, e) =>
             {
                 UpdateTargetBuffer(_targetBufferName);
             };
-            _aggsx_0.DstBitmapDetached += (s, e) =>
+            _pcx_0.DstBitmapDetached += (s, e) =>
             {
                 DetachMaskPixelBlender();
             };
 
+
             TargetBufferName = TargetBufferName.Default;
             _stroke = new Stroke(1);//default
             _useDefaultBrush = true;
-            _defaultPixelBlender = this.DestBitmapBlender.OutputPixelBlender;
+            _defaultPixelBlender = this.DestBitmapBlender.OutputPixelBlender;            
         }
+
+        public override RenderSurface CreateNewRenderSurface(int w, int h)
+        {
+            return new MemBitmapRenderSurface(new MemBitmap(w, h), true);
+        }
+        public AggPainterCore Core => _pcx;
+        public MemBitmap CurrentDestBitmap => _pcx.DestBitmap;
 
         public void Reset()
         {
@@ -50,12 +57,13 @@ namespace PixelFarm.CpuBlit
             //reset to init state
             //
             FillingRule = FillingRule.NonZero;
+            
         }
         public override FillingRule FillingRule
         {
             //TODO: set filling for both aggsx (default and mask)
-            get => _aggsx.FillingRule;
-            set => _aggsx.FillingRule = value;
+            get => _pcx.FillingRule;
+            set => _pcx.FillingRule = value;
         }
         public override float FillOpacity
         {
@@ -81,6 +89,8 @@ namespace PixelFarm.CpuBlit
             }
         }
 
+
+        public override Color TextBackgroundColorHint { get; set; }
 
         public override TargetBuffer TargetBuffer
         {
@@ -109,19 +119,24 @@ namespace PixelFarm.CpuBlit
         }
         public override ICoordTransformer CoordTransformer
         {
-            get => _aggsx.CurrentTransformMatrix;
-            set => _aggsx.CurrentTransformMatrix = value;
+            get => _pcx.CurrentTransformMatrix;
+            set => _pcx.CurrentTransformMatrix = value;
         }
 
-        public DrawBoard DrawBoard { get; set; }
-        public AggRenderSurface RenderSurface => _aggsx;
-        public BitmapBlenderBase DestBitmapBlender => _aggsx.DestBitmapBlender;
-        public override int Width => _aggsx.Width;
-        public override int Height => _aggsx.Height;
-        public override float OriginX => _aggsx.ScanlineRasOriginX;
-        public override float OriginY => _aggsx.ScanlineRasOriginY;
-        public override void Clear(Color color) => _aggsx.Clear(color);
-        public override void SetOrigin(float x, float y) => _aggsx.SetScanlineRasOrigin(x, y);
+
+        public BitmapBlenderBase DestBitmapBlender => _pcx.DestBitmapBlender;
+        public override int Width => _pcx.Width;
+        public override int Height => _pcx.Height;
+        public override void GetOrigin(out float ox, out float oy)
+        {
+            ox = _pcx.ScanlineRasOriginX;
+            oy = _pcx.ScanlineRasOriginY;
+        }
+        public override void SetOrigin(float x, float y) => _pcx.SetScanlineRasOrigin(x, y);
+
+        public override void Clear(Color color) => _pcx.Clear(color);
+        public void Clear(Color color, int left, int top, int width, int height) => _pcx.Clear(color, left, top, width, height);
+
 
         public override RenderQuality RenderQuality { get; set; }
 
@@ -147,7 +162,7 @@ namespace PixelFarm.CpuBlit
                     case Drawing.SmoothingMode.HighSpeed:
                     default:
                         this.RenderQuality = RenderQuality.Fast;
-                        _aggsx.UseSubPixelLcdEffect = false;
+                        _pcx.UseSubPixelLcdEffect = false;
                         break;
                 }
             }
@@ -169,23 +184,53 @@ namespace PixelFarm.CpuBlit
         {
             return new AggRenderVx(vxs);
         }
-
-
+        public override Region CreateRegion(VertexStore vxs)
+        {
+            throw new NotImplementedException();
+        }
+        public override Region CreateRegion(Image img)
+        {
+            throw new NotImplementedException();
+        }
+       
         public static AggPainter Create(MemBitmap bmp, PixelProcessing.PixelBlender32 blender = null)
         {
             //helper func
 
-            AggRenderSurface renderSx = new AggRenderSurface();
-            renderSx.AttachDstBitmap(bmp);
+            AggPainterCore pcx = new AggPainterCore();
+            pcx.AttachDstBitmap(bmp);
 
             if (blender == null)
             {
                 blender = new PixelProcessing.PixelBlenderBGRA();
             }
-            renderSx.PixelBlender = blender;
+            pcx.PixelBlender = blender;
 
-            return new AggPainter(renderSx);
+            return new AggPainter(pcx);
         }
+
+
+        Region _rgn;
+        public override Region CurrentRegion
+        {
+            get
+            {
+                return _rgn;
+            }
+            set
+            {
+                _rgn = value;
+            }
+        }
+        public override void ExitCurrentSurface(ViewState state)
+        {
+            throw new NotImplementedException();
+        }
+        public override ViewState EnterNewSurface(RenderSurface backbuffer)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 
 }

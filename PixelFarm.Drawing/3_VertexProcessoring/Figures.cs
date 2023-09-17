@@ -435,7 +435,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //if we already have a main polygon
                         //then this is another sub polygon
                         //IsHole is correct after we Analyze() the glyph contour 
-                        _otherPolygons.Add(CreatePolygon(cnt));
+                        Poly2Tri.Polygon polygon = CreatePolygon(cnt);
+                        if (polygon != null)
+                        {
+                            _otherPolygons.Add(polygon);
+                        }
+                        else
+                        {
+
+                        }
                     }
                 }
                 else
@@ -459,7 +467,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 throw new NotSupportedException();
             }
 
-            outputPolygons.Add(mainPolygon);
+            if (mainPolygon != null)
+            {
+                outputPolygons.Add(mainPolygon);
+            }
+            else
+            {
+
+            }
             if (_otherPolygons.Count > 0)
             {
                 outputPolygons.AddRange(_otherPolygons);
@@ -660,11 +675,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //then this is another sub polygon
                         //IsHole is correct after we Analyze() the glyph contour
                         Poly2Tri.Polygon subPolygon = CreatePolygon(cnt);
-                        if (otherPolygons == null)
+                        if (subPolygon != null)
                         {
-                            otherPolygons = new List<Poly2Tri.Polygon>();
+                            if (otherPolygons == null)
+                            {
+                                otherPolygons = new List<Poly2Tri.Polygon>();
+                            }
+                            otherPolygons.Add(subPolygon);
                         }
-                        otherPolygons.Add(subPolygon);
                     }
                 }
                 else
@@ -689,17 +707,21 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
             //------------------------------------------
             //2. tri angulate 
-            Poly2Tri.P2T.Triangulate(mainPolygon); //that poly is triangulated 
-            outputPolygons.Add(mainPolygon);
-
-            if (otherPolygons != null)
+            if (mainPolygon != null)
             {
-                outputPolygons.AddRange(otherPolygons);
-                for (int i = otherPolygons.Count - 1; i >= 0; --i)
+                Poly2Tri.P2T.Triangulate(mainPolygon); //that poly is triangulated 
+                outputPolygons.Add(mainPolygon);
+
+                if (otherPolygons != null)
                 {
-                    Poly2Tri.P2T.Triangulate(otherPolygons[i]);
+                    outputPolygons.AddRange(otherPolygons);
+                    for (int i = otherPolygons.Count - 1; i >= 0; --i)
+                    {
+                        Poly2Tri.P2T.Triangulate(otherPolygons[i]);
+                    }
                 }
             }
+
             //------------------------------------------
             _waitingHoles.Clear();
             _flattenContours.Clear();
@@ -734,6 +756,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         points.Add(new Poly2Tri.TriangulationPoint(prevX = x, prevY = y, userData));
                     }
                 }
+                if (points.Count < 3)
+                {
+                    return null;
+                }
                 return new Poly2Tri.Polygon(points.ToArray());
             }
         }
@@ -764,6 +790,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //points.Add(triPoint);
                         points.Add(new Poly2Tri.TriangulationPoint(prevX = x, prevY = y));
                     }
+                }
+                if (points.Count < 3)
+                {
+                    return null;
                 }
                 return new Poly2Tri.Polygon(points.ToArray());
             }
@@ -1234,6 +1264,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     contours[i].Flatten(_partFlattener);
                 }
                 //4. after flatten, the we can create fit outline
+                if (contours.Count < 1)
+                {
+                    return null;
+                }
                 return CreateIntermediateOutline(contours);
             }
             else
@@ -1253,6 +1287,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             {
                 List<Poly2Tri.Polygon> output = new List<Poly2Tri.Polygon>();
                 p23tool.Triangulate(flattenContours, output);
+                if (output.Count < 1) { return null; }
                 return new IntermediateOutline(flattenContours, output);
             }
         }

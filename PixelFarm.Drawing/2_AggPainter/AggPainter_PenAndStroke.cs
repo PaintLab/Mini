@@ -62,7 +62,7 @@ namespace PixelFarm.CpuBlit
                         var blender = new PixelBlenderBGRA();
 
                         var outlineRenderer = new Rasterization.Lines.OutlineRenderer(
-                            new ClipProxyImage(new SubBitmapBlender(_aggsx.DestBitmap, blender)), //Need ClipProxyImage
+                            new ClipProxyImage(new SubBitmapBlender(_pcx.DestBitmap, blender)), //Need ClipProxyImage
                             blender,
                             _lineProfileAA);
                         outlineRenderer.SetClipBox(0, 0, this.Width, this.Height);
@@ -155,7 +155,7 @@ namespace PixelFarm.CpuBlit
                 //----------------------------------------------------------
                 if (_lineRenderingTech == LineRenderingTechnique.StrokeVxsGenerator)
                 {
-                    _aggsx.Render(_stroke.MakeVxs(v1, v2), _strokeColor);
+                    _pcx.Render(_stroke.MakeVxs(v1, v2), _strokeColor);
 
                 }
                 else
@@ -240,7 +240,7 @@ namespace PixelFarm.CpuBlit
                 {
                     using (Tools.BorrowVxs(out var v1))
                     {
-                        _aggsx.Render(_stroke.MakeVxs(vxs, v1), _strokeColor);
+                        _pcx.Render(_stroke.MakeVxs(vxs, v1), _strokeColor);
                     }
                 }
                 else
@@ -356,7 +356,7 @@ namespace PixelFarm.CpuBlit
                 {
                     using (Tools.BorrowVxs(out var v1, out var v2))
                     {
-                        _aggsx.Render(_stroke.MakeVxs(rectTool.MakeVxs(v1), v2), _strokeColor);
+                        _pcx.Render(_stroke.MakeVxs(rectTool.MakeVxs(v1), v2), _strokeColor);
                     }
                 }
                 else
@@ -390,9 +390,38 @@ namespace PixelFarm.CpuBlit
                        _ellipseGenNSteps);
                 if (LineRenderingTech == LineRenderingTechnique.StrokeVxsGenerator)
                 {
-                    using (Tools.BorrowVxs(out var v1, out var v2))
+                    using (Tools.BorrowVxs(out var v1, out var v2, out var v3))
                     {
-                        _aggsx.Render(_stroke.MakeVxs(ellipseTool.MakeVxs(v1), v2), _strokeColor);
+
+
+                        double px = 0, py = 0;
+
+                        LineDashGenerator tmp = _lineDashGen;
+                        ellipseTool.MakeVxs(v2);
+                        _lineDashGen.CreateDash(v2, v3);
+
+                        int n = v3.Count;
+                        _lineDashGen = null; //tmp turn dash gen off 
+                        for (int i = 0; i < n; ++i)
+                        {
+                            VertexCmd cmd = v3.GetVertex(i, out double x, out double y);
+                            switch (cmd)
+                            {
+                                case VertexCmd.MoveTo:
+                                    px = x;
+                                    py = y;
+                                    break;
+                                case VertexCmd.LineTo:
+                                    this.DrawLine(px, py, x, y);
+                                    break;
+                            }
+                            px = x;
+                            py = y;
+                        }
+                        _lineDashGen = tmp; //restore prev dash gen
+
+
+                        _pcx.Render(v3, _strokeColor);
                     }
                 }
                 else

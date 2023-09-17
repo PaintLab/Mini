@@ -94,8 +94,19 @@ namespace PixelFarm.Drawing
             //return aff.TransformToVxs(src, outputVxs);
         }
         public static VertexStore RotateRadToNewVxs(this VertexStore src, double rad, VertexStore outputVxs)
-        {             
+        {
             return AffineMat.GetRotateMat(rad).TransformToVxs(src, outputVxs);
+            //Affine aff = Affine.NewRotation(rad);
+            //return aff.TransformToVxs(src, outputVxs);
+        }
+        public static VertexStore RotateRadToNewVxs(this VertexStore src, double rad, float centerX, float centerY, VertexStore outputVxs)
+        {
+            AffineMat aff = AffineMat.Iden();
+            aff.Translate(-centerX, -centerY);
+            aff.Rotate(rad);
+            aff.Translate(centerX, centerY);
+            aff.TransformToVxs(src, outputVxs);
+            return outputVxs;
             //Affine aff = Affine.NewRotation(rad);
             //return aff.TransformToVxs(src, outputVxs);
         }

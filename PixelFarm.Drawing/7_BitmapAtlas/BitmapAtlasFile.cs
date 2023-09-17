@@ -48,6 +48,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     switch (objKind)
                     {
                         default: throw new NotSupportedException();
+
                         case ObjectKind.OverviewMultiSizeFontInfo:
                             listCount = reader.ReadUInt16();
                             break;
@@ -114,6 +115,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
             //read str len 
             _atlas.FontName = ReadLengthPrefixUtf8String(reader);
+            _atlas.FontSubFamilyName = ReadLengthPrefixUtf8String(reader);
+
             int old_random_num = reader.ReadInt32();//unused 
             _atlas.SizeInPts = reader.ReadSingle();
         }
@@ -194,12 +197,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _writer.Write((ushort)utf8Buffer.Length);
             _writer.Write(utf8Buffer);
         }
-        internal void WriteOverviewFontInfo(string fontName, int fontKey, float sizeInPt)
+        internal void WriteOverviewFontInfo(string fontName, string fontSubFamilyName, int fontKey, float sizeInPt)
         {
+
             _writer.Write((ushort)ObjectKind.OverviewFontInfo);
+
             WriteLengthPrefixUtf8String(fontName);
+            WriteLengthPrefixUtf8String(fontSubFamilyName);
             _writer.Write(fontKey); //
             _writer.Write(sizeInPt); //
+
+
         }
         internal void WriteScriptTags(uint[] scriptTags)
         {

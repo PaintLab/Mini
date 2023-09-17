@@ -22,6 +22,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         //information about font
         public float FontSizeInPoints { get; private set; }
         public string FontName { get; private set; }
+        public string FontSubFamilyName { get; private set; }
         public CompactOption SpaceCompactOption { get; set; }
         //
         public enum CompactOption
@@ -66,9 +67,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             this.TextureKind = textureKind;
             this.DPI = dpi;
         }
-        public void SetAtlasFontInfo(string fontName, float fontSizeInPts)
+        public void SetAtlasFontInfo(string fontName, string fontSubFamilyName, float fontSizeInPts)
         {
             this.FontName = fontName;
+            this.FontSubFamilyName = fontSubFamilyName;
             this.FontSizeInPoints = fontSizeInPts;
         }
         public MemBitmap BuildSingleImage(bool flipY)
@@ -92,20 +94,20 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         //3. layout 
                         for (int i = itemList.Count - 1; i >= 0; --i)
                         {
-                            BitmapAtlasItemSource g = itemList[i];
-                            if (g.Height > maxRowHeight)
+                            BitmapAtlasItemSource itm = itemList[i];
+                            if (itm.Height > maxRowHeight)
                             {
-                                maxRowHeight = g.Height;
+                                maxRowHeight = itm.Height;
                             }
-                            if (currentX + g.Width > totalMaxLim)
+                            if (currentX + itm.Width > totalMaxLim)
                             {
                                 //start new row
                                 currentY += maxRowHeight;
                                 currentX = 0;
                             }
                             //-------------------
-                            g.Area = new Rectangle(currentX, currentY, g.Width, g.Height);
-                            currentX += g.Width;
+                            itm.Area = new Rectangle(currentX, currentY, itm.Width, itm.Height);
+                            currentX += itm.Width;
                         }
 
                     }
@@ -116,24 +118,24 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         itemList.Sort((a, b) => a.Height.CompareTo(b.Height));
 
                         //3. layout 
-                        int glyphCount = itemList.Count;
-                        for (int i = 0; i < glyphCount; ++i)
+                        int count = itemList.Count;
+                        for (int i = 0; i < count; ++i)
                         {
-                            BitmapAtlasItemSource g = itemList[i];
-                            if (g.Height > maxRowHeight)
+                            BitmapAtlasItemSource itm = itemList[i];
+                            if (itm.Height > maxRowHeight)
                             {
-                                maxRowHeight = g.Height;
+                                maxRowHeight = itm.Height;
                             }
-                            if (currentX + g.Width > totalMaxLim)
+                            if (currentX + itm.Width > totalMaxLim)
                             {
                                 //start new row
                                 currentY += maxRowHeight;
                                 currentX = 0;
-                                maxRowHeight = g.Height;//reset, after start new row
+                                maxRowHeight = itm.Height;//reset, after start new row
                             }
                             //-------------------
-                            g.Area = new Rectangle(currentX, currentY, g.Width, g.Height);
-                            currentX += g.Width;
+                            itm.Area = new Rectangle(currentX, currentY, itm.Width, itm.Height);
+                            currentX += itm.Width;
                         }
 
                     }
@@ -265,7 +267,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             BitmapAtlasFile atlasFile = new BitmapAtlasFile();
             atlasFile.StartWrite(outputStream);
 
-            atlasFile.WriteOverviewFontInfo(FontName ?? "", 0, FontSizeInPoints);
+
+            atlasFile.WriteOverviewFontInfo(FontName ?? "", FontSubFamilyName ?? "", 0, FontSizeInPoints);
             atlasFile.WriteScriptTags(ScriptTags.ToArray());
 
 
@@ -306,8 +309,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
             SimpleBitmapAtlas atlas = new SimpleBitmapAtlas
             {
-                TextureKind = this.TextureKind, 
+                TextureKind = this.TextureKind,
                 FontName = this.FontName,
+                FontSubFamilyName = this.FontSubFamilyName,
                 SizeInPts = this.FontSizeInPoints
             };
 

@@ -33,12 +33,12 @@ using PixelFarm.VectorMath;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.Rasterization;
 using PixelFarm.CpuBlit.FragmentProcessing;
-using PixelFarm.CpuBlit.Imaging;
+
 
 
 namespace PixelFarm.CpuBlit
 {
-    partial class AggRenderSurface
+    partial class AggPainterCore
     {
 
         //
@@ -579,16 +579,9 @@ namespace PixelFarm.CpuBlit
                 //
                 unchecked { _destImageChanged++; };
             }
-
         }
-
-
-
     }
-
-
-
-    partial class AggRenderSurface
+    partial class AggPainterCore
     {
         class SubBitmap : IBitmapSrc
         {
@@ -614,7 +607,7 @@ namespace PixelFarm.CpuBlit
             public int BitDepth => 32; // 
             public int Width => _w;
             public int Height => _h;
-            public int Stride => _w << 2; //stride = w /4 , we use <<2 
+            public int Stride => _w << 2; //stride = w *4 , we use <<2 
 
             public int BytesBetweenPixelsInclusive => throw new NotSupportedException();
 

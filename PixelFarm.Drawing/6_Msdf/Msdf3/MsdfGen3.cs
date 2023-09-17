@@ -358,10 +358,9 @@ namespace Msdfgen
             using (Tools.BorrowAggPainter(bmpLut, out var painter))
             using (Tools.BorrowShapeBuilder(out var sh))
             {
-
-
+                 
                 _msdfEdgePxBlender.ClearOverlapList();//reset
-                painter.RenderSurface.SetCustomPixelBlender(_msdfEdgePxBlender);
+                painter.Core.SetCustomPixelBlender(_msdfEdgePxBlender);
 
                 //1. clear all bg to black 
                 painter.Clear(PixelFarm.Drawing.Color.Black);
@@ -374,11 +373,11 @@ namespace Msdfgen
                 //---------
                 //2. force fill the shape (this include hole(s) inside shape to)
                 //( we set threshold to 50 and do force fill)
-                painter.RenderSurface.SetGamma(_prebuiltThresholdGamma_50);
+                painter.Core.SetGamma(_prebuiltThresholdGamma_50);
                 _msdfEdgePxBlender.FillMode = MsdfEdgePixelBlender.BlenderFillMode.Force;
                 painter.Fill(sh.CurrentSharedVxs, EdgeBmpLut.EncodeToColor(0, AreaKind.AreaInsideCoverage50));
 
-                painter.RenderSurface.SetGamma(_prebuiltThresholdGamma_50);//restore
+                painter.Core.SetGamma(_prebuiltThresholdGamma_50);//restore
 #if DEBUG
                 //debug for output
                 //painter.Fill(v7, Color.Red);
@@ -400,7 +399,7 @@ namespace Msdfgen
 
                     //-----------
                     //AA-borders of the contour
-                    painter.RenderSurface.SetGamma(_prebuiltThresholdGamma_OverlappedBorder); //this creates overlapped area 
+                    painter.Core.SetGamma(_prebuiltThresholdGamma_OverlappedBorder); //this creates overlapped area 
 
                     for (; n < next_corner_startAt; ++n)
                     {
@@ -438,8 +437,8 @@ namespace Msdfgen
 
 
 
-                painter.RenderSurface.SetCustomPixelBlender(null);
-                painter.RenderSurface.SetGamma(null);
+                painter.Core.SetCustomPixelBlender(null);
+                painter.Core.SetGamma(null);
 
                 //
                 List<CornerList> overlappedList = MakeUniqueList(_msdfEdgePxBlender._overlapList);
