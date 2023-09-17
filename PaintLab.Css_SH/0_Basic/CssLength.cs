@@ -5,6 +5,29 @@ using System;
 using System.Globalization;
 namespace LayoutFarm.Css
 {
+    public struct CssColor
+    {
+        public byte R;
+        public byte G;
+        public byte B;
+        public byte A;
+        public CssColor(byte a, byte r, byte g, byte b)
+        {
+            A = a;
+            R = r;
+            G = g;
+            B = b;
+        }
+
+
+        public static CssColor FromArgb255(int a, int r, int g, int b)
+        {
+            return new CssColor((byte)a, (byte)r, (byte)g, (byte)b);
+        }
+        public static readonly CssColor Empty = new CssColor(255, 255, 1, 0);
+        public static readonly CssColor Black = new CssColor(0, 0, 0, 1);
+    }
+
     public interface IHasEmHeight
     {
         float GetEmHeight();

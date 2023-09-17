@@ -227,14 +227,14 @@ namespace PaintLab.Svg
     {
         void OnBegin();
         void OnVisitNewElement(string elemName);
+        void OnVisitNewElement(string prefix, string elemName);
 
         void OnAttribute(string attrName, string value);
+        void OnAttribute(string attrPrefix, string attrName, string value);
         void OnEnteringElementBody();
         void OnTextNode(string text);
         void OnExitingElementBody();
         void OnEnd();
-    }
-
-
+    } 
 
 }

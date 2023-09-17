@@ -54,7 +54,7 @@ namespace LayoutFarm.WebDom
         void AddRuleSet(WebDom.CssRuleSet ruleset)
         {
             List<CssRuleSetGroup> relatedRuleSets = new List<CssRuleSetGroup>();
-            ExpandSelector(relatedRuleSets, ruleset.GetSelector());
+            ExpandSelector(relatedRuleSets, ruleset.Selector);
             CssPropertyAssignmentCollection assignmentCollection = new CssPropertyAssignmentCollection(null);
             assignmentCollection.LoadRuleSet(ruleset);
             foreach (var ruleSetGroup in relatedRuleSets)
@@ -69,8 +69,7 @@ namespace LayoutFarm.WebDom
         static CssRuleSetGroup GetGroupOrCreateIfNotExists(Dictionary<string, CssRuleSetGroup> dic,
             WebDom.CssSimpleElementSelector simpleSelector)
         {
-            CssRuleSetGroup ruleSetGroup;
-            if (!dic.TryGetValue(simpleSelector.Name, out ruleSetGroup))
+            if (!dic.TryGetValue(simpleSelector.Name, out CssRuleSetGroup ruleSetGroup))
             {
                 ruleSetGroup = new CssRuleSetGroup(simpleSelector.Name);
                 dic.Add(simpleSelector.Name, ruleSetGroup);
@@ -190,20 +189,17 @@ namespace LayoutFarm.WebDom
 
         public CssRuleSetGroup GetRuleSetForTagName(string tagName)
         {
-            CssRuleSetGroup found;
-            _rulesForTagName.TryGetValue(tagName, out found);
+            _rulesForTagName.TryGetValue(tagName, out CssRuleSetGroup found);
             return found;
         }
         public CssRuleSetGroup GetRuleSetForClassName(string className)
         {
-            CssRuleSetGroup found;
-            _rulesForClassName.TryGetValue(className, out found);
+            _rulesForClassName.TryGetValue(className, out CssRuleSetGroup found);
             return found;
         }
         public CssRuleSetGroup GetRuleSetForId(string elementId)
         {
-            CssRuleSetGroup found;
-            _rulesForElementId.TryGetValue(elementId, out found);
+            _rulesForElementId.TryGetValue(elementId, out CssRuleSetGroup found);
             return found;
         }
         public CssActiveSheet Clone()
@@ -246,8 +242,8 @@ namespace LayoutFarm.WebDom
         {
             foreach (CssRuleSetGroup b_ruleSet in b.Values)
             {
-                CssRuleSetGroup a_ruleset;
-                if (!a.TryGetValue(b_ruleSet.Name, out a_ruleset))
+
+                if (!a.TryGetValue(b_ruleSet.Name, out CssRuleSetGroup a_ruleset))
                 {
                     //not found
                     a.Add(b_ruleSet.Name, b_ruleSet);
@@ -393,8 +389,7 @@ namespace LayoutFarm.WebDom
         {
             if (_assignments != null)
             {
-                WebDom.CssPropertyDeclaration decl;
-                _assignments.GetDeclarations().TryGetValue(wellknownPropName, out decl);
+                _assignments.GetDeclarations().TryGetValue(wellknownPropName, out CssPropertyDeclaration decl);
                 return decl;
             }
             return null;
@@ -439,31 +434,23 @@ namespace LayoutFarm.WebDom
                 return _subGroups.Count;
             }
         }
-        public CssRuleSetGroup GetSubGroup(int index)
-        {
-            return _subGroups[index];
-        }
-        public WebDom.CssSimpleElementSelector OriginalSelector
-        {
-            get
-            {
-                return _originalSelector;
-            }
-        }
+        public CssRuleSetGroup GetSubGroup(int index) => _subGroups[index];
+
+        public WebDom.CssSimpleElementSelector OriginalSelector => _originalSelector;
     }
 
 
     public class CssPropertyAssignmentCollection
     {
         Dictionary<LayoutFarm.WebDom.WellknownCssPropertyName, WebDom.CssPropertyDeclaration> _myAssignments = new Dictionary<WebDom.WellknownCssPropertyName, WebDom.CssPropertyDeclaration>();
-        object owner;
+        object _owner;
 #if DEBUG
         static int s_dbugTotalId = 0;
         public static readonly int _dbugId = s_dbugTotalId++;
 #endif
         public CssPropertyAssignmentCollection(object owner)
         {
-            this.owner = owner;
+            _owner = owner;
         }
         internal void LoadRuleSet(CssRuleSet ruleSet)
         {
@@ -477,14 +464,7 @@ namespace LayoutFarm.WebDom
             }
         }
 
-
-        public object OriginalOwner
-        {
-            get
-            {
-                return this.owner;
-            }
-        }
+        public object OriginalOwner => _owner;
         public CssPropertyAssignmentCollection Clone(object newOwner)
         {
             CssPropertyAssignmentCollection newclone = new CssPropertyAssignmentCollection(newOwner);
@@ -505,10 +485,7 @@ namespace LayoutFarm.WebDom
                 targetDic[sourceAssignment.WellknownPropertyName] = sourceAssignment;
             }
         }
+        internal Dictionary<WellknownCssPropertyName, CssPropertyDeclaration> GetDeclarations() => _myAssignments;
 
-        internal Dictionary<WellknownCssPropertyName, CssPropertyDeclaration> GetDeclarations()
-        {
-            return _myAssignments;
-        }
     }
 }

@@ -18,13 +18,12 @@ using LayoutFarm.Css;
 
 namespace LayoutFarm.WebDom.Parser
 {
+
     /// <summary>
     /// Parse CSS properties values like numbers, urls, etc.
     /// </summary>
     public static class CssValueParser
     {
-
-
         /// <summary>
         /// get length in pixel
         /// </summary>
@@ -117,10 +116,9 @@ namespace LayoutFarm.WebDom.Parser
         /// </summary>
         /// <param name="colorValue">color string value to parse</param>
         /// <returns>Color value</returns>
-        public static PixelFarm.Drawing.Color ParseCssColor(string colorValue)
+        public static CssColor ParseCssColor(string colorValue)
         {
-            PixelFarm.Drawing.Color color;
-            TryGetColor(colorValue, 0, colorValue.Length, out color);
+            TryGetColor(colorValue, 0, colorValue.Length, out CssColor color);
             return color;
         }
         #region Private methods
@@ -133,7 +131,7 @@ namespace LayoutFarm.WebDom.Parser
         /// <param name="length">substring length</param>
         /// <param name="color">return the parsed color</param>
         /// <returns>true - valid color, false - otherwise</returns>
-        static bool TryGetColor(string str, int idx, int length, out PixelFarm.Drawing.Color color)
+        static bool TryGetColor(string str, int idx, int length, out CssColor color)
         {
 
             //https://www.w3.org/TR/SVGColor12/
@@ -174,7 +172,7 @@ namespace LayoutFarm.WebDom.Parser
                 //TODO: review here ?????
 
             }
-            color = PixelFarm.Drawing.Color.Black;
+            color = Css.CssColor.Black;
             return false;
         }
         /// <summary>
@@ -199,7 +197,7 @@ namespace LayoutFarm.WebDom.Parser
         /// Get color by parsing given hex value color string (#A28B34).
         /// </summary>
         /// <returns>true - valid color, false - otherwise</returns>
-        static bool GetColorByHex(string str, int idx, int length, out PixelFarm.Drawing.Color color)
+        static bool GetColorByHex(string str, int idx, int length, out CssColor color)
         {
 
             //from //https://www.w3.org/TR/SVGColor12/
@@ -219,7 +217,7 @@ namespace LayoutFarm.WebDom.Parser
             switch (length)
             {
                 default:
-                    color = PixelFarm.Drawing.Color.Empty;
+                    color = CssColor.Empty;
                     return false;
                 case 4:
                     {
@@ -229,17 +227,18 @@ namespace LayoutFarm.WebDom.Parser
                         g = g * 16 + g;
                         int b = ParseHexInt(str, idx + 3, 1);
                         b = b * 16 + b;
-                        color = PixelFarm.Drawing.Color.FromArgb(r, g, b);
+                        color = CssColor.FromArgb255(255, r, g, b);
                         return true;
                     }
                 case 7:
-                    color = PixelFarm.Drawing.Color.FromArgb(
+                    color = CssColor.FromArgb255(
+                        255,
                         ParseHexInt(str, idx + 1, 2),//r
                         ParseHexInt(str, idx + 3, 2),//g
                         ParseHexInt(str, idx + 5, 2));//b
                     return true;
                 case 9:
-                    color = PixelFarm.Drawing.Color.FromArgb(
+                    color = CssColor.FromArgb255(
                        ParseHexInt(str, idx + 1, 2),//a
                        ParseHexInt(str, idx + 3, 2),//r
                        ParseHexInt(str, idx + 5, 2),//g
@@ -253,7 +252,7 @@ namespace LayoutFarm.WebDom.Parser
         /// Get color by parsing given RGB value color string (RGB(255,180,90))
         /// </summary>
         /// <returns>true - valid color, false - otherwise</returns>
-        static bool GetColorByRgb(string str, int idx, int length, out PixelFarm.Drawing.Color color)
+        static bool GetColorByRgb(string str, int idx, int length, out CssColor color)
         {
             int r = -1;
             int g = -1;
@@ -274,10 +273,10 @@ namespace LayoutFarm.WebDom.Parser
 
             if (r > -1 && g > -1 && b > -1)
             {
-                color = PixelFarm.Drawing.Color.FromArgb(r, g, b);
+                color = CssColor.FromArgb255(255, r, g, b);
                 return true;
             }
-            color = PixelFarm.Drawing.Color.Empty;
+            color = CssColor.Empty;
             return false;
         }
 
@@ -285,7 +284,7 @@ namespace LayoutFarm.WebDom.Parser
         /// Get color by parsing given RGBA value color string (RGBA(255,180,90,180))
         /// </summary>
         /// <returns>true - valid color, false - otherwise</returns>
-        static bool GetColorByRgba(string str, int idx, int length, out PixelFarm.Drawing.Color color)
+        static bool GetColorByRgba(string str, int idx, int length, out CssColor color)
         {
             int r = -1;
             int g = -1;
@@ -311,10 +310,10 @@ namespace LayoutFarm.WebDom.Parser
 
             if (r > -1 && g > -1 && b > -1 && a > -1)
             {
-                color = PixelFarm.Drawing.Color.FromArgb(a, r, g, b);
+                color = CssColor.FromArgb255(a, r, g, b);
                 return true;
             }
-            color = PixelFarm.Drawing.Color.Empty;
+            color = CssColor.Empty;
             return false;
         }
 
@@ -322,7 +321,7 @@ namespace LayoutFarm.WebDom.Parser
         /// Get color by given name, including .NET name.
         /// </summary>
         /// <returns>true - valid color, false - otherwise</returns>
-        static bool GetColorByName(string str, int idx, int length, out PixelFarm.Drawing.Color color)
+        static bool GetColorByName(string str, int idx, int length, out CssColor color)
         {
             color = LayoutFarm.WebDom.KnownColors.FromKnownColor(str.Substring(idx, length));
             return color.A > 0;

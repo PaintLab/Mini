@@ -10,7 +10,7 @@ namespace LayoutFarm.WebDom
     {
         public string AttributeName;
         public CssAttributeSelectorOperator operatorName;
-        public CssCodeValueExpression valueExpression;
+        public CssValueExpression valueExpression;
         public string SelectorSignature
         {
             get

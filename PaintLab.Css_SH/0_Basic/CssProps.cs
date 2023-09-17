@@ -4,7 +4,7 @@
 
 namespace LayoutFarm.Css
 {
-    //    <display-outside>
+    // <display-outside>
     //  = block | inline | run-in ;
     //<display-inside>
     //   = flow | flow-root | table | flex | grid | ruby ;
@@ -312,6 +312,8 @@ namespace LayoutFarm.Css
         _500,
         [Map("600")]
         _600,
+        [Map("700")]
+        _700,
         [Map(CssConstants.Inherit)]
         Inherit,
         Unknown,

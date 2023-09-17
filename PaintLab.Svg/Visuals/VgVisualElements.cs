@@ -17,10 +17,7 @@ namespace PaintLab.Svg
     /// </summary>
     public abstract class VgVisualElementBase
     {
-        public virtual void Paint(VgPaintArgs p)
-        {
-            //paint with painter interface
-        }
+        public virtual void Paint(VgPaintArgs p) { }
         public abstract WellknownSvgElementName ElemName { get; }
         public virtual void Accept(VgVisitorArgs p) { }
 
@@ -176,11 +173,11 @@ namespace PaintLab.Svg
         public override WellknownSvgElementName ElemName => WellknownSvgElementName.ForeignNode;
     }
 
+
+
     public class VgVisualElement : VgVisualElementBase, IDisposable
     {
 
-        bool _handleBitmapSnapshotAsOwner;
-        //-------------------------
         List<VgVisualElementBase> _childNodes = null;
         WellknownSvgElementName _wellknownName;
         //-------------------------
@@ -193,10 +190,10 @@ namespace PaintLab.Svg
         internal SvgVisualSpec _visualSpec;
         internal VgPathVisualMarkers _pathMarkers;
 
-
         ImageBinder _imgBinder;
-        VgVisualDoc _vgVisualDoc;
+        VgVisualDoc _vgVisualDoc; //owner doc
 
+        bool _handleBitmapSnapshotAsOwner;
         Image _backimg;
         Q1RectD _boundRect;
         bool _needBoundUpdate;
@@ -206,12 +203,13 @@ namespace PaintLab.Svg
         internal float _imgX;
         internal float _imgY;
 
-        VertexStore _vxsPath;
+        VertexStore _vxsPath;//filling shape
         bool _isRenderVxOwner;
+        RenderVx _renderVx;
 
         public VgVisualElement(WellknownSvgElementName wellknownName,
-            SvgVisualSpec visualSpec,
-            VgVisualDoc vgVisualDoc)
+               SvgVisualSpec visualSpec,
+               VgVisualDoc vgVisualDoc)
         {
             //we can create visual element without its DOM
             _needBoundUpdate = true;
@@ -219,6 +217,7 @@ namespace PaintLab.Svg
             _visualSpec = visualSpec;
             _vgVisualDoc = vgVisualDoc;
         }
+
 
         //
         public VgVisualDoc VgVisualDoc => _vgVisualDoc;
@@ -230,9 +229,6 @@ namespace PaintLab.Svg
         public object GetController() => _controller;
         //
         public ICoordTransformer CoordTx { get; set; }
-
-
-        RenderVx _renderVx;
         public RenderVx RenderVx => _renderVx;
         public void SetRenderVx(RenderVx renderVx, bool isOwner)
         {
@@ -251,8 +247,13 @@ namespace PaintLab.Svg
                 }
 #endif
                 _vxsPath = value;
-                ReleaseRenderVx();
+                VxsPathChanged();
+                ReleaseRenderVx();//release previous render vx
             }
+        }
+        protected virtual void VxsPathChanged()
+        {
+
         }
         void ReleaseRenderVx()
         {
@@ -289,27 +290,13 @@ namespace PaintLab.Svg
                     {
                         _imgH = value.Height;
                     }
+
                     value.ImageChanged += (s, e) => _vgVisualDoc.Invalidate(this);
                 }
             }
         }
 
-        public void HitTest(float x, float y, Action<VgVisualElement, float, float, VertexStore> onHitSvg)
-        {
-            using (VgVistorArgsPool.Borrow(out VgVisitorArgs visitor))
-            {
-                visitor.VgElemenVisitHandler = (vxs, args) =>
-                {
-                    if (args.Current != null &&
-                       PixelFarm.CpuBlit.VertexProcessing.VertexHitTester.IsPointInVxs(vxs, x, y))
-                    {
-                        //add actual transform vxs ... 
-                        onHitSvg(args.Current, x, y, vxs);
-                    }
-                };
-                this.Accept(visitor);
-            }
-        }
+
         public bool HitTest(VgHitChain hitChain)
         {
             using (VgVistorArgsPool.Borrow(out VgVisitorArgs paintArgs))
@@ -322,9 +309,9 @@ namespace PaintLab.Svg
                     {
                         //add actual transform vxs ... 
                         hitChain.AddHit(args.Current,
-                        hitChain.X,
-                        hitChain.Y,
-                        hitChain.MakeCopyOfHitVxs ? vxs.CreateTrim() : null);
+                            hitChain.X,
+                            hitChain.Y,
+                            hitChain.MakeCopyOfHitVxs ? vxs.CreateTrim() : null);
                     }
                 };
                 this.Accept(paintArgs);
@@ -634,11 +621,15 @@ namespace PaintLab.Svg
             }
         }
         //---------------------------
-        public override void Paint(VgPaintArgs vgPainterArgs)
+
+        static LineDashGenerator s_lineDashGen;
+
+
+        public override void Paint(VgPaintArgs args)
         {
 
             //save
-            Painter p = vgPainterArgs.P;
+            Painter p = args.P;
 
             Color color = p.FillColor;
             bool restoreFillColor;
@@ -655,10 +646,12 @@ namespace PaintLab.Svg
             double strokeW = p.StrokeWidth;
             Color strokeColor = p.StrokeColor;
             RequestFont currentFont = p.CurrentFont;
-            PaintFx.Effects.CpuBlitImgFilter imgFilter = null;
+
+
+            PixelFarm.Drawing.IImageFilter imgFilter = null;
             VgVisualElement filterElem = null;
-            ICoordTransformer prevTx = vgPainterArgs._currentTx; //backup
-            ICoordTransformer currentTx = vgPainterArgs._currentTx;
+            ICoordTransformer prevTx = args._currentTx; //backup
+            ICoordTransformer currentTx = args._currentTx;
 
             bool hasClip = false;
             bool newFontReq = false;
@@ -666,7 +659,7 @@ namespace PaintLab.Svg
             bool userGradientWithOpacity = false;
 
 
-            float prevOpacity = vgPainterArgs.Opacity;
+            float prevOpacity = args.Opacity;
             bool enableMaskMode = false;
 
             if (_visualSpec != null)
@@ -677,23 +670,18 @@ namespace PaintLab.Svg
                     if (currentTx != null)
                     {
                         //*** IMPORTANT : matrix transform order !***                         
-                        currentTx = latest.MultiplyWith(vgPainterArgs._currentTx);
+                        currentTx = latest.MultiplyWith(args._currentTx);
                     }
                     else
                     {
                         currentTx = latest;
                     }
-                    vgPainterArgs._currentTx = currentTx;
+                    args._currentTx = currentTx;
                 }
                 //apply this to current tx 
 
                 if (_visualSpec.MaskPathLink != null)
                 {
-                    //apply mask path 
-                    if (_visualSpec.ResolvedMask == null)
-                    {
-
-                    }
 
                     if (_visualSpec.ResolvedMask != null)
                     {
@@ -729,11 +717,11 @@ namespace PaintLab.Svg
                         if (maskElem.BackingImage != null)
                         {
                             //use this as mask bitmap
-                            vgPainterArgs.P.TargetBuffer = TargetBuffer.MaskBuffer;
-                            vgPainterArgs.P.Clear(Color.Black);
-                            vgPainterArgs.P.DrawImage(maskElem.BackingImage, maskSpec.X.Number, maskSpec.Y.Number);
-                            vgPainterArgs.P.TargetBuffer = TargetBuffer.ColorBuffer;
-                            enableMaskMode = vgPainterArgs.P.EnableMask = true;
+                            args.P.TargetBuffer = TargetBuffer.MaskBuffer;
+                            args.P.Clear(Color.Black);
+                            args.P.DrawImage(maskElem.BackingImage, maskSpec.X.Number, maskSpec.Y.Number);
+                            args.P.TargetBuffer = TargetBuffer.ColorBuffer;
+                            enableMaskMode = args.P.EnableMask = true;
 
                         }
                     }
@@ -786,10 +774,13 @@ namespace PaintLab.Svg
                                 else if (vgVisualElem.VisualSpec is SvgLinearGradientSpec)
                                 {
                                     SvgLinearGradientSpec linearGrSpec = (SvgLinearGradientSpec)vgVisualElem.VisualSpec;
+
+#if DEBUG
                                     if (linearGrSpec.Transform != null)
                                     {
 
                                     }
+#endif
                                     if (linearGrSpec.StopList != null)
                                     {
                                         int stopListCount = linearGrSpec.StopList.Count;
@@ -863,19 +854,19 @@ namespace PaintLab.Svg
 
                 if (_visualSpec.HasOpacity)
                 {
-                    vgPainterArgs.Opacity = prevOpacity * _visualSpec.Opacity;
+                    args.Opacity = prevOpacity * _visualSpec.Opacity;
                 }
 
-                if (vgPainterArgs.HasOpacity)
+                if (args.HasOpacity)
                 {
                     if (useGradientColor)
                     {
                         userGradientWithOpacity = true;
-                        p.FillOpacity = vgPainterArgs.Opacity;
+                        p.FillOpacity = args.Opacity;
                     }
                     else
                     {
-                        p.FillColor = p.FillColor.NewFromChangeCoverage((int)(vgPainterArgs.Opacity * 255));
+                        p.FillColor = p.FillColor.NewFromChangeCoverage((int)(args.Opacity * 255));
                     }
 
                 }
@@ -888,7 +879,8 @@ namespace PaintLab.Svg
                     //TODO: how to get and apply children nodes
                     VgVisualElement content1 = (VgVisualElement)filterElem.GetChildNode(0);
                     SvgFeColorMatrixSpec colorMatSpec = content1.VisualSpec as SvgFeColorMatrixSpec;
-                    imgFilter = colorMatSpec.ResolvedFilter as PaintFx.Effects.ImgFilterSvgFeColorMatrix;
+
+                    imgFilter = colorMatSpec.ResolvedFilter as PixelFarm.Drawing.IImageFilter;// PaintFx.Effects.ImgFilterSvgFeColorMatrix;
                 }
 
 
@@ -952,7 +944,7 @@ namespace PaintLab.Svg
                     break;
                 case WellknownSvgElementName.Mask:
                     {
-                        if (!vgPainterArgs.MaskMode)
+                        if (!args.MaskMode)
                         {
                             return;
                         }
@@ -969,7 +961,6 @@ namespace PaintLab.Svg
                             isOK = false;
                             if (imgSpec.ImageSrc != null)
                             {
-                                //create new 
                                 this.ImageBinder = new PixelFarm.Drawing.ImageBinder(imgSpec.ImageSrc);
                                 isOK = true;
                             }
@@ -1018,7 +1009,19 @@ namespace PaintLab.Svg
                                             {
                                                 RenderQuality prevQ = p.RenderQuality;
                                                 //p.RenderQuality = RenderQuality.Fast;
-                                                p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, currentTx);
+
+
+                                                if (currentTx is Affine aff && args.GlobalScale != 1)
+                                                {
+                                                    Affine aff2 = Affine.NewScaling(aff, args.GlobalScale);
+                                                    p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, aff2);
+                                                }
+                                                else
+                                                {
+                                                    p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, currentTx);
+                                                }
+
+
                                                 p.RenderQuality = prevQ;
                                             }
                                             else
@@ -1152,7 +1155,7 @@ namespace PaintLab.Svg
                         if (currentTx == null)
                         {
                             //no transform
-                            if (vgPainterArgs.PaintVisitHandler == null)
+                            if (args.PaintVisitHandler == null)
                             {
                                 if (useGradientColor)
                                 {
@@ -1173,17 +1176,21 @@ namespace PaintLab.Svg
                                 }
                                 else if (p.FillColor.A > 0)
                                 {
-                                    RenderVx renderVx = this.RenderVx;
-                                    if (renderVx != null)
+                                    if (ElemName != WellknownSvgElementName.Line &&
+                                        ElemName != WellknownSvgElementName.Polyline)
                                     {
-                                        //has render vx     
-                                        p.FillRenderVx(renderVx);
-                                    }
-                                    else
-                                    {
-                                        renderVx = p.CreateRenderVx(VxsPath);
-                                        SetRenderVx(renderVx, true);
-                                        p.FillRenderVx(renderVx);
+                                        RenderVx renderVx = this.RenderVx;
+                                        if (renderVx != null)
+                                        {
+                                            //has render vx     
+                                            p.FillRenderVx(renderVx);
+                                        }
+                                        else
+                                        {
+                                            renderVx = p.CreateRenderVx(VxsPath);
+                                            SetRenderVx(renderVx, true);
+                                            p.FillRenderVx(renderVx);
+                                        }
                                     }
                                 }
                                 //to draw stroke
@@ -1200,26 +1207,59 @@ namespace PaintLab.Svg
                                     //else
                                     //{ 
                                     //check if we need to create a new stroke or not
+
                                     if (_strokeVxs == null || _latestStrokeW != (float)p.StrokeWidth)
                                     {
                                         //TODO: review here again***
                                         //vxs caching 
                                         _latestStrokeW = (float)p.StrokeWidth;
 
-                                        using (Tools.BorrowVxs(out var v1))
-                                        using (Tools.BorrowStroke(out var stroke))
+                                        if (_visualSpec.StrokeDashArray != null)
                                         {
-                                            stroke.Width = _latestStrokeW;
-                                            stroke.MakeVxs(VxsPath, v1);
-                                            _strokeVxs = v1.CreateTrim();
+                                            if (s_lineDashGen == null)
+                                            {
+                                                s_lineDashGen = new LineDashGenerator();
+                                            }
+
+                                            //set dash generator
+                                            s_lineDashGen.SetDashPattern(_visualSpec.StrokeDashArray[0], _visualSpec.StrokeDashArray[1]);//temp !                                         
+
+                                            VertexStore vxs = VxsPath;
+                                            IDashGenerator tmp = p.LineDashGen;
+                                            //TODO: review here//***
+
+                                            p.StrokeWidth = _visualSpec.StrokeWidth.Number; // 3;
+
+                                            p.LineDashGen = s_lineDashGen;
+                                            p.Draw(vxs);//draw a dash-vxs path
+                                            p.LineDashGen = tmp;//restore 
+
                                         }
+                                        else
+                                        {
+                                            using (Tools.BorrowVxs(out var v1))
+                                            using (Tools.BorrowStroke(out var stroke))
+                                            {
+                                                stroke.Width = _latestStrokeW;
+                                                stroke.MakeVxs(VxsPath, v1);
+                                                _strokeVxs = v1.CreateTrim();
+                                            }
+                                            p.Fill(_strokeVxs, p.StrokeColor);
+                                        }
+
+                                        p.StrokeWidth = _latestStrokeW;
+
                                     }
-                                    p.Fill(_strokeVxs, p.StrokeColor);
+                                    else
+                                    {
+                                        p.Fill(_strokeVxs, p.StrokeColor);
+                                    }
+
                                 }
                             }
                             else
                             {
-                                vgPainterArgs.PaintVisitHandler(VxsPath, vgPainterArgs);
+                                args.PaintVisitHandler(VxsPath, args);
                             }
 
 
@@ -1240,17 +1280,17 @@ namespace PaintLab.Svg
                                         //temp fix 
                                         if (_pathMarkers.StartMarkerAffine != null)
                                         {
-                                            vgPainterArgs._currentTx = _pathMarkers.StartMarkerAffine * Affine.NewTranslation(_pathMarkers.StartMarkerPos.X, _pathMarkers.StartMarkerPos.Y);
+                                            args._currentTx = _pathMarkers.StartMarkerAffine * Affine.NewTranslation(_pathMarkers.StartMarkerPos.X, _pathMarkers.StartMarkerPos.Y);
                                         }
                                         else
                                         {
-                                            vgPainterArgs._currentTx = Affine.NewTranslation(_pathMarkers.StartMarkerPos.X, _pathMarkers.StartMarkerPos.Y);
+                                            args._currentTx = Affine.NewTranslation(_pathMarkers.StartMarkerPos.X, _pathMarkers.StartMarkerPos.Y);
                                         }
-                                        _pathMarkers.StartMarker.GetChildNode(i).Paint(vgPainterArgs);
+                                        _pathMarkers.StartMarker.GetChildNode(i).Paint(args);
 
                                     }
                                     //p.FillColor = prevFillColor;
-                                    vgPainterArgs._currentTx = currentTx;
+                                    args._currentTx = currentTx;
                                 }
 
                                 if (_pathMarkers.MidMarker != null)
@@ -1276,19 +1316,19 @@ namespace PaintLab.Svg
 
                                                 if (_pathMarkers.MidMarkerAffine != null)
                                                 {
-                                                    vgPainterArgs._currentTx = _pathMarkers.MidMarkerAffine * Affine.NewTranslation(btwPoint.X, btwPoint.Y);
+                                                    args._currentTx = _pathMarkers.MidMarkerAffine * Affine.NewTranslation(btwPoint.X, btwPoint.Y);
                                                 }
                                                 else
                                                 {
-                                                    vgPainterArgs._currentTx = Affine.NewTranslation(btwPoint.X, btwPoint.Y);
+                                                    args._currentTx = Affine.NewTranslation(btwPoint.X, btwPoint.Y);
                                                 }
 
-                                                _pathMarkers.MidMarker.GetChildNode(i).Paint(vgPainterArgs);
+                                                _pathMarkers.MidMarker.GetChildNode(i).Paint(args);
                                             }
                                         }
                                     }
                                     //p.FillColor = prevFillColor;
-                                    vgPainterArgs._currentTx = currentTx;
+                                    args._currentTx = currentTx;
                                 }
 
                                 if (_pathMarkers.EndMarker != null)
@@ -1303,16 +1343,16 @@ namespace PaintLab.Svg
                                         //temp fix 
                                         if (_pathMarkers.EndMarkerAffine != null)
                                         {
-                                            vgPainterArgs._currentTx = _pathMarkers.EndMarkerAffine * Affine.NewTranslation(_pathMarkers.EndMarkerPos.X, _pathMarkers.EndMarkerPos.Y);
+                                            args._currentTx = _pathMarkers.EndMarkerAffine * Affine.NewTranslation(_pathMarkers.EndMarkerPos.X, _pathMarkers.EndMarkerPos.Y);
                                         }
                                         else
                                         {
-                                            vgPainterArgs._currentTx = Affine.NewTranslation(_pathMarkers.EndMarkerPos.X, _pathMarkers.EndMarkerPos.Y);
+                                            args._currentTx = Affine.NewTranslation(_pathMarkers.EndMarkerPos.X, _pathMarkers.EndMarkerPos.Y);
                                         }
-                                        _pathMarkers.EndMarker.GetChildNode(i).Paint(vgPainterArgs);
+                                        _pathMarkers.EndMarker.GetChildNode(i).Paint(args);
                                     }
                                     //p.FillColor = prevFillColor;
-                                    vgPainterArgs._currentTx = currentTx;
+                                    args._currentTx = currentTx;
                                 }
                             }
                         }
@@ -1323,7 +1363,7 @@ namespace PaintLab.Svg
                             {
                                 currentTx.TransformToVxs(VxsPath, v1);
 
-                                if (vgPainterArgs.PaintVisitHandler == null)
+                                if (args.PaintVisitHandler == null)
                                 {
                                     if (p.FillColor.A > 0)
                                     {
@@ -1340,7 +1380,7 @@ namespace PaintLab.Svg
                                 }
                                 else
                                 {
-                                    vgPainterArgs.PaintVisitHandler(v1, vgPainterArgs);
+                                    args.PaintVisitHandler(v1, args);
                                 }
                             }
 
@@ -1353,14 +1393,14 @@ namespace PaintLab.Svg
                                     //*** IMPORTANT : matrix transform order !***                 
                                     //*** IMPORTANT : matrix transform order !***                        
 
-                                    vgPainterArgs._currentTx = _pathMarkers.StartMarkerAffine;
-                                    _pathMarkers.StartMarker.Paint(vgPainterArgs);
-                                    vgPainterArgs._currentTx = currentTx;
+                                    args._currentTx = _pathMarkers.StartMarkerAffine;
+                                    _pathMarkers.StartMarker.Paint(args);
+                                    args._currentTx = currentTx;
 
                                 }
                                 if (_pathMarkers.EndMarker != null)
                                 {
-                                    //draw this
+                                    //draw this***
 
                                 }
 
@@ -1376,7 +1416,7 @@ namespace PaintLab.Svg
             {
                 if (GetChildNode(i) is VgVisualElement node)
                 {
-                    node.Paint(vgPainterArgs);
+                    node.Paint(args);
                 }
             }
 
@@ -1384,7 +1424,7 @@ namespace PaintLab.Svg
             //
             if (filterElem != null)
             {
-                vgPainterArgs.P.ApplyFilter(imgFilter);
+                args.P.ApplyFilter(imgFilter);
             }
 
             //restore
@@ -1407,11 +1447,11 @@ namespace PaintLab.Svg
             }
             p.StrokeColor = strokeColor;
             p.StrokeWidth = strokeW;
-            vgPainterArgs.Opacity = prevOpacity;
-            vgPainterArgs._currentTx = prevTx;
+            args.Opacity = prevOpacity;
+            args._currentTx = prevTx;
             if (hasClip)
             {
-                p.SetClipRgn(null);
+                p.SetClipRgn(null as VertexStore);
             }
             if (newFontReq)
             {
@@ -1438,7 +1478,6 @@ namespace PaintLab.Svg
                 _childNodes = new List<VgVisualElementBase>();
             }
             _childNodes.Add(vgVisElem);
-
         }
         public int ChildCount => (_childNodes == null) ? 0 : _childNodes.Count;
 

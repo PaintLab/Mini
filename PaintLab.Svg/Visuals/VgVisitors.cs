@@ -19,6 +19,7 @@ namespace PaintLab.Svg
             _currentTx = null;
             Current = null;
         }
+        public float GlobalScale { get; set; } = 1;
     }
 
     public class VgVisitorArgs : VgVisitorBase

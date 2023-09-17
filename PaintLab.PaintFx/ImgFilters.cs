@@ -13,6 +13,7 @@ namespace PaintFx.Effects
     public abstract class CpuBlitImgFilter : PixelFarm.Drawing.IImageFilter, ICpuBlitImgFilter
     {
         protected PixelFarm.CpuBlit.PixelProcessing.BitmapBlenderBase _target;
+        public float[] ColorMatrix { get; set; }
         public abstract void Apply();
         public void SetTarget(PixelFarm.CpuBlit.PixelProcessing.BitmapBlenderBase target)
         {

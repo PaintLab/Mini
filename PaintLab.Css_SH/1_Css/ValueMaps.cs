@@ -10,7 +10,7 @@ namespace LayoutFarm.WebDom
 {
     public class ValueMap<T>
     {
-        static Type s_mapNameAttrType = typeof(MapAttribute);
+        static readonly Type s_mapNameAttrType = typeof(MapAttribute);
         readonly Dictionary<string, T> _stringToValue;
         readonly Dictionary<T, string> _valueToString;
         public ValueMap()
@@ -49,25 +49,18 @@ namespace LayoutFarm.WebDom
         }
         public string GetStringFromValue(T value)
         {
-            string found;
-            _valueToString.TryGetValue(value, out found);
+            _valueToString.TryGetValue(value, out string found);
             return found;
         }
         public T GetValueFromString(string str, T defaultIfNotFound)
         {
-            T found;
-            if (_stringToValue.TryGetValue(str, out found))
+
+            if (_stringToValue.TryGetValue(str, out T found))
             {
                 return found;
             }
             return defaultIfNotFound;
         }
-        public int Count
-        {
-            get
-            {
-                return _valueToString.Count;
-            }
-        }
+        public int Count => _valueToString.Count;
     }
 }

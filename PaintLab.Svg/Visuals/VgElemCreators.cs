@@ -244,7 +244,7 @@ namespace PaintLab.Svg
 
                                 if (visualSpec != null)
                                 {
-                                    visualSpec.FillColor = CssValueParser.ParseCssColor(attrValue);
+                                    visualSpec.FillColor = FromCssColor(CssValueParser.ParseCssColor(attrValue));
                                 }
                             }
                         }
@@ -281,7 +281,7 @@ namespace PaintLab.Svg
                             //
                             if (visualSpec != null)
                             {
-                                visualSpec.StrokeColor = CssValueParser.ParseCssColor(attrValue);
+                                visualSpec.StrokeColor = FromCssColor(CssValueParser.ParseCssColor(attrValue));
                             }
                         }
                     }
@@ -429,9 +429,14 @@ namespace PaintLab.Svg
 
     static class CommonValueParsingUtils
     {
+        internal static Color FromCssColor(in LayoutFarm.Css.CssColor color)
+        {
+            return Color.FromArgb(color.A, color.R, color.G, color.B);
+        }
         internal static Color ParseCssColor(string value)
         {
-            return CssValueParser.ParseCssColor(value);
+
+            return FromCssColor(CssValueParser.ParseCssColor(value));
         }
         internal static LayoutFarm.Css.CssLength ParseGenericLength(string value)
         {
@@ -910,7 +915,9 @@ namespace PaintLab.Svg
                         throw new NotSupportedException();
                     }
                     break;
-
+                case "xlink:href":
+                    _spec.ImageSrc = attrValue;//TODO: check if it is a valid value/path
+                    break;
                 case "x":
                     _spec.X = ParseGenericLength(attrValue);
                     break;
@@ -980,16 +987,22 @@ namespace PaintLab.Svg
             switch (attrName)
             {
                 default:
-                    if (!AssignCommonAttribute(attrName, attrValue) &&
-                       !MarkerAssigner.AssignMarker(_spec, attrName, attrValue))
                     {
+                        if (!AssignCommonAttribute(attrName, attrValue) &&
+                           !MarkerAssigner.AssignMarker(_spec, attrName, attrValue))
+                        {
+                            if (!attrName.StartsWith("data-"))
+                            {
 #if DEBUG
-                        System.Diagnostics.Debug.WriteLine("NOT IMPL Attr:" + attrName + "=" + attrValue);
+                                System.Diagnostics.Debug.WriteLine("NOT IMPL Attr:" + attrName + "=" + attrValue);
 #endif
-                        //throw new NotSupportedException();
+                            }
+
+
+                            //throw new NotSupportedException();
+                        }
                     }
                     break;
-
                 case "d":
                     _spec.D = attrValue;
                     break;
@@ -1121,7 +1134,9 @@ namespace PaintLab.Svg
                 default:
                     if (!AssignCommonAttribute(attrName, attrValue))
                     {
-                        System.Diagnostics.Debug.WriteLine("please impl " + attrName);
+#if DEBUG
+                        //System.Diagnostics.Debug.WriteLine("please impl " + attrName);
+#endif
                         //throw new NotSupportedException();
                     }
                     break;

@@ -9,8 +9,8 @@ namespace LayoutFarm.WebDom
     {
         bool _isAutoGen;
         bool _markedAsInherit;
-        CssCodeValueExpression _firstValue;
-        List<CssCodeValueExpression> _moreValues;
+        CssValueExpression _firstValue;
+        List<CssValueExpression> _moreValues;
 #if DEBUG
         static int dbugTotalId;
         public readonly int dbugId = dbugTotalId++;
@@ -26,7 +26,7 @@ namespace LayoutFarm.WebDom
             //convert from name to wellknown property name; 
             this.WellknownPropertyName = wellNamePropertyName;
         }
-        public CssPropertyDeclaration(WellknownCssPropertyName wellNamePropertyName, CssCodeValueExpression value)
+        public CssPropertyDeclaration(WellknownCssPropertyName wellNamePropertyName, CssValueExpression value)
         {
             //from another 
             this.WellknownPropertyName = wellNamePropertyName;
@@ -38,7 +38,7 @@ namespace LayoutFarm.WebDom
         public bool IsExpand { get; set; }
         public string UnknownRawName { get; private set; }
 
-        public void AddValue(CssCodeValueExpression value)
+        public void AddValue(CssValueExpression value)
         {
             if (_firstValue == null)
             {
@@ -49,13 +49,13 @@ namespace LayoutFarm.WebDom
             {
                 if (_moreValues == null)
                 {
-                    _moreValues = new List<CssCodeValueExpression>();
+                    _moreValues = new List<CssValueExpression>();
                 }
                 _moreValues.Add(value);
                 _markedAsInherit = false;
             }
         }
-        public void ReplaceValue(int index, CssCodeValueExpression value)
+        public void ReplaceValue(int index, CssValueExpression value)
         {
             if (index == 0)
             {
@@ -91,7 +91,7 @@ namespace LayoutFarm.WebDom
                 int j = _moreValues.Count;
                 for (int i = 0; i < j; ++i)
                 {
-                    CssCodeValueExpression propV = _moreValues[i];
+                    CssValueExpression propV = _moreValues[i];
                     stBuilder.Append(propV.ToString());
                     if (i < j - 1)
                     {
@@ -126,7 +126,7 @@ namespace LayoutFarm.WebDom
         }
 
 
-        public CssCodeValueExpression GetPropertyValue(int index)
+        public CssValueExpression GetPropertyValue(int index)
         {
             switch (index)
             {

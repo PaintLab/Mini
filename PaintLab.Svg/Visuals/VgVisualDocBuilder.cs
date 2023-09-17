@@ -39,6 +39,7 @@ namespace PaintLab.Svg
         public VgVisualDocBuilder()
         {
         }
+        public float PathScale { get; set; } = 1;
         public void SetContainerSize(float width, float height)
         {
             _containerWidth = width;
@@ -545,7 +546,7 @@ namespace PaintLab.Svg
 
                         AffineMat mat = AffineMat.Iden();
                         mat.Translate(-markerSpec.RefX.Number, -markerSpec.RefY.Number); //move to the ref point
-                        mat.Rotate(rotateRad); 
+                        mat.Rotate(rotateRad);
                         pathMarkers.EndMarkerAffine = new Affine(mat);
                     }
                 }
@@ -657,10 +658,18 @@ namespace PaintLab.Svg
         {
             VgVisualElement feColorMatrixElem = new VgVisualElement(WellknownSvgElementName.FeColorMatrix, spec, _vgVisualDoc);
 
-            PaintFx.Effects.ImgFilterSvgFeColorMatrix colorMat = new PaintFx.Effects.ImgFilterSvgFeColorMatrix();
-            spec.ResolvedFilter = colorMat;
-            //TODO: check if matrix is identify matrix or not            //
-            colorMat.Elements = spec.matrix;
+            PixelFarm.Drawing.IImageFilter imgFilter = PixelFarm.ImageFilters.GetImageFilterByName("fe-colorMatrix");
+            if (imgFilter != null)
+            {
+                //apply the image
+                //PaintFx.Effects.ImgFilterSvgFeColorMatrix colorMat = new PaintFx.Effects.ImgFilterSvgFeColorMatrix();
+                imgFilter.ColorMatrix = spec.matrix;
+                spec.ResolvedFilter = imgFilter;
+            }
+
+            //spec.ResolvedFilter = colorMat;
+            ////TODO: check if matrix is identify matrix or not            //
+            //colorMat.Elements = spec.matrix;
             return feColorMatrixElem;
         }
         VgVisualElement CreateRadialGradient(VgVisualElement parentNode, SvgElement elem, SvgRadialGradientSpec spec)
@@ -812,7 +821,7 @@ namespace PaintLab.Svg
                                 textspec.FontFace = propDecl.GetPropertyValue(0).ToString();
                                 break;
                             case LayoutFarm.WebDom.WellknownCssPropertyName.Fill:
-                                textspec.FillColor = LayoutFarm.WebDom.Parser.CssValueParser.ParseCssColor(propDecl.GetPropertyValue(0).ToString());
+                                textspec.FillColor = CommonValueParsingUtils.FromCssColor(LayoutFarm.WebDom.Parser.CssValueParser.ParseCssColor(propDecl.GetPropertyValue(0).ToString()));
                                 break;
                             case LayoutFarm.WebDom.WellknownCssPropertyName.Unknown:
                                 {
@@ -829,12 +838,9 @@ namespace PaintLab.Svg
                 }
             }
 
-
             ReEvaluateArgs a = new ReEvaluateArgs(_containerWidth, _containerHeight, _emHeight); //temp fix
             textspec.ActualX = ConvertToPx(textspec.X, ref a);
             textspec.ActualY = ConvertToPx(textspec.Y, ref a);
-
-
             AssignAttributes(textspec);
 
             //text x,y
@@ -901,14 +907,25 @@ namespace PaintLab.Svg
         VertexStore CreateVxsFromPathDefinition(char[] pathDefinition)
         {
             using (Tools.BorrowCurveFlattener(out var curveFlattener))
-            using (Tools.BorrowVxs(out var v1, out var v2))
+            using (Tools.BorrowVxs(out var v1, out var v2, out var v3))
             using (Tools.BorrowPathWriter(v1, out PathWriter pathWriter))
             {
                 _pathDataParser.SetPathWriter(pathWriter);
                 _pathDataParser.Parse(pathDefinition);
-                curveFlattener.MakeVxs(v1, v2);
+
+                if (PathScale != 1)
+                {
+                    AffineMat mat = AffineMat.GetScaleMat(PathScale);
+                    mat.TransformToVxs(v1, v2);
+                    curveFlattener.MakeVxs(v2, v3);
+                }
+                else
+                { 
+                    curveFlattener.MakeVxs(v1, v3);
+                }
+
                 //create a small copy of the vxs                  
-                return v2.CreateTrim();
+                return v3.CreateTrim();
             }
         }
         VgVisualElement CreateGroup(VgVisualElement parentNode, SvgVisualSpec visSpec)

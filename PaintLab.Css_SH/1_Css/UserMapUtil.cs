@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 
 using LayoutFarm.Css;
-using PixelFarm.Drawing;
 
 namespace LayoutFarm.WebDom
 {
@@ -65,7 +64,7 @@ namespace LayoutFarm.WebDom
 
         //-----------------------
 
-        public static CssBorderCollapse GetBorderCollapse(WebDom.CssCodeValueExpression value)
+        public static CssBorderCollapse GetBorderCollapse(WebDom.CssValueExpression value)
         {
             return (CssBorderCollapse)EvaluateIntPropertyValueFromString(
                _cssCollapseBorderMap,
@@ -83,7 +82,7 @@ namespace LayoutFarm.WebDom
             WebDom.CssValueEvaluatedAs
             evalAs,
             T defaultValue,
-            WebDom.CssCodeValueExpression value)
+            WebDom.CssValueExpression value)
             where T : struct
         {
             if (value.EvaluatedAs != evalAs)
@@ -99,7 +98,7 @@ namespace LayoutFarm.WebDom
             }
         }
         //-----------------------
-        public static CssDisplay GetDisplayType(WebDom.CssCodeValueExpression value)
+        public static CssDisplay GetDisplayType(WebDom.CssValueExpression value)
         {
             return (CssDisplay)EvaluateIntPropertyValueFromString(
                 _cssDisplayMap,
@@ -107,7 +106,7 @@ namespace LayoutFarm.WebDom
                 CssDisplay.Inline,
                 value);
         }
-        public static CssBackgroundRepeat GetBackgroundRepeat(WebDom.CssCodeValueExpression value)
+        public static CssBackgroundRepeat GetBackgroundRepeat(WebDom.CssValueExpression value)
         {
             return (CssBackgroundRepeat)EvaluateIntPropertyValueFromString(
                 _cssBackgroundRepeatMap,
@@ -120,7 +119,7 @@ namespace LayoutFarm.WebDom
         {
             return _cssDirectionMap.GetStringFromValue(value);
         }
-        public static CssDirection GetCssDirection(WebDom.CssCodeValueExpression value)
+        public static CssDirection GetCssDirection(WebDom.CssValueExpression value)
         {
             return (CssDirection)EvaluateIntPropertyValueFromString(
              _cssDirectionMap,
@@ -129,7 +128,7 @@ namespace LayoutFarm.WebDom
              value);
         }
         //----------------------
-        public static CssPosition GetCssPosition(WebDom.CssCodeValueExpression value)
+        public static CssPosition GetCssPosition(WebDom.CssValueExpression value)
         {
             return (CssPosition)EvaluateIntPropertyValueFromString(
              _cssPositionMap,
@@ -137,7 +136,7 @@ namespace LayoutFarm.WebDom
              CssPosition.Static,
              value);
         }
-        public static CssWordBreak GetWordBreak(WebDom.CssCodeValueExpression value)
+        public static CssWordBreak GetWordBreak(WebDom.CssValueExpression value)
         {
             return (CssWordBreak)EvaluateIntPropertyValueFromString(
              _cssWordBreakMap,
@@ -145,7 +144,7 @@ namespace LayoutFarm.WebDom
              CssWordBreak.Normal,
              value);
         }
-        public static CssTextDecoration GetTextDecoration(WebDom.CssCodeValueExpression value)
+        public static CssTextDecoration GetTextDecoration(WebDom.CssValueExpression value)
         {
             return (CssTextDecoration)EvaluateIntPropertyValueFromString(
                 _cssTextDecorationMap,
@@ -153,7 +152,7 @@ namespace LayoutFarm.WebDom
                 CssTextDecoration.NotAssign,
                 value);
         }
-        public static CssOverflow GetOverflow(WebDom.CssCodeValueExpression value)
+        public static CssOverflow GetOverflow(WebDom.CssValueExpression value)
         {
             return (CssOverflow)EvaluateIntPropertyValueFromString(
                _cssOverFlowMap,
@@ -161,7 +160,7 @@ namespace LayoutFarm.WebDom
                CssOverflow.Visible,
                value);
         }
-        public static CssTextAlign GetTextAlign(WebDom.CssCodeValueExpression value)
+        public static CssTextAlign GetTextAlign(WebDom.CssValueExpression value)
         {
             return (CssTextAlign)EvaluateIntPropertyValueFromString(
                 _cssTextAlignMap,
@@ -169,7 +168,7 @@ namespace LayoutFarm.WebDom
                 CssTextAlign.NotAssign,
                 value);
         }
-        public static CssBoxSizing GetBoxSizing(WebDom.CssCodeValueExpression value)
+        public static CssBoxSizing GetBoxSizing(WebDom.CssValueExpression value)
         {
             return (CssBoxSizing)EvaluateIntPropertyValueFromString(
                 _cssBoxSizingMap,
@@ -177,7 +176,7 @@ namespace LayoutFarm.WebDom
                 CssBoxSizing.ContentBox,//default
                 value);
         }
-        public static CssVerticalAlign GetVerticalAlign(WebDom.CssCodeValueExpression value)
+        public static CssVerticalAlign GetVerticalAlign(WebDom.CssValueExpression value)
         {
             return (CssVerticalAlign)EvaluateIntPropertyValueFromString(
             _cssVerticalAlignMap,
@@ -187,7 +186,7 @@ namespace LayoutFarm.WebDom
         }
 
 
-        public static CssVisibility GetVisibility(WebDom.CssCodeValueExpression value)
+        public static CssVisibility GetVisibility(WebDom.CssValueExpression value)
         {
             return (CssVisibility)EvaluateIntPropertyValueFromString(
             _cssVisibilityMap,
@@ -195,7 +194,7 @@ namespace LayoutFarm.WebDom
             CssVisibility.Visible,
             value);
         }
-        public static CssWhiteSpace GetWhitespace(WebDom.CssCodeValueExpression value)
+        public static CssWhiteSpace GetWhitespace(WebDom.CssValueExpression value)
         {
             return (CssWhiteSpace)EvaluateIntPropertyValueFromString(
             _cssWhitespaceMap,
@@ -203,7 +202,7 @@ namespace LayoutFarm.WebDom
             CssWhiteSpace.Normal,
             value);
         }
-        public static CssBorderStyle GetBorderStyle(WebDom.CssCodeValueExpression value)
+        public static CssBorderStyle GetBorderStyle(WebDom.CssValueExpression value)
         {
             return (CssBorderStyle)EvaluateIntPropertyValueFromString(
                    _cssBorderStyleMap,
@@ -240,7 +239,7 @@ namespace LayoutFarm.WebDom
             }
         }
 
-        public static CssEmptyCell GetEmptyCell(WebDom.CssCodeValueExpression value)
+        public static CssEmptyCell GetEmptyCell(WebDom.CssValueExpression value)
         {
             return (CssEmptyCell)EvaluateIntPropertyValueFromString(
                _cssEmptyCellMap,
@@ -296,7 +295,7 @@ namespace LayoutFarm.WebDom
         {
             return _wellKnownCssPropNameMap.GetValueFromString(propertyName, WebDom.WellknownCssPropertyName.Unknown);
         }
-        public static CssFloat GetFloat(WebDom.CssCodeValueExpression value)
+        public static CssFloat GetFloat(WebDom.CssValueExpression value)
         {
             return (CssFloat)EvaluateIntPropertyValueFromString(
                 _cssFloatMap,
@@ -321,15 +320,15 @@ namespace LayoutFarm.WebDom
         {
             return _cssBackgroundRepeatMap.GetStringFromValue(backgrounRepeat);
         }
-        public static string ToHexColor(this Color color)
-        {
-            return string.Concat("#", color.R.ToString("X"), color.G.ToString("X"), color.B.ToString("X"));
-        }
+        //public static string ToHexColor(this CssColor color)
+        //{
+        //    return string.Concat("#", color.R.ToString("X"), color.G.ToString("X"), color.B.ToString("X"));
+        //}
         public static string ToCssStringValue(this CssFontStyle fontstyle)
         {
             return _cssFontStyleMap.GetStringFromValue(fontstyle);
         }
-        public static CssFontStyle GetFontStyle(WebDom.CssCodeValueExpression value)
+        public static CssFontStyle GetFontStyle(WebDom.CssValueExpression value)
         {
             return (CssFontStyle)EvaluateIntPropertyValueFromString(
               _cssFontStyleMap,
@@ -341,7 +340,7 @@ namespace LayoutFarm.WebDom
         {
             return _cssFontVariantMap.GetStringFromValue(fontVariant);
         }
-        public static CssFontVariant GetFontVariant(WebDom.CssCodeValueExpression value)
+        public static CssFontVariant GetFontVariant(WebDom.CssValueExpression value)
         {
             return (CssFontVariant)EvaluateIntPropertyValueFromString(
               _cssFontVariantMap,
@@ -384,7 +383,7 @@ namespace LayoutFarm.WebDom
         }
 
 
-        public static LayoutFarm.Css.CssLength AsBorderLength(this WebDom.CssCodeValueExpression value)
+        public static LayoutFarm.Css.CssLength AsBorderLength(this WebDom.CssValueExpression value)
         {
             if (value.EvaluatedAs != WebDom.CssValueEvaluatedAs.BorderLength)
             {
@@ -392,9 +391,9 @@ namespace LayoutFarm.WebDom
                 {
                     case WebDom.CssValueHint.Number:
                         {
-                            if (value is WebDom.CssCodePrimitiveExpression)
+                            if (value is WebDom.CssPrimitiveValueExpression)
                             {
-                                WebDom.CssCodePrimitiveExpression prim = (WebDom.CssCodePrimitiveExpression)value;
+                                WebDom.CssPrimitiveValueExpression prim = (WebDom.CssPrimitiveValueExpression)value;
                                 CssLength len = new CssLength(value.AsNumber(), GetCssUnit(prim.Unit));
                                 value.SetCssLength(len, WebDom.CssValueEvaluatedAs.BorderLength);
                                 return len;
@@ -418,7 +417,7 @@ namespace LayoutFarm.WebDom
         }
 
 
-        public static CssLength AsLength(this WebDom.CssCodeValueExpression value)
+        public static CssLength AsLength(this WebDom.CssValueExpression value)
         {
             if (value.EvaluatedAs != WebDom.CssValueEvaluatedAs.Length)
             {
@@ -427,9 +426,9 @@ namespace LayoutFarm.WebDom
                 {
                     case WebDom.CssValueHint.Number:
                         {
-                            if (value is WebDom.CssCodePrimitiveExpression)
+                            if (value is WebDom.CssPrimitiveValueExpression)
                             {
-                                WebDom.CssCodePrimitiveExpression prim = (WebDom.CssCodePrimitiveExpression)value;
+                                WebDom.CssPrimitiveValueExpression prim = (WebDom.CssPrimitiveValueExpression)value;
                                 CssLength len = new CssLength(value.AsNumber(), GetCssUnit(prim.Unit));
                                 value.SetCssLength(len, WebDom.CssValueEvaluatedAs.Length);
                                 return len;
@@ -454,7 +453,7 @@ namespace LayoutFarm.WebDom
 
 
 
-        public static CssLength AsTranslatedLength(this WebDom.CssCodeValueExpression value)
+        public static CssLength AsTranslatedLength(this WebDom.CssValueExpression value)
         {
             if (value.EvaluatedAs != WebDom.CssValueEvaluatedAs.TranslatedLength)
             {
@@ -462,9 +461,9 @@ namespace LayoutFarm.WebDom
                 {
                     case WebDom.CssValueHint.Number:
                         {
-                            if (value is WebDom.CssCodePrimitiveExpression)
+                            if (value is WebDom.CssPrimitiveValueExpression)
                             {
-                                WebDom.CssCodePrimitiveExpression prim = (WebDom.CssCodePrimitiveExpression)value;
+                                WebDom.CssPrimitiveValueExpression prim = (WebDom.CssPrimitiveValueExpression)value;
                                 CssLength len = new CssLength(value.AsNumber(), GetCssUnit(prim.Unit));
                                 if (len.HasError)
                                 {
@@ -490,17 +489,17 @@ namespace LayoutFarm.WebDom
             }
             return value.GetCacheCssLength();
         }
-        public static Color AsColor(WebDom.CssCodeValueExpression value)
+        public static CssColor AsColor(WebDom.CssValueExpression value)
         {
             if (value.EvaluatedAs != WebDom.CssValueEvaluatedAs.Color)
             {
-                if (value is WebDom.CssCodeColor)
+                if (value is WebDom.CssColorValueExpression v)
                 {
-                    return ((WebDom.CssCodeColor)value).ActualColor;
+                    return v.ActualColor;
                 }
                 else
                 {
-                    Color actualColor = LayoutFarm.WebDom.Parser.CssValueParser.ParseCssColor(value.GetTranslatedStringValue());
+                    CssColor actualColor = LayoutFarm.WebDom.Parser.CssValueParser.ParseCssColor(value.GetTranslatedStringValue());
                     value.SetColorValue(actualColor);
                     return actualColor;
                 }
@@ -509,7 +508,7 @@ namespace LayoutFarm.WebDom
         }
 
 
-        public static CssFontWeight GetFontWeight(WebDom.CssCodeValueExpression value)
+        public static CssFontWeight GetFontWeight(WebDom.CssValueExpression value)
         {
             return (CssFontWeight)EvaluateIntPropertyValueFromString(
                 _cssFontWeightMap,
@@ -527,7 +526,7 @@ namespace LayoutFarm.WebDom
         {
             return _cssListStylePositionMap.GetStringFromValue(listStylePosition);
         }
-        public static CssListStylePosition GetListStylePosition(WebDom.CssCodeValueExpression value)
+        public static CssListStylePosition GetListStylePosition(WebDom.CssValueExpression value)
         {
             return (CssListStylePosition)EvaluateIntPropertyValueFromString(
                _cssListStylePositionMap,
@@ -540,7 +539,7 @@ namespace LayoutFarm.WebDom
         {
             return _cssListStyleTypeMap.GetStringFromValue(listStyleType);
         }
-        public static CssListStyleType GetListStyleType(WebDom.CssCodeValueExpression value)
+        public static CssListStyleType GetListStyleType(WebDom.CssValueExpression value)
         {
             return (CssListStyleType)EvaluateIntPropertyValueFromString(
             _cssListStyleTypeMap,
@@ -1044,7 +1043,7 @@ namespace LayoutFarm.WebDom
             0xFFECE9D8,	/* 173 - MenuBar */
             0xFF316AC5,	/* 174 - MenuHighlight */
         };
-        static Dictionary<string, Color> colorsByName = new Dictionary<string, Color>();
+        static Dictionary<string, CssColor> colorsByName = new Dictionary<string, CssColor>();
         static KnownColors()
         {
             int j = argbValues.Length;
@@ -1053,28 +1052,28 @@ namespace LayoutFarm.WebDom
                 string colorName = GetName(i).ToUpper();
                 colorsByName[colorName] = FromKnownColor((KnownColor)i);
             }
-            colorsByName["NONE"] = Color.Empty;
+            colorsByName["NONE"] = CssColor.Empty;
         }
 
-        public static Color FromKnownColor(string colorName)
+
+        public static CssColor FromKnownColor(string colorName)
         {
             colorName = colorName.ToUpper();
-            Color c;
-            if (!colorsByName.TryGetValue(colorName.ToUpper(), out c))
+            if (!colorsByName.TryGetValue(colorName.ToUpper(), out CssColor c))
             {
-                return Color.Black;
+                return CssColor.Black;
             }
             return c;
         }
-        public static Color FromKnownColor(KnownColor kc)
+        public static CssColor FromKnownColor(KnownColor kc)
         {
             int index = (int)kc;
             if (index < 0 || index > argbValues.Length)
             {
-                return Color.Black;
+                return CssColor.Black;
             }
             uint colorValue = argbValues[index];
-            return new Color((byte)(colorValue >> 24),
+            return CssColor.FromArgb255((byte)(colorValue >> 24),
                      (byte)((colorValue >> 16) & 0xFF),
                      (byte)((colorValue >> 8) & 0xFF),
                      (byte)(colorValue & 0xFF));

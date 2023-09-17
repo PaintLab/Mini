@@ -4,18 +4,18 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using LayoutFarm.Css;
-using PixelFarm.Drawing;
+
 
 namespace LayoutFarm.WebDom
 {
-    public abstract class CssCodeValueExpression
+    public abstract class CssValueExpression
     {
 #if DEBUG
         static int dbugTotalId;
         public readonly int dbugId = dbugTotalId++;
 #endif
 
-        public CssCodeValueExpression(CssValueHint hint)
+        public CssValueExpression(CssValueHint hint)
         {
 #if DEBUG
             //if (this.dbugId == 111)
@@ -28,32 +28,21 @@ namespace LayoutFarm.WebDom
 
 
         CssValueEvaluatedAs _evaluatedAs;
-        PixelFarm.Drawing.Color _cachedColor;
-        LayoutFarm.Css.CssLength _cachedLength;
+        CssColor _cachedColor;
+        CssLength _cachedLength;
         int _cachedInt;
         protected float _number;
-        public bool IsInherit
-        {
-            get;
-            internal set;
-        }
-        public CssValueHint Hint
-        {
-            get;
-            private set;
-        }
-        //------------------------------------------------------
-        public float AsNumber()
-        {
-            return _number;
-        }
+        public bool IsInherit { get; internal set; }
+        public CssValueHint Hint { get; internal set; }
+
+        public float AsNumber() => _number;
 
         public void SetIntValue(int intValue, CssValueEvaluatedAs evaluatedAs)
         {
             _evaluatedAs = evaluatedAs;
             _cachedInt = intValue;
         }
-        public void SetColorValue(PixelFarm.Drawing.Color color)
+        public void SetColorValue(CssColor color)
         {
             _evaluatedAs = CssValueEvaluatedAs.Color;
             _cachedColor = color;
@@ -67,7 +56,7 @@ namespace LayoutFarm.WebDom
         //
         public CssValueEvaluatedAs EvaluatedAs => _evaluatedAs;
         //
-        public Color GetCacheColor() => _cachedColor;
+        public CssColor GetCacheColor() => _cachedColor;
         //
         public CssLength GetCacheCssLength() => _cachedLength;
         //
@@ -75,25 +64,23 @@ namespace LayoutFarm.WebDom
         //
         public int GetCacheIntValue() => _cachedInt;
     }
-    public class CssCodeColor : CssCodeValueExpression
+    public class CssColorValueExpression : CssValueExpression
     {
 
-        public CssCodeColor(Color color)
+        public CssColorValueExpression(CssColor color)
             : base(CssValueHint.HexColor)
         {
             ActualColor = color;
             SetColorValue(color);
         }
-        public Color ActualColor { get; private set; }
+        public CssColor ActualColor { get; private set; }
     }
 
-
-
-    public class CssCodePrimitiveExpression : CssCodeValueExpression
+    public class CssPrimitiveValueExpression : CssValueExpression
     {
 
         readonly string _propertyValue;
-        public CssCodePrimitiveExpression(string value, CssValueHint hint)
+        public CssPrimitiveValueExpression(string value, CssValueHint hint)
             : base(hint)
         {
             _propertyValue = value;
@@ -112,7 +99,7 @@ namespace LayoutFarm.WebDom
                     break;
             }
         }
-        public CssCodePrimitiveExpression(float number)
+        public CssPrimitiveValueExpression(float number)
             : base(CssValueHint.Number)
         {
             //number             
@@ -152,23 +139,18 @@ namespace LayoutFarm.WebDom
     }
 
 
-
-    public class CssCodeFunctionCallExpression : CssCodeValueExpression
+    public class CssFunctionCallExpression : CssValueExpression
     {
         string _evaluatedStringValue;
         bool _isEval;
-        List<CssCodeValueExpression> _funcArgs = new List<CssCodeValueExpression>();
-        public CssCodeFunctionCallExpression(string funcName)
+        List<CssValueExpression> _funcArgs = new List<CssValueExpression>();
+        public CssFunctionCallExpression(string funcName)
             : base(CssValueHint.Func)
         {
             this.FunctionName = funcName;
         }
-        public string FunctionName
-        {
-            get;
-            private set;
-        }
-        public void AddFuncArg(CssCodeValueExpression arg)
+        public string FunctionName { get; }
+        public void AddFuncArg(CssValueExpression arg)
         {
             _funcArgs.Add(arg);
         }
@@ -263,27 +245,15 @@ namespace LayoutFarm.WebDom
         }
     }
 
-    public class CssCodeBinaryExpression : CssCodeValueExpression
+    public class CssBinaryExpression : CssValueExpression
     {
-        public CssCodeBinaryExpression()
+        public CssBinaryExpression()
             : base(CssValueHint.BinaryExpression)
         {
         }
-        public CssValueOpName OpName
-        {
-            get;
-            set;
-        }
-        public CssCodeValueExpression Left
-        {
-            get;
-            set;
-        }
-        public CssCodeValueExpression Right
-        {
-            get;
-            set;
-        }
+        public CssValueOpName OpName { get; set; }
+        public CssValueExpression Left { get; set; }
+        public CssValueExpression Right { get; set; }
         public override string ToString()
         {
             StringBuilder stbuilder = new StringBuilder();

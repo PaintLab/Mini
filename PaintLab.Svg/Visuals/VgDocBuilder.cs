@@ -43,6 +43,12 @@ namespace PaintLab.Svg
             }
             _currentElem = _svgDoc.Root;
         }
+        public void OnVisitNewElement(string prefix, string elemName)
+        {
+            //TODO: review here again
+            //throw new NotSupportedException();
+            OnVisitNewElement(elemName);
+        }
         public void OnVisitNewElement(string elemName)
         {
             SvgElement newElem = CreateElement(elemName);
@@ -52,6 +58,12 @@ namespace PaintLab.Svg
                 _currentElem.AddElement(newElem);
             }
             _currentElem = newElem;
+        }
+        public void OnAttribute(string attrPrefix, string attrName, string value)
+        {
+            //
+            //throw new NotSupportedException();//TODO: review here again**
+            _currentCreator.AssignAttribute(attrName, value);
         }
         public void OnAttribute(string attrName, string value)
         {
