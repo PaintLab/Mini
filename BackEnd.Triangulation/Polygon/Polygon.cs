@@ -58,7 +58,8 @@ namespace Poly2Tri
         public Polygon(TriangulationPoint[] points)
         {
             _points = points;
-            if (points.Length < 3) throw new ArgumentException("List has fewer than 3 points", "points");
+            if (points.Length < 3) 
+                throw new ArgumentException("List has fewer than 3 points", "points");
             // Lets do one sanity check that first and last point hasn't got same position
             // Its something that often happen when importing polygon data from other formats 
             if (points[0].Equals(points[points.Length - 1]))

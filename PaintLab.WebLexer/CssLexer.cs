@@ -373,8 +373,7 @@ namespace LayoutFarm.WebDom.Parser
 
         static CssTokenName GetTerminalTokenName(char c)
         {
-            CssTokenName tokenName;
-            if (terminals.TryGetValue(c, out tokenName))
+            if (s_terminals.TryGetValue(c, out CssTokenName tokenName))
             {
                 return tokenName;
             }
@@ -385,48 +384,48 @@ namespace LayoutFarm.WebDom.Parser
         }
 
         //===============================================================================================
-        static readonly Dictionary<char, CssTokenName> terminals = new Dictionary<char, CssTokenName>();
-        static readonly Dictionary<string, CssTokenName> multiCharTokens = new Dictionary<string, CssTokenName>();
+        static readonly Dictionary<char, CssTokenName> s_terminals = new Dictionary<char, CssTokenName>();
+        static readonly Dictionary<string, CssTokenName> s_multiCharTokens = new Dictionary<string, CssTokenName>();
         static CssLexer()
         {
             //" @+-*/%.:;[](){}"
-            terminals.Add(' ', CssTokenName.Whitespace);
-            terminals.Add('\r', CssTokenName.Whitespace);
-            terminals.Add('\t', CssTokenName.Whitespace);
-            terminals.Add('\f', CssTokenName.Whitespace);
-            terminals.Add('\n', CssTokenName.Newline);
-            terminals.Add('\'', CssTokenName.Quote);
-            terminals.Add('"', CssTokenName.DoubleQuote);
-            terminals.Add(',', CssTokenName.Comma);
-            terminals.Add('@', CssTokenName.At);
-            terminals.Add('+', CssTokenName.Plus);
-            terminals.Add('-', CssTokenName.Minus);
-            terminals.Add('*', CssTokenName.Star);
-            terminals.Add('/', CssTokenName.Divide);
-            terminals.Add('%', CssTokenName.Percent);
-            terminals.Add('#', CssTokenName.Sharp);
-            terminals.Add('~', CssTokenName.Tile);
-            terminals.Add('.', CssTokenName.Dot);
-            terminals.Add(':', CssTokenName.Colon);
-            terminals.Add(';', CssTokenName.SemiColon);
-            terminals.Add('[', CssTokenName.LBracket);
-            terminals.Add(']', CssTokenName.RBracket);
-            terminals.Add('(', CssTokenName.LParen);
-            terminals.Add(')', CssTokenName.RParen);
-            terminals.Add('{', CssTokenName.LBrace);
-            terminals.Add('}', CssTokenName.RBrace);
-            terminals.Add('<', CssTokenName.LAngle);
-            terminals.Add('>', CssTokenName.RAngle);
-            terminals.Add('=', CssTokenName.OpEq);
-            terminals.Add('|', CssTokenName.OrPipe);
-            terminals.Add('$', CssTokenName.Dollar);
-            terminals.Add('^', CssTokenName.Cap);
+            s_terminals.Add(' ', CssTokenName.Whitespace);
+            s_terminals.Add('\r', CssTokenName.Whitespace);
+            s_terminals.Add('\t', CssTokenName.Whitespace);
+            s_terminals.Add('\f', CssTokenName.Whitespace);
+            s_terminals.Add('\n', CssTokenName.Newline);
+            s_terminals.Add('\'', CssTokenName.Quote);
+            s_terminals.Add('"', CssTokenName.DoubleQuote);
+            s_terminals.Add(',', CssTokenName.Comma);
+            s_terminals.Add('@', CssTokenName.At);
+            s_terminals.Add('+', CssTokenName.Plus);
+            s_terminals.Add('-', CssTokenName.Minus);
+            s_terminals.Add('*', CssTokenName.Star);
+            s_terminals.Add('/', CssTokenName.Divide);
+            s_terminals.Add('%', CssTokenName.Percent);
+            s_terminals.Add('#', CssTokenName.Sharp);
+            s_terminals.Add('~', CssTokenName.Tile);
+            s_terminals.Add('.', CssTokenName.Dot);
+            s_terminals.Add(':', CssTokenName.Colon);
+            s_terminals.Add(';', CssTokenName.SemiColon);
+            s_terminals.Add('[', CssTokenName.LBracket);
+            s_terminals.Add(']', CssTokenName.RBracket);
+            s_terminals.Add('(', CssTokenName.LParen);
+            s_terminals.Add(')', CssTokenName.RParen);
+            s_terminals.Add('{', CssTokenName.LBrace);
+            s_terminals.Add('}', CssTokenName.RBrace);
+            s_terminals.Add('<', CssTokenName.LAngle);
+            s_terminals.Add('>', CssTokenName.RAngle);
+            s_terminals.Add('=', CssTokenName.OpEq);
+            s_terminals.Add('|', CssTokenName.OrPipe);
+            s_terminals.Add('$', CssTokenName.Dollar);
+            s_terminals.Add('^', CssTokenName.Cap);
             //----------------------------------- 
-            multiCharTokens.Add("|=", CssTokenName.OrPipeAssign);
-            multiCharTokens.Add("~=", CssTokenName.TileAssign);
-            multiCharTokens.Add("^=", CssTokenName.CapAssign);
-            multiCharTokens.Add("$=", CssTokenName.DollarAssign);
-            multiCharTokens.Add("*=", CssTokenName.StarAssign);
+            s_multiCharTokens.Add("|=", CssTokenName.OrPipeAssign);
+            s_multiCharTokens.Add("~=", CssTokenName.TileAssign);
+            s_multiCharTokens.Add("^=", CssTokenName.CapAssign);
+            s_multiCharTokens.Add("$=", CssTokenName.DollarAssign);
+            s_multiCharTokens.Add("*=", CssTokenName.StarAssign);
             //----------------------------------- 
         }
     }

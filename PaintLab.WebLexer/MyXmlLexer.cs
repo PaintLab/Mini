@@ -329,9 +329,7 @@ namespace LayoutFarm.WebDom.Parser
             dbug_OnFinishAnalyze();
 #endif
         }
-
-
-
+        
         void FlushExisingBuffer(int lastFlushAtIndex, XmlLexerEvent lexerEvent)
         {
             //raise lexer event
