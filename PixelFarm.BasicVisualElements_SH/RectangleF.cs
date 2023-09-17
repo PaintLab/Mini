@@ -81,9 +81,9 @@ namespace PixelFarm.Drawing
         ///	Inflates the RectangleF by a specified width and height.
         /// </remarks>
 
-        public void Inflate(float x, float y)
+        public void Inflate(float dw, float dh)
         {
-            Inflate(new SizeF(x, y));
+            Inflate(new SizeF(dw, dh));
         }
 
         /// <summary>
@@ -288,6 +288,7 @@ namespace PixelFarm.Drawing
 
 
         public float Left => _left;
+        
 
         /// <summary>
         ///	Location Property
@@ -508,6 +509,8 @@ namespace PixelFarm.Drawing
         {
             Offset(pos.X, pos.Y);
         }
+        public float X => _left;
+        public float Y => _top;
 
         /// <summary>
         ///	ToString Method

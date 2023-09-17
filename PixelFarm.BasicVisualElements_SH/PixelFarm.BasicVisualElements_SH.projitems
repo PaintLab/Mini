@@ -12,7 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)AffineMat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BasicGeometries.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BitmapBufferFormat.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ClipLiangBarsky.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Color.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExtensionAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICoordTransformer.cs" />

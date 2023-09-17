@@ -43,7 +43,20 @@ namespace PixelFarm.CpuBlit
             sx, shy,
             shx, sy,
             tx, ty;
-
+#if DEBUG
+        public override string ToString()
+        {
+            return $"{sx},{shy},0|\r\n{shx},{sy},0|\r\n{tx},{ty},1";
+        }
+#endif
+        public AffineMat(double v0_sx, double v1_shy,
+                              double v2_shx, double v3_sy,
+                              double v4_tx, double v5_ty)
+        {
+            sx = v0_sx; shy = v1_shy;
+            shx = v2_shx; sy = v3_sy;
+            tx = v4_tx; ty = v5_ty;
+        }
         public void SetValues(double v0_sx, double v1_shy,
                               double v2_shx, double v3_sy,
                               double v4_tx, double v5_ty)
@@ -59,11 +72,24 @@ namespace PixelFarm.CpuBlit
                (float) shx, (float) sy, 0,
                (float) tx, (float) ty, 1
             };
+
+
+
+        public bool IsIden()
+        {
+            return (sx == 1 && sx == sy) && (tx == 0 && tx == ty) && (shx == 0 && shx == shy);
+        }
+
+        public void Multiply(in AffineMat m, out AffineMat newOutput)
+        {
+            newOutput = this;//copy
+            newOutput.Multiply(m);
+        }
         /// <summary>
         /// inside-values will be CHANGED after call this
         /// </summary>
         /// <param name="m"></param>
-        public void Multiply(ref AffineMat m)
+        public void Multiply(in AffineMat m)
         {
             double t0 = sx * m.sx + shy * m.shx;
             double t2 = shx * m.sx + sy * m.shx;
@@ -209,7 +235,8 @@ namespace PixelFarm.CpuBlit
 
 
 
-        static readonly AffineMat s_Iden = new AffineMat() {
+        static readonly AffineMat s_Iden = new AffineMat()
+        {
             sx = 1,
             shy = 0,
             shx = 0,
