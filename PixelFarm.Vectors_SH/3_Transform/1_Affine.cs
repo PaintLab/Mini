@@ -285,14 +285,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         ICoordTransformer ICoordTransformer.CreateInvert() => CreateInvert();
         public ICoordTransformer MultiplyWith(ICoordTransformer another)
         {
-            if (another is Affine)
+            if (another is Affine aff)
             {
-                return this * (Affine)another;
+                return this * aff;
             }
-            else if (another is Perspective)
+            else if (another is Perspective persective)
             {
                 Perspective p = new Perspective(this);
-                return p * (Perspective)another;
+                return p * persective;
             }
             else
             {
@@ -344,7 +344,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             _isIdenHint = a._isIdenHint;
             _elems = a._elems; //copy
-            _elems.Multiply(ref b._elems);
+            _elems.Multiply(in b._elems);
 
         }
 
@@ -394,7 +394,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             return NewRotation(degree * (Math.PI / 180d));
         }
         public static Affine NewRotationDeg(double degree, double rotationCenterX, double rotationCenterY)
-        { 
+        {
             return new Affine(AffineMat.GetRotateDegMat(degree, rotationCenterX, rotationCenterY));
         }
         //====================================================trans_affine_scaling
@@ -406,7 +406,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 0.0, scale,
                 0.0, 0.0);
         }
-
+        public static Affine NewScaling(Affine a1, double scale)
+        {
+            return new Affine(
+                a1.sx * scale, a1.shx * scale,
+                a1.shy * scale, a1.sy * scale,
+                a1.tx * scale, a1.ty * scale);
+        }
         public static Affine NewScaling(double x, double y)
         {
             return new Affine(

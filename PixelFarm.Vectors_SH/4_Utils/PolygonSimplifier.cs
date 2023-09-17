@@ -197,12 +197,12 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public abstract class BaseSimplifier<T>
     {
-        Func<T, T, Boolean> _equalityChecker;
+        Func<T, T, bool> _equalityChecker;
 
-        private class Range
+        struct Range
         {
-            public int First { get; }
-            public int Last { get; }
+            public readonly int First;
+            public readonly int Last;
 
             public Range(int first, int last)
             {

@@ -152,8 +152,9 @@ namespace Tesselate
             }
             else
             {
+
                 if (begin >= end)
-                {
+                {   //https://github.com/LayoutFarm/Typography/pull/227/commits/7dc5493723a3c5f7302fc447b98aa92a43d2d7e2
                     return -1;//not found
                 }
                 if (sample.Data.CompareTo(refItem.Data) < 0)
