@@ -1318,7 +1318,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 int bufferOffset = x1;
                 byte alpha = (byte)(((int)(src_alpha) * (cover + 1)) >> 8);
                 byte[] buffer = _line_buffer;
-
+                byte new_value = (byte)((alpha) - ((BASE_MASK) >> (int)CO.BASE_SHIFT));
                 if (alpha == BASE_MASK)
                 {
                     //full
@@ -1336,7 +1336,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                         //original
                         //buffer[bufferOffset] = (byte)((alpha + EXISTING_A) - ((alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
                         //since in this case EXISTING_A is always 0, so we remove it
-                        buffer[bufferOffset] = (byte)((alpha) - ((BASE_MASK) >> (int)CO.BASE_SHIFT));
+                        buffer[bufferOffset] = new_value;
                         bufferOffset++;
 
                     } while (--len != 0);
@@ -1347,7 +1347,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         /// <summary>
         /// temporary (forward write) accum buffer
         /// </summary>
-        struct TempForwardAccumBuffer
+        ref struct TempForwardAccumBuffer
         {
             //similar to circular queue.
 

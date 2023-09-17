@@ -163,7 +163,7 @@ namespace PixelFarm.CpuBlit.Rasterization
 
         //--------------------------------------------------------------------
         /// <summary>
-        /// reset scanlineRas cell and status
+        /// reset scanlineRas cell and status (perline)
         /// </summary>
         public void Reset()
         {
@@ -197,12 +197,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         static int upscale(double v) => AggMathRound.iround(v * poly_subpix.SCALE);
         static int upscale(int v) => v << poly_subpix.SHIFT;
         //
-        ////from vector clipper
-        //static int downscale(int v)
-        //{
-        //    return v / (int)poly_subpix.SCALE;
-        //}
-        //---------------------------------
+      
         public FillingRule ScanlineFillingRule
         {
             get => _filling_rule;

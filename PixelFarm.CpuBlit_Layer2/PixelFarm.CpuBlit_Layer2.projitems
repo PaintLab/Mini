@@ -42,7 +42,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)04_FragmentProcessing\SpanInterpolatorPerspectiveLerp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)04_FragmentProcessing_Gradient\RGBAGouraudSpanGen.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)05_PixelProcessing\MemBitmapBinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)05_PixelProcessing\PixelBlenderOthers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)05_PixelProcessing\SubBitmapBlender.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)08_ImageResampling\IImageFilter.cs" />

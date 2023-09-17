@@ -40,9 +40,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         protected const int BASE_SHITF = 8;
         protected const int BASE_SCALE = (int)(1 << BASE_SHITF);
         protected const int BASE_MASK = BASE_SCALE - 1;
-        protected IBitmapSrc _bmpSrc;
-
-
+        protected IBitmapSrc _bmpSrc; 
 
         public ImgSpanGen()
         {

@@ -46,7 +46,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         // A pixel cell. There're no constructors defined and it was done ***
         // intentionally in order to avoid extra overhead when allocating an ****
         // array of cells. ***
-        struct CellAA
+        readonly struct CellAA
         {
             public readonly int x;
             public readonly int y;
@@ -54,8 +54,8 @@ namespace PixelFarm.CpuBlit.Rasterization
             public readonly int area;
 #if DEBUG
 #if !COSMOS
-            public int dbugLeft;
-            public int dbugRight;
+            public readonly int dbugLeft;
+            public readonly int dbugRight;
 #endif
 #endif
             private CellAA(int x, int y, int cover, int area)
@@ -82,21 +82,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 //cell.area = area;
                 //return cell;
             }
-#if DEBUG
-            public static CellAA dbugCreate(int x, int y, int cover, int area, int left, int right)
-            {
-                CellAA cell = new CellAA(x, y, cover, area);
-                //cell.x = x;
-                //cell.y = y;
-                //cell.cover = cover;
-                //cell.area = area;
-#if !COSMOS
-                cell.dbugLeft = left;
-                cell.dbugRight = right;
-#endif
-                return cell;
-            }
-#endif
+
 #if DEBUG
 #if !COSMOS
             public override string ToString()
@@ -639,7 +625,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                     }
                     else
                     {
-                        int pivot = GetPivotPoint(dataToSort, beg, end);
+                        int pivot = SwapValuesAndGetPivotPoint(dataToSort, beg, end);
                         if (pivot > beg)
                         {
                             Sort(dataToSort, beg, pivot - 1);
@@ -652,7 +638,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                     }
                 }
 
-                static int GetPivotPoint(CellAA[] dataToSort, int begPoint, int endPoint)
+                static int SwapValuesAndGetPivotPoint(CellAA[] dataToSort, int begPoint, int endPoint)
                 {
                     int pivot = begPoint;
                     int m = begPoint + 1;
@@ -673,7 +659,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                     while (m < n)
                     {
                         //swap data between m and n
-                        CellAA temp = dataToSort[m];
+                        CellAA temp = dataToSort[m];//copy value
                         dataToSort[m] = dataToSort[n];
                         dataToSort[n] = temp;
                         while ((m < endPoint) && (x_at_PivotPoint >= dataToSort[m].x))
