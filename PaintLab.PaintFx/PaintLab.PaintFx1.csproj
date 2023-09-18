@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <Import Project="..\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\PixelFarm.Drawing\PixelFarm.Drawing.csproj" />
+  </ItemGroup>
+
+</Project>
