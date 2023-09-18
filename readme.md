@@ -1,0 +1,2 @@
+This repository contains shared software rendering projects utilized by both [PixelFarm](https://github.com/PaintLab/PixelFarm) and [Typography](https://github.com/LayoutFarm/Typography)
+For testing and demonstration projects, refer to the PixelFarm repository [PixelFarm](https://github.com/PaintLab/PixelFarm)
