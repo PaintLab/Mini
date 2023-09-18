@@ -3,16 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <Import Project="..\PaintLab.Css_SH\PaintLab.Css_SH.projitems" Label="Shared" />
-
-  <Import Project="..\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems" Label="Shared" />
-
-  <Import Project="..\PaintLab.WebLexer\WebLexer.projitems" Label="Shared" /> 
+  </PropertyGroup> 
 
   <ItemGroup>
-    <ProjectReference Include="..\PaintLab.PaintFx\PaintLab.PaintFx.csproj" />
+    <ProjectReference Include="..\PaintLab.Css1\PaintLab.Css1.csproj" />
+    <ProjectReference Include="..\PaintLab.PaintFx\PaintLab.PaintFx1.csproj" />
     <ProjectReference Include="..\PixelFarm.Drawing\PixelFarm.Drawing.csproj" />
   </ItemGroup>
 
