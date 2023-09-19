@@ -123,7 +123,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             atlasItem = null;
             return false;
         }
-
+        public string ResourceIden { get; set; }
         public static Dictionary<ushort, AtlasItem> CloneLocationWithOffset(SimpleBitmapAtlas org, int dx, int dy)
         {
             Dictionary<ushort, AtlasItem> cloneDic = new Dictionary<ushort, AtlasItem>();
