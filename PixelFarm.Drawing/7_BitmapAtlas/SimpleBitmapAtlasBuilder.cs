@@ -24,6 +24,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public string FontName { get; private set; }
         public string FontSubFamilyName { get; private set; }
         public CompactOption SpaceCompactOption { get; set; }
+        public bool DisableQuantizationOnFinalImage { get; set; }
         //
         public enum CompactOption
         {
@@ -73,6 +74,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             this.FontSubFamilyName = fontSubFamilyName;
             this.FontSizeInPoints = fontSizeInPts;
         }
+
         public MemBitmap BuildSingleImage(bool flipY)
         {
             //1. add to list 
@@ -219,8 +221,29 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 }
             }
 
+
+            if (!DisableQuantizationOnFinalImage)
+            {
+                //quantization : reduce blur edge of each mask (because of 0-255 gradient)
+                unsafe
+                {
+                    int len = mergeBmpBuffer.Length;
+                    fixed (int* ptr1_head = &mergeBmpBuffer[0])
+                    {
+                        int* p = ptr1_head;
+                        for (int i = 0; i < len; ++i)
+                        {
+                            int value = *p;
+                            //abgr, perserve alpha channel?                      
+                            *p = (value & (7 << 24)) | (QuantizePixel((byte)(value >> 16)) << 16) | (QuantizePixel((byte)(value >> 8)) << 8) | (QuantizePixel((byte)value));
+                            ++p;//move next
+                        }
+                    }
+                }
+            }
+
             //5. since the mergeBmpBuffer is head-down
-            //we will flipY axis again to head-up, the head-up img is easy to read and debug
+            //we will flipY axis again to head-up, the head-up img is easy to read and debug 
 
             if (flipY)
             {
@@ -254,6 +277,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             {
                 return _latestResultBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(totalImgWidth, imgH, mergeBmpBuffer);
             }
+        }
+
+        static byte QuantizePixel(byte byteValue)
+        {
+            if (byteValue < 31) return 0;
+            if (byteValue > 223) return 255;
+
+            if (byteValue <= 63) return 31;
+            if (byteValue <= 127) return 95;
+            if (byteValue <= 191) return 159;
+            return 223;
         }
 
         public void SaveAtlasInfo(System.IO.Stream outputStream)
