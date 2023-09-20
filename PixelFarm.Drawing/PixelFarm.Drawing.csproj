@@ -34,4 +34,8 @@
 
   <Import Project="..\BackEnd.Triangulation\Triangulation.projitems" Label="Shared" />
 
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+  </ItemGroup>
+
 </Project>

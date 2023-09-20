@@ -14,13 +14,15 @@ namespace PixelFarm.CpuBlit
         /// <param name="left"></param>
         /// <param name="top"></param>
         void DrawString(AggRenderVxFormattedString renderVx, double left, double top);
-        void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, char[] text, int startAt, int len);
+
+        void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, ReadOnlySpan<char> textspan);
         void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, IFormattedGlyphPlanList fmtGlyphPlans);
         int CurrentLineSpaceHeight { get; }
         void ChangeFont(RequestFont font);
         void ChangeFillColor(Color fillColor);
         void ChangeStrokeColor(Color strokColor);
         TextBaseline TextBaseline { get; set; }
+
         void DrawString(char[] text, int startAt, int len, double left, double top);
     }
 
@@ -119,9 +121,8 @@ namespace PixelFarm.CpuBlit
             var renderVxFmtStr = new AggRenderVxFormattedString();
             if (_textPrinter != null)
             {
-                char[] buffer = textspan.ToCharArray();
                 //prepare string from current printer setting
-                _textPrinter.PrepareStringForRenderVx(renderVxFmtStr, buffer, 0, buffer.Length);
+                _textPrinter.PrepareStringForRenderVx(renderVxFmtStr, textspan.AsSpan());
             }
             return renderVxFmtStr;
         }
@@ -139,7 +140,7 @@ namespace PixelFarm.CpuBlit
             var renderVxFmtStr = new AggRenderVxFormattedString();
             if (_textPrinter != null)
             {
-                _textPrinter.PrepareStringForRenderVx(renderVxFmtStr, textspanBuff, startAt, len);
+                _textPrinter.PrepareStringForRenderVx(renderVxFmtStr, new ReadOnlySpan<char>(textspanBuff, startAt, len));
             }
             return renderVxFmtStr;
         }
