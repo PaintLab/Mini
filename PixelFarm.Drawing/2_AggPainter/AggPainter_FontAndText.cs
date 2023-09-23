@@ -14,7 +14,7 @@ namespace PixelFarm.CpuBlit
         /// <param name="left"></param>
         /// <param name="top"></param>
         void DrawString(AggRenderVxFormattedString renderVx, double left, double top);
-
+        void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, ReadOnlySpan<int> textspan);
         void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, ReadOnlySpan<char> textspan);
         void PrepareStringForRenderVx(AggRenderVxFormattedString renderVx, IFormattedGlyphPlanList fmtGlyphPlans);
         int CurrentLineSpaceHeight { get; }
@@ -23,7 +23,7 @@ namespace PixelFarm.CpuBlit
         void ChangeStrokeColor(Color strokColor);
         TextBaseline TextBaseline { get; set; }
 
-        void DrawString(char[] text, int startAt, int len, double left, double top);
+        void DrawString(ReadOnlySpan<char> textspan, double left, double top);
     }
 
     partial class AggPainter
@@ -70,16 +70,14 @@ namespace PixelFarm.CpuBlit
             {
                 if (_orientation == RenderSurfaceOriginKind.LeftBottom)
                 {
-                    char[] buffer = text.ToCharArray();
-                    _textPrinter.DrawString(buffer, 0, buffer.Length, x, y);
+                    _textPrinter.DrawString(text.AsSpan(), x, y);
                 }
                 else
                 {
                     //from current point size 
                     //we need line height of current font size
                     //then we will start on 'base line'
-                    char[] buffer = text.ToCharArray();
-                    _textPrinter.DrawString(buffer, 0, buffer.Length, x, this.Height - y);
+                    _textPrinter.DrawString(text.AsSpan(), x, this.Height - y);
                 }
             }
         }
@@ -135,38 +133,27 @@ namespace PixelFarm.CpuBlit
             }
             return renderVxFmtStr;
         }
-        public override RenderVxFormattedString CreateRenderVx(char[] textspanBuff, int startAt, int len)
+
+        public override RenderVxFormattedString CreateFormattedString(ReadOnlySpan<char> buffer, bool delay)
         {
             var renderVxFmtStr = new AggRenderVxFormattedString();
             if (_textPrinter != null)
             {
-                _textPrinter.PrepareStringForRenderVx(renderVxFmtStr, new ReadOnlySpan<char>(textspanBuff, startAt, len));
+                _textPrinter.PrepareStringForRenderVx(renderVxFmtStr, buffer);
             }
             return renderVxFmtStr;
         }
-
         //-------------
-        public override RenderVxFormattedString CreateRenderVx(int[] utf32buffer, int startAt, int len)
+        public override RenderVxFormattedString CreateFormattedString(ReadOnlySpan<int> buffer, bool delay)
         {
-            throw new NotImplementedException();
+            var renderVxFmtStr = new AggRenderVxFormattedString();
+            if (_textPrinter != null)
+            {
+                _textPrinter.PrepareStringForRenderVx(renderVxFmtStr, buffer);
+            }
+            return renderVxFmtStr;
         }
-        public override RenderVxFormattedString CreateFormattedString(char[] buffer, int startAt, int len, bool delay)
-        {
-            throw new NotImplementedException();
-        }
-        public override RenderVxFormattedString CreateFormattedString(int[] buffer, int startAt, int len, bool delay)
-        {
-            throw new NotImplementedException();
-        }
-        public override void DrawText(char[] buffer, int startAt, int len, Rectangle logicalTextBox, int textAlignment)
-        {
-            throw new NotImplementedException();
-        }
-        public override void DrawText(char[] buffer, int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-        public override void DrawText(char[] buffer, Rectangle logicalTextBox, int textAlignment)
+        public override void DrawText(ReadOnlySpan<char> text, int x, int y)
         {
             throw new NotImplementedException();
         }

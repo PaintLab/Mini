@@ -61,7 +61,7 @@ namespace PixelFarm.Drawing
 
     namespace Internal
     {
-        public struct RenderVxGlyphPlan
+        public readonly struct RenderVxGlyphPlan
         {
             public readonly ushort glyphIndex;
             public readonly float x;

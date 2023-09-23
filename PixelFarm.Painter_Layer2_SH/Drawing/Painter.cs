@@ -17,6 +17,8 @@
 
 
 using PixelFarm.CpuBlit;
+using System;
+
 namespace PixelFarm.Drawing
 {
 
@@ -129,8 +131,7 @@ namespace PixelFarm.Drawing
         //-----
         public abstract RenderVxFormattedString CreateRenderVx(IFormattedGlyphPlanList formattedGlyphPlans);
         public abstract RenderVxFormattedString CreateRenderVx(string textspan);
-        public abstract RenderVxFormattedString CreateRenderVx(char[] textspanBuff, int startAt, int len);
-        public abstract RenderVxFormattedString CreateRenderVx(int[] utf32, int startAt, int len);
+
         //text,string
         //TODO: review text drawing funcs 
 
@@ -144,17 +145,16 @@ namespace PixelFarm.Drawing
 
         public abstract Color CurrentTextColor { get; set; }
         public abstract TextDrawingTech TextDrawingTech { get; set; }
-        public abstract void DrawText(char[] buffer, int x, int y);
-        public abstract void DrawText(char[] buffer, Rectangle logicalTextBox, int textAlignment);
-        public abstract void DrawText(char[] buffer, int startAt, int len, Rectangle logicalTextBox, int textAlignment);
+        public abstract void DrawText(ReadOnlySpan<char> text, int x, int y);
 
         /// <summary>
         /// create formatted string base on current font,font-size, font style
         /// </summary>
         /// <param name="buffer"></param>
-        /// <returns></returns>
-        public abstract RenderVxFormattedString CreateFormattedString(char[] buffer, int startAt, int len, bool delay);
-        public abstract RenderVxFormattedString CreateFormattedString(int[] buffer, int startAt, int len, bool delay);
+        /// <returns></returns> 
+
+        public abstract RenderVxFormattedString CreateFormattedString(ReadOnlySpan<char> buffer, bool delay);
+        public abstract RenderVxFormattedString CreateFormattedString(ReadOnlySpan<int> buffer, bool delay);
         public abstract void DrawRenderVx(RenderVx renderVx, float x, float y);
 
         //---------------
