@@ -75,6 +75,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             this.FontSizeInPoints = fontSizeInPts;
         }
 
+
+        const int PRESEVE_ALPHA = 0xFF << 24;
         public MemBitmap BuildSingleImage(bool flipY)
         {
             //1. add to list 
@@ -231,11 +233,13 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     fixed (int* ptr1_head = &mergeBmpBuffer[0])
                     {
                         int* p = ptr1_head;
+
                         for (int i = 0; i < len; ++i)
                         {
                             int value = *p;
-                            //abgr, perserve alpha channel?                      
-                            *p = (value & (7 << 24)) | (QuantizePixel((byte)(value >> 16)) << 16) | (QuantizePixel((byte)(value >> 8)) << 8) | (QuantizePixel((byte)value));
+                            //abgr, perserve alpha channel?
+                            //int alpha = (byte)(value >> 24);
+                            *p = (value & PRESEVE_ALPHA) | (QuantizePixel((byte)(value >> 16)) << 16) | (QuantizePixel((byte)(value >> 8)) << 8) | (QuantizePixel((byte)value));
                             ++p;//move next
                         }
                     }
