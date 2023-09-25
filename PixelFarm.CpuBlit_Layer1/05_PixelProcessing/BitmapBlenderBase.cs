@@ -21,6 +21,8 @@
 using System;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
+
+
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
 
@@ -53,8 +55,15 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         PixelBlender32 _outputPxBlender;
 
         public IntPtr GetInternalBufferPtr32 => _raw_buffer32;
+        public IntPtr GetRawBufferHead() => _raw_buffer32;
+        public unsafe byte* GetRawUInt8BufferHead() => (byte*)_raw_buffer32;
+        public unsafe int* GetRawInt32BufferHead() => (int*)_raw_buffer32;
 
-        public TempMemPtr GetBufferPtr() => new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
+        public BitmapBlenderBase()
+        {
+
+        }
+        public int BufferLengthInBytes => _rawBufferLenInBytes;
 
         protected void SetBufferToNull()
         {
@@ -62,13 +71,13 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             _rawBufferLenInBytes = 0;
         }
 
-        protected void SetBuffer(TempMemPtr tmpMem)
+        protected void SetBuffer(IntPtr memptr, int lengthInBytes)
         {
-            _raw_buffer32 = tmpMem.Ptr;
-            _rawBufferLenInBytes = tmpMem.LengthInBytes;
+            _raw_buffer32 = memptr;
+            _rawBufferLenInBytes = lengthInBytes;
         }
 
-        public abstract void WriteBuffer(int[] newbuffer);
+        public abstract void WriteBuffer(ReadOnlySpan<int> newBuffer);
 
 
         public void Attach(MemBitmap bmp, PixelBlender32 pixelBlender = null)
@@ -84,7 +93,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
 
             OnAttachingDstBitmap(bmp);
-            Attach(bmp.Width, bmp.Height, bmp.BitDepth, MemBitmap.GetBufferPtr(bmp), pixelBlender);
+            Attach(bmp.Width, bmp.Height, bmp.BitDepth, bmp, pixelBlender);
         }
 
         protected virtual void OnAttachingDstBitmap(MemBitmap bmp) { }
@@ -97,7 +106,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="bitsPerPixel"></param>
         /// <param name="imgbuffer"></param>
         /// <param name="outputPxBlender"></param>
-        protected void Attach(int width, int height, int bitsPerPixel, TempMemPtr imgbuffer, PixelBlender32 outputPxBlender)
+        protected void Attach(int width, int height, int bitsPerPixel, MemBitmap bmp, PixelBlender32 outputPxBlender)
         {
             if (width <= 0 || height <= 0)
             {
@@ -121,8 +130,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             SetDimmensionAndFormat(width, height, stride, bitsPerPixel, bitsPerPixel / 8);
             SetUpLookupTables();
             OutputPixelBlender = outputPxBlender;
-            _raw_buffer32 = imgbuffer.Ptr;
-            _rawBufferLenInBytes = imgbuffer.LengthInBytes;
+
+
+            _raw_buffer32 = bmp.GetRawBufferHead();
+            _rawBufferLenInBytes = bmp.BufferLengthInBytes;
         }
         /// <summary>
         /// detach from current img buffer and output pixel blender
@@ -176,11 +187,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 unsafe
                 {
 
-                    using (TempMemPtr memPtr = sourceImage.GetBufferPtr())
-                    using (TempMemPtr destPtr = this.GetBufferPtr())
+                    fixed (byte* sourceBuffer = sourceImage.GetBufferSpan())
                     {
-                        byte* sourceBuffer = (byte*)memPtr.Ptr;
-                        byte* destBuffer = (byte*)destPtr.Ptr;
+                        byte* destBuffer = this.GetRawUInt8BufferHead();
                         int destOffset = GetBufferOffsetXY32(clippedSourceImageRect.Left + destXOffset, clippedSourceImageRect.Bottom + destYOffset);
 
                         for (int i = 0; i < clippedSourceImageRect.Height; i++)
@@ -190,6 +199,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                             destOffset += Stride;
                         }
                     }
+
+
                 }
 
             }
@@ -209,20 +220,17 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                     {
                                         int sourceOffset = sourceImage.GetBufferOffsetXY32(clippedSourceImageRect.Left, clippedSourceImageRect.Bottom + i);
 
-                                        //byte[] sourceBuffer = sourceImage.GetBuffer();
-                                        //byte[] destBuffer = GetBuffer();
+                                        Span<int> srcMemPtr = sourceImage.GetInt32BufferSpan();
 
-                                        using (TempMemPtr srcMemPtr = sourceImage.GetBufferPtr())
-                                        using (TempMemPtr destBufferPtr = this.GetBufferPtr())
+                                        int destOffset = GetBufferOffsetXY32(
+                                          clippedSourceImageRect.Left + destXOffset,
+                                          clippedSourceImageRect.Bottom + i + destYOffset);
+
+                                        unsafe
                                         {
-
-                                            int destOffset = GetBufferOffsetXY32(
-                                              clippedSourceImageRect.Left + destXOffset,
-                                              clippedSourceImageRect.Bottom + i + destYOffset);
-                                            unsafe
+                                            int* destBuffer = this.GetRawInt32BufferHead();
+                                            fixed (int* sourceBuffer = srcMemPtr)
                                             {
-                                                int* destBuffer = (int*)destBufferPtr.Ptr;
-                                                int* sourceBuffer = (int*)srcMemPtr.Ptr;
                                                 for (int x = 0; x < numPixelsToCopy; x++)
                                                 {
                                                     int color = sourceBuffer[sourceOffset++];
@@ -239,6 +247,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                                 }
                                             }
                                         }
+
                                     }
                                 }
                                 break;
@@ -401,13 +410,18 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         }
         public void SetPixel(int x, int y, Color color)
         {
-            _outputPxBlender.CopyPixel(new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes), GetBufferOffsetXY32(x, y), color);
+            unsafe
+            {
+                _outputPxBlender.CopyPixel((int*)_raw_buffer32, GetBufferOffsetXY32(x, y), color);
+            }
         }
 
         public void CopyHL(int x, int y, int len, Color sourceColor)
         {
-
-            _outputPxBlender.CopyPixels(new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes), GetBufferOffsetXY32(x, y), sourceColor, len);
+            unsafe
+            {
+                _outputPxBlender.CopyPixels(new Span<int>((void*)_raw_buffer32, _rawBufferLenInBytes / 4), GetBufferOffsetXY32(x, y), sourceColor, len);
+            }
         }
 
         public void CopyVL(int x, int y, int len, Color sourceColor)
@@ -485,18 +499,22 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             int colorAlpha = sourceColor.A;
             if (colorAlpha != 0)
             {
-                TempMemPtr buffer = this.GetBufferPtr();
+                IntPtr buffer = this.GetRawBufferHead();
+                Span<int> buffer2 = this.GetInt32BufferSpan();
                 int bufferOffset32 = GetBufferOffsetXY32(x, y);
                 do
                 {
                     int alpha = ((colorAlpha) * ((covers[coversIndex]) + 1)) >> 8;
                     if (alpha == BASE_MASK)
                     {
-                        _outputPxBlender.CopyPixel(buffer, bufferOffset32, sourceColor);
+                        unsafe
+                        {
+                            _outputPxBlender.CopyPixel((int*)buffer, bufferOffset32, sourceColor);
+                        }
                     }
                     else
                     {
-                        _outputPxBlender.BlendPixels(buffer, bufferOffset32, Color.FromArgb(alpha, sourceColor));
+                        _outputPxBlender.BlendPixels(buffer2, bufferOffset32, Color.FromArgb(alpha, sourceColor));
                     }
 
                     bufferOffset32++;
@@ -517,23 +535,26 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
                     int bufferOffset32 = GetBufferOffsetXY32(x, y);
                     int actualW = scanWidthInBytes / 4;
-                    TempMemPtr dst = new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
-                    do
+                    unsafe
                     {
-                        //TODO: review here again
-                        Color newcolor = sourceColor.NewFromChangeCoverage(covers[coversIndex++]);
-                        if (newcolor.A == BASE_MASK)
-                        {
-                            _outputPxBlender.CopyPixel(dst, bufferOffset32, newcolor);
-                        }
-                        else
-                        {
-                            _outputPxBlender.BlendPixels(dst, bufferOffset32, newcolor);
-                        }
-                        bufferOffset32 += actualW;//vertically move to next line ***
-                    }
-                    while (--len != 0);
+                        Span<int> dst = new Span<int>((void*)_raw_buffer32, _rawBufferLenInBytes / 4);
 
+                        do
+                        {
+                            //TODO: review here again
+                            Color newcolor = sourceColor.NewFromChangeCoverage(covers[coversIndex++]);
+                            if (newcolor.A == BASE_MASK)
+                            {
+                                _outputPxBlender.CopyPixel((int*)_raw_buffer32, bufferOffset32, newcolor);
+                            }
+                            else
+                            {
+                                _outputPxBlender.BlendPixels(dst, bufferOffset32, newcolor);
+                            }
+                            bufferOffset32 += actualW;//vertically move to next line ***
+                        }
+                        while (--len != 0);
+                    }
 
                 }
             }
@@ -542,28 +563,35 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         public void CopyColorHSpan(int x, int y, int len, Color[] colors, int colorsIndex)
         {
             int bufferOffset32 = GetBufferOffsetXY32(x, y);
-            TempMemPtr dst = new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
-            do
+
+            int actualW = _strideInBytes / 4;
+            unsafe
             {
-                _outputPxBlender.CopyPixel(dst, bufferOffset32, colors[colorsIndex]);
-                ++colorsIndex;
-                bufferOffset32++;
+                do
+                {
+                    _outputPxBlender.CopyPixel((int*)_raw_buffer32, bufferOffset32, colors[colorsIndex]);
+                    ++colorsIndex;
+                    bufferOffset32++;
+                }
+                while (--len != 0);
             }
-            while (--len != 0);
         }
 
         public void CopyColorVSpan(int x, int y, int len, Color[] colors, int colorsIndex)
         {
             int bufferOffset32 = GetBufferOffsetXY32(x, y);
             int actualW = _strideInBytes / 4;
-            TempMemPtr dst = new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
-            do
+            unsafe
             {
-                _outputPxBlender.CopyPixel(dst, bufferOffset32, colors[colorsIndex]);
-                ++colorsIndex;
-                bufferOffset32 += actualW; //vertically move to next line ***
+                do
+                {
+                    _outputPxBlender.CopyPixel((int*)_raw_buffer32, bufferOffset32, colors[colorsIndex]);
+                    ++colorsIndex;
+                    bufferOffset32 += actualW; //vertically move to next line ***
+                }
+                while (--len != 0);
             }
-            while (--len != 0);
+
         }
         public void BlendColorHSpan(int x, int y, int len, Color[] colors, int colorsIndex, byte[] covers, int coversIndex, bool firstCoverForAll)
         {
@@ -571,8 +599,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             int bufferOffset32 = GetBufferOffsetXY32Check(x, y);
             if (bufferOffset32 > -1)
             {
-                TempMemPtr dst = new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
-                _outputPxBlender.BlendPixels(dst, bufferOffset32, colors, colorsIndex, covers, coversIndex, firstCoverForAll, len);
+                unsafe
+                {
+                    _outputPxBlender.BlendPixels(new Span<int>((void*)_raw_buffer32, _rawBufferLenInBytes / 4), bufferOffset32, colors, colorsIndex, covers, coversIndex, firstCoverForAll, len);
+                }
             }
             else
             {
@@ -717,20 +747,20 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
             if (alpha == BASE_MASK)
             {
-                //full
-                //int[] buffer = this.GetBuffer32();
-                _outputPxBlender.CopyPixels(this.GetBufferPtr(), bufferOffset, srcColor, len);
+                //full 
+                _outputPxBlender.CopyPixels(this.GetInt32BufferSpan(), bufferOffset, srcColor, len); ;
 
             }
             else
             {
                 Color c2 = Color.FromArgb(alpha, srcColor);
-                TempMemPtr buffer = this.GetBufferPtr();
+                Span<int> buffer = this.GetInt32BufferSpan();
                 do
                 {
                     //copy pixel-by-pixel
                     _outputPxBlender.BlendPixels(buffer, bufferOffset, c2);
                     bufferOffset++;
+                    //TODO: review here
                 }
                 while (--len != 0);
             }
@@ -770,14 +800,14 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             if (alpha == BASE_MASK)
             {
                 //full
-                //int[] buffer = this.GetBuffer32();
-                _outputPxBlender.CopyPixels(this.GetBufferPtr(), bufferOffset, srcColor, len);
+
+                _outputPxBlender.CopyPixels(this.GetInt32BufferSpan(), bufferOffset, srcColor, len);
 
             }
             else
             {
                 Color c2 = Color.FromArgb(alpha, srcColor);
-                TempMemPtr buffer = this.GetBufferPtr();
+                Span<int> buffer = this.GetInt32BufferSpan();
                 do
                 {
                     //copy pixel-by-pixel
@@ -794,28 +824,52 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             int colorAlpha = sourceColor.A;
             if (colorAlpha != 0)
             {
-                TempMemPtr buffer = this.GetBufferPtr();
-                int bufferOffset32 = GetBufferOffsetXY32(x, y);
-                do
+                Span<int> buffer = this.GetInt32BufferSpan();
+                unsafe
                 {
-                    int alpha = ((colorAlpha) * ((covers[coversIndex]) + 1)) >> 8;
-                    if (alpha == BASE_MASK)
+                    int bufferOffset32 = GetBufferOffsetXY32(x, y);
+                    fixed (int* buffer_ptr = buffer)
                     {
-                        _outputPxBlender.CopyPixel(buffer, bufferOffset32, sourceColor);
-                    }
-                    else
-                    {
-                        _outputPxBlender.BlendPixels(buffer, bufferOffset32, Color.FromArgb(alpha, sourceColor));
-                    }
+                        do
+                        {
+                            int alpha = ((colorAlpha) * ((covers[coversIndex]) + 1)) >> 8;
+                            if (alpha == BASE_MASK)
+                            {
+                                _outputPxBlender.CopyPixel(buffer_ptr, bufferOffset32, sourceColor);
+                            }
+                            else
+                            {
+                                _outputPxBlender.BlendPixels(buffer, bufferOffset32, Color.FromArgb(alpha, sourceColor));
+                            }
 
-                    bufferOffset32++;
-                    coversIndex++;
+                            bufferOffset32++;
+                            coversIndex++;
+                        }
+                        while (--len != 0);
+                    }
                 }
-                while (--len != 0);
+
             }
         }
 
-
+        //public TempMemPtr GetBufferPtr()
+        //{
+        //    return new TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
+        //}
+        public Span<byte> GetBufferSpan()
+        {
+            unsafe
+            {
+                return new Span<byte>((void*)_raw_buffer32, _rawBufferLenInBytes);
+            }
+        }
+        public Span<int> GetInt32BufferSpan()
+        {
+            unsafe
+            {
+                return new Span<int>((void*)_raw_buffer32, _rawBufferLenInBytes / 4);
+            }
+        }
 
 
 

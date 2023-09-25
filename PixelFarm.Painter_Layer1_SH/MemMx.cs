@@ -25,87 +25,25 @@ using System;
 namespace PixelFarm.Drawing.Internal
 {
     public static class MemMx
-    {
-
-        public unsafe delegate void _memset(byte* dest, byte c, int byteCount);
-        public unsafe delegate void _memcpy(byte* dest, byte* src, int byteCount);
-
-        public static void memcpy(byte[] dest,
-            int destIndex, byte[] source,
-            int sourceIndex, int count)
-        {
-            unsafe
-            {
-                fixed (byte* head_dest = &dest[destIndex])
-                fixed (byte* head_src = &source[sourceIndex])
-                {
-                    s_memCopyImpl(head_dest, head_src, count);
-                }
-            }
-        }
+    { 
         public static unsafe void memcpy(byte* dest, byte* src, int len)
         {
-            s_memCopyImpl(dest, src, len);
+            new Span<byte>(src, len).CopyTo(new Span<byte>(dest, len));             
         }
-        public static void memmove(byte[] dest, int destIndex, byte[] source, int sourceIndex, int count)
-        {
-            if (source != dest
-                || destIndex < sourceIndex)
-            {
-                memcpy(dest, destIndex, source, sourceIndex, count);
-            }
-            else
-            {
-                throw new Exception("this code needs to be tested");
-            }
-        }
+
         public static unsafe void memmove(byte* dest, int destIndex, byte* source, int sourceIndex, int count)
         {
             if (source != dest
                 || destIndex < sourceIndex)
-            {
-                s_memCopyImpl(dest + destIndex, source + sourceIndex, count);
-                // memcpy(dest, destIndex, source, sourceIndex, Count);
+            {                  
+                new Span<byte>(source+ sourceIndex, count).CopyTo(new Span<byte>(dest + destIndex, count));
             }
             else
             {
                 throw new Exception("this code needs to be tested");
             }
         }
-        public static void memset(byte[] dest, int destIndex, byte byteValue, int count)
-        {
-            unsafe
-            {
-                fixed (byte* d = &dest[destIndex])
-                {
-                    s_memSetImpl(d, byteValue, count);
-                }
 
-            }
-        }
-        public static void memset_unsafe(IntPtr dest, byte byteValue, int count)
-        {
-            unsafe
-            {
-                s_memSetImpl((byte*)dest, byteValue, count);
-            }
-        }
 
-        static _memcpy s_memCopyImpl;
-        static _memset s_memSetImpl;
-        public static void SetMemImpl(_memcpy memcopyImpl, _memset memsetImpl)
-        {
-            s_memCopyImpl = memcopyImpl;
-            s_memSetImpl = memsetImpl;
-        }
-         
-        static MemMx()
-        {
-            unsafe
-            {
-                //set default implementation
-                SetMemImpl(NativeMemMx.memcpy, NativeMemMx.memset);
-            }
-        }
     }
 }

@@ -604,13 +604,15 @@ namespace PixelFarm.CpuBlit
             {
                 _src = null;
             }
+
             public int BitDepth => 32; // 
             public int Width => _w;
             public int Height => _h;
             public int Stride => _w << 2; //stride = w *4 , we use <<2 
 
             public int BytesBetweenPixelsInclusive => throw new NotSupportedException();
-
+            public int BufferLengthInBytes => _src.BufferLengthInBytes;
+            public IntPtr GetRawBufferHead() => _src.GetRawBufferHead();
             public Q1Rect GetBounds() => new Q1Rect(_x, _y, _x + _w, _y + _h);
             public int GetBufferOffsetXY32(int x, int y)
             {
@@ -618,15 +620,16 @@ namespace PixelFarm.CpuBlit
                 return ((_y + y) * _orgSrcW) + _x + x;
             }
 
-            public TempMemPtr GetBufferPtr() => _src.GetBufferPtr();
-
+    
+            public Span<byte> GetBufferSpan() => _src.GetBufferSpan();
+            public Span<int> GetInt32BufferSpan() => _src.GetInt32BufferSpan();
 
             public Color GetPixel(int x, int y)
             {
                 //TODO: not support here
                 throw new NotImplementedException();
             }
-            public void WriteBuffer(int[] newBuffer)
+            public void WriteBuffer(ReadOnlySpan<int> newBuffer)
             {
                 //not support replace buffer?
 

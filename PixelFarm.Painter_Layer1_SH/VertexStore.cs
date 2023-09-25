@@ -20,9 +20,11 @@
 
 
 namespace PixelFarm.Drawing
-{ /// <summary>
-  /// vertex command and flags
-  /// </summary>
+{
+
+    /// <summary>
+    /// vertex command and flags
+    /// </summary>
     public enum VertexCmd : byte
     {
         //---------------------------------

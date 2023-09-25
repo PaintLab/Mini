@@ -39,8 +39,8 @@ namespace PaintFx.Effects
 
             bounds.Intersect(dstArgs.Bounds);
 
-            Surface src = (Surface)srcArgs.Surface;
-            Surface dst = (Surface)dstArgs.Surface;
+            Surface src = srcArgs.Surface;
+            Surface dst = dstArgs.Surface;
             //PdnRegion selection = this.EnvironmentParameters.GetSelection(src.Bounds);
             Rectangle srcBounds = src.Bounds;
             int srcMaxX = srcBounds.Width - 1;

@@ -52,30 +52,29 @@ namespace PixelFarm.CpuBlit.Imaging
         {
             unsafe
             {
-                using (TempMemPtr bufferPtr = img.GetBufferPtr())
+
+                fixed (int* bufferPtr = img.GetInt32BufferSpan())
                 {
-                    int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
+                    int[] output = new int[img.BufferLengthInBytes / 4]; //TODO: review here again
 
                     fixed (int* outputPtr = &output[0])
                     {
-                        byte* srcBuffer = (byte*)bufferPtr.Ptr;
-                        int* srcBuffer1 = (int*)srcBuffer;
-                        int* outputBuffer1 = (int*)outputPtr;
+                        int* outputBuffer1 = outputPtr;
                         int stride = img.Stride;
                         int w = img.Width;
                         int h = img.Height;
 
-                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, bufferPtr.LengthInBytes / 4);//
+                        MemHolder srcMemHolder = new MemHolder((IntPtr)bufferPtr, output.Length);//
                         Surface srcSurface = new Surface(stride, w, h, srcMemHolder);
                         //
-                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, bufferPtr.LengthInBytes / 4);
+                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, output.Length);
                         Surface destSurface = new Surface(stride, w, h, destMemHolder);
                         //
-                      
+
                         _shRenderer1.Amount = radius;
                         _shRenderer1.Render(srcSurface, destSurface, new PixelFarm.Drawing.Rectangle[]{
                             new PixelFarm.Drawing.Rectangle(0,0,w,h)
-                        }, 0, 1);
+                            }, 0, 1);
                     }
 
                     //ActualImage.SaveImgBufferToPngFile(output, img.Stride, img.Width + 1, img.Height + 1, "test_1.png");

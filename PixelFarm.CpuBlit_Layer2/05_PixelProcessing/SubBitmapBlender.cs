@@ -24,7 +24,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
     /// <summary>
     /// sub-image reader /writer/blend part of org bitmap
     /// </summary>
-    public class SubBitmapBlender : BitmapBlenderBase
+    public sealed class SubBitmapBlender : BitmapBlenderBase
     {
         IBitmapSrc _sourceImage;
 
@@ -34,7 +34,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             int height)
         {
             this.OutputPixelBlender = image.OutputPixelBlender;
-            AttachBuffer(image.GetBufferPtr(),
+            Span<byte> span = image.GetBufferSpan();
+            AttachBuffer(image.GetRawBufferHead(), span.Length,
                 arrayOffset32,
                 width,
                 height,
@@ -43,7 +44,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 image.BytesBetweenPixelsInclusive);
         }
 
-        public SubBitmapBlender(TempMemPtr buffer,
+        public SubBitmapBlender(IntPtr ptr, int lenInBytes,
             int arrayOffset32,
             int width,
             int height,
@@ -51,7 +52,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             int bitDepth,
             int distanceInBytesBetweenPixelsInclusive)
         {
-            AttachBuffer(buffer,
+            AttachBuffer(ptr, lenInBytes,
                 arrayOffset32,
                 width,
                 height,
@@ -72,11 +73,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             Attach(image, blender, image.BytesBetweenPixelsInclusive, 0, image.BitDepth);
         }
-        public override void WriteBuffer(int[] newbuffer)
+        public override void WriteBuffer(ReadOnlySpan<int> newbuffer)
         {
             _sourceImage?.WriteBuffer(newbuffer);
         }
-        void AttachBuffer(TempMemPtr buffer,
+        void AttachBuffer(IntPtr buffer, int bufferLenInBytes,
           int elemOffset,
           int width,
           int height,
@@ -87,7 +88,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             SetBufferToNull();
             SetDimmensionAndFormat(width, height, strideInBytes, bitDepth,
                 distanceInBytesBetweenPixelsInclusive);
-            SetBuffer(buffer, elemOffset);
+            SetBuffer(buffer, bufferLenInBytes);
+            SetUpLookupTables();
+
         }
 
         void Attach(IBitmapSrc sourceImage,
@@ -104,55 +107,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 distanceBetweenPixelsInclusive);
 
             int srcOffset32 = sourceImage.GetBufferOffsetXY32(0, 0);
-            SetBuffer(sourceImage.GetBufferPtr(), srcOffset32 + arrayElemOffset);
+            SetBuffer(sourceImage.GetRawBufferHead(), sourceImage.BufferLengthInBytes);
+            SetUpLookupTables();
             this.OutputPixelBlender = outputPxBlender;
         }
-        //bool Attach(IBitmapBlender sourceImage, int x1, int y1, int x2, int y2)
-        //{
-        //    _sourceImage = sourceImage;
-        //    SetBufferToNull();
-        //    if (x1 > x2 || y1 > y2)
-        //    {
-        //        throw new Exception("You need to have your x1 and y1 be the lower left corner of your sub image.");
-        //    }
-        //    RectInt boundsRect = new RectInt(x1, y1, x2, y2);
-        //    if (boundsRect.Clip(new RectInt(0, 0, sourceImage.Width - 1, sourceImage.Height - 1)))
-        //    {
-        //        SetDimmensionAndFormat(boundsRect.Width, boundsRect.Height, sourceImage.Stride, sourceImage.BitDepth, sourceImage.BytesBetweenPixelsInclusive);
-        //        int bufferOffset = sourceImage.GetByteBufferOffsetXY(boundsRect.Left, boundsRect.Bottom) / 4;
-        //        int[] buffer = sourceImage.GetInt32Buffer();
-        //        SetBuffer(buffer, bufferOffset);
-        //        return true;
-        //    }
-
-        //    return false;
-        //}
-
-        void SetBuffer(TempMemPtr src, int arrayElemOffset)
-        {
-            int height = this.Height;
-
-            if ((src.LengthInBytes / 4) < height * Width)
-            {
-                throw new Exception("Your buffer does not have enough room it it for your height and strideInBytes.");
-            }
-
-            SetBuffer(src);
-            _int32ArrayStartPixelAt = arrayElemOffset;
-
-            if (this.Stride < 0) //stride in bytes
-            {
-                //TODO: review here 
-                int addAmount = -((height - 1) * Width);
-                _int32ArrayStartPixelAt = addAmount + arrayElemOffset;
-            }
-            SetUpLookupTables();
-        }
     }
-
-
-
-
 
     public static class BitmapBlenderExtension
     {

@@ -89,12 +89,14 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 }
             }
         }
-        internal override void BlendPixels(TempMemPtr dstBuffer, int arrayOffset, Color srcColor)
+        internal override void BlendPixels(Span<int> dstBuffer, int arrayOffset, Color srcColor)
         {
             unsafe
             {
-                //fixed (int* head = &dstBuffer[arrayOffset])  
-                BlendPixel32Internal((int*)dstBuffer.Ptr + arrayOffset, srcColor);
+                fixed (int* dst = dstBuffer)
+                {
+                    BlendPixel32Internal(dst + arrayOffset, srcColor);
+                }
             }
         }
         internal override unsafe void BlendPixel32(int* ptr, Color sc)
@@ -370,7 +372,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
 
 
-        internal override void BlendPixels(TempMemPtr dstBuffer, int arrayElemOffset, Color[] srcColors, int srcColorOffset, byte[] covers, int coversIndex, bool firstCoverForAll, int count)
+        internal override void BlendPixels(Span<int> dstBuffer, int arrayElemOffset, Color[] srcColors, int srcColorOffset, byte[] covers, int coversIndex, bool firstCoverForAll, int count)
         {
             if (firstCoverForAll)
             {
@@ -406,9 +408,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                         //int* dstBuff = (int*)dstBuffer.Ptr;
                         //int* head = &dstBuff[arrayElemOffset];
 
-                        //fixed (int* head = &dstBuffer[arrayElemOffset])
+                        fixed (int* head = dstBuffer)
                         {
-                            int* header2 = (int*)dstBuffer.Ptr + arrayElemOffset;
+                            int* header2 = head + arrayElemOffset;
 
                             if (count % 2 != 0)
                             {
@@ -471,10 +473,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     {
                         //int* dstBuff = (int*)dstBuffer.Ptr;
                         //int* head = &dstBuff[arrayElemOffset];
-                        //fixed (int* head = &dstBuffer[arrayElemOffset])
+                        fixed (int* head = dstBuffer)
                         {
                             //int* header2 = (int*)(IntPtr)head;
-                            int* header2 = (int*)dstBuffer.Ptr + arrayElemOffset;
+                            int* header2 = head + arrayElemOffset;
                             if (count % 2 != 0)
                             {
                                 //odd
@@ -506,9 +508,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 {
                     //int* dstBuff = (int*)dstBuffer.Ptr;
                     //int* dstHead = &dstBuff[arrayElemOffset];
-                    //fixed (int* dstHead = &dstBuffer[arrayElemOffset])
+                    fixed (int* dstHead = dstBuffer)
                     {
-                        int* dstBufferPtr = (int*)dstBuffer.Ptr + arrayElemOffset;
+                        int* dstBufferPtr = dstHead + arrayElemOffset;
                         do
                         {
                             //cover may diff in each loop
@@ -530,15 +532,16 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
         }
 
-        internal override void CopyPixels(TempMemPtr dstBuffer, int arrayOffset, Color srcColor, int count)
+        internal override void CopyPixels(Span<int> dstBuffer, int arrayOffset, Color srcColor, int count)
         {
             unsafe
             {
                 unchecked
                 {
-
-                    int* ptr = (int*)dstBuffer.Ptr + arrayOffset;
+                    fixed (int* ptr1 = dstBuffer)
                     {
+                        int* ptr = ptr1 + arrayOffset;
+
                         //TODO: consider use memcpy() impl*** 
                         int argb = srcColor.ToARGB();
                         //---------
@@ -563,23 +566,23 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                             count--;
                         }
 
+
                     }
+
                 }
             }
         }
 
-        internal override void CopyPixel(TempMemPtr dstBuffer, int arrayOffset, Color srcColor)
+        internal override unsafe void CopyPixel(int* dstBuffer, int arrayOffset, Color srcColor)
         {
             //copy single pixel
             unsafe
-            {
+            { 
+                int* ptr = dstBuffer + arrayOffset;
 
-                //int* dstBuff = (int*)dstBuffer.Ptr;
-                int* ptr = (int*)dstBuffer.Ptr + arrayOffset;
-                {
-                    //TODO: consider use memcpy() impl*** 
-                    *ptr = srcColor.ToARGB();
-                }
+                //TODO: consider use memcpy() impl*** 
+                *ptr = srcColor.ToARGB();
+
             }
 
             // throw new NotImplementedException();

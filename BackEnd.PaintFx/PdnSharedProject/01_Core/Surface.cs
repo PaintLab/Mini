@@ -68,7 +68,6 @@ namespace PaintFx
     public sealed class Surface : IDisposable
     {
         MemHolder _memHolder;
-
         /// <summary>
         /// Creates a new instance of the Surface class.
         /// </summary>
@@ -80,19 +79,7 @@ namespace PaintFx
             Width = width;
             Height = height;
             _memHolder = memHolder; //mem buffer 
-            //try
-            //{
-            //    stride = checked(width * ColorBgra.SizeOf);
-            //    bytes = (long)height * (long)stride;
-            //}
 
-            //catch (OverflowException ex)
-            //{
-            //    throw new OutOfMemoryException("Dimensions are too large - not enough memory, width=" + width.ToString() + ", height=" + height.ToString(), ex);
-            //}
-
-            //MemoryBlock scan0 = new MemoryBlock(width, height);
-            //Create(width, height, stride, scan0);
         }
         public bool IsDisposed { get; private set; } = false;
 

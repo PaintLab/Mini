@@ -21,6 +21,8 @@
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.Imaging;
+using System;
+
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
     public abstract class ProxyImage : IBitmapBlender
@@ -30,7 +32,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             _linkedImage = linkedImage;
         }
-        public void WriteBuffer(int[] newbuffer)
+        public void WriteBuffer(ReadOnlySpan<int> newbuffer)
         {
             throw new System.NotSupportedException();
         }
@@ -40,7 +42,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         public virtual int Stride => _linkedImage.Stride;
         // 
         public virtual Q1Rect GetBounds() => _linkedImage.GetBounds();
-
+        public int BufferLengthInBytes => _linkedImage.BufferLengthInBytes;
+        public IntPtr GetRawBufferHead() => _linkedImage.GetRawBufferHead();
         public PixelProcessing.PixelBlender32 OutputPixelBlender
         {
             get => _linkedImage.OutputPixelBlender;
@@ -110,8 +113,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             _linkedImage.BlendColorVSpan(x, y, len, colors, colorsIndex, covers, coversIndex, firstCoverForAll);
         }
 
+        public Span<int> GetInt32BufferSpan() => _linkedImage.GetInt32BufferSpan();
+        public Span<byte> GetBufferSpan() => _linkedImage.GetBufferSpan();
 
-        public TempMemPtr GetBufferPtr() => _linkedImage.GetBufferPtr();
 
         public void ReplaceBuffer()
         {

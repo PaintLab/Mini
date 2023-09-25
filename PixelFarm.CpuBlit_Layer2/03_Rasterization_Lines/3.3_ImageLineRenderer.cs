@@ -23,6 +23,8 @@ using System;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.PixelProcessing;
+using PixelFarm.Drawing.Internal;
+
 namespace PixelFarm.CpuBlit.Rasterization.Lines
 {
     /*
@@ -58,20 +60,23 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
      */
 
     //======================================================line_image_pattern
-    public class LineImagePattern
+    public class LineImagePattern : IDisposable
     {
         IPatternFilter _filter;
         int _dilation;
         int _dilation_hr;
         SubBitmapBlender _buf;
-        TempMemPtr _data;
+
         int _DataSizeInBytes = 0;
         int _width;
         int _height;
         int _width_hr;
         int _half_height_hr;
         int _offset_y_hr;
-        //--------------------------------------------------------------------
+
+        IntPtr _nativeMem;
+
+
         public LineImagePattern(IPatternFilter filter)
         {
             _filter = filter;
@@ -90,15 +95,20 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 throw new NotSupportedException();
             }
         }
-        ~LineImagePattern()
+        public void Dispose()
         {
-            //TODO: review here, remove finalizer
-            if (_DataSizeInBytes > 0)
-            {
-                _data.Dispose();
-            }
+            ReleaseNativeMem();
         }
 
+        void ReleaseNativeMem()
+        {
+            if (_nativeMem != IntPtr.Zero)
+            {
+                System.Runtime.InteropServices.Marshal.FreeHGlobal(_nativeMem);
+                _nativeMem = IntPtr.Zero;
+                _DataSizeInBytes = 0;
+            }
+        }
         // Create
         //--------------------------------------------------------------------
         public LineImagePattern(IPatternFilter filter, LineImagePattern src)
@@ -143,26 +153,29 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             int bufferHeight = _height + _dilation * 2;
             int bytesPerPixel = src.BitDepth / 8;
             int newSizeInBytes = bufferWidth * bufferHeight * bytesPerPixel;
+
             if (_DataSizeInBytes < newSizeInBytes)
             {
+                ReleaseNativeMem();
                 _DataSizeInBytes = newSizeInBytes;
-
-                _data.Dispose();
+                //create a new one                 
 
                 IntPtr nativeBuff = System.Runtime.InteropServices.Marshal.AllocHGlobal(_DataSizeInBytes);
-                _data = new TempMemPtr(nativeBuff, _DataSizeInBytes);
+                _nativeMem = nativeBuff;
             }
 
-            _buf = new PixelProcessing.SubBitmapBlender(_data, 0, bufferWidth, bufferHeight, bufferWidth * bytesPerPixel, src.BitDepth, bytesPerPixel);
+            _buf = new PixelProcessing.SubBitmapBlender(_nativeMem, _DataSizeInBytes, 0, bufferWidth, bufferHeight, bufferWidth * bytesPerPixel, src.BitDepth, bytesPerPixel);
 
             unsafe
             {
 
-                using (TempMemPtr destMemPtr = _buf.GetBufferPtr())
-                using (TempMemPtr srcMemPtr = src.GetBufferPtr())
+                Span<int> destMemPtr = _buf.GetInt32BufferSpan();
+                Span<int> srcMemPtr = src.GetInt32BufferSpan();
+
+                fixed (int* destBuffer = destMemPtr)
+                fixed (int* srcBuffer = srcMemPtr)
                 {
-                    int* destBuffer = (int*)destMemPtr.Ptr;
-                    int* srcBuffer = (int*)srcMemPtr.Ptr;
+
                     // copy the image into the middle of the dest
                     for (int y = 0; y < _height; y++)
                     {
@@ -189,6 +202,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         }
                     }
                 }
+
+
             }
 
 

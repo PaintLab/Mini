@@ -130,7 +130,7 @@ namespace PixelFarm.PathReconstruction
 
                 unsafe
                 {
-                    _curAddr = _bufferPtr = (int*)MemBitmap.GetBufferPtr(bmp).Ptr;
+                    _curAddr = _bufferPtr = bmp.GetRawInt32BufferHead();
                 }
             }
             public void MoveTo(int x, int y)
@@ -196,7 +196,7 @@ namespace PixelFarm.PathReconstruction
                 _widthLim = _width - 1;
                 unsafe
                 {
-                    _curAddr = _bufferPtr = (int*)MemBitmap.GetBufferPtr(bmp).Ptr;
+                    _curAddr = _bufferPtr = bmp.GetRawInt32BufferHead();
                 }
             }
             public void MoveTo(int x, int y)

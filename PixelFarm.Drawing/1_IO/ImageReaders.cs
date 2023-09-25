@@ -11,19 +11,11 @@ namespace PixelFarm.CpuBlit.Imaging
     }
     public static class PngImageWriter
     {
-        public static void SaveImgBufferToPngFile(TempMemPtr imgBuffer, int stride, int width, int height, string filename)
+        public static void SaveImgBufferToPngFile(MemBitmap mem, int stride, int width, int height, string filename)
         {
             if (s_saveToFile != null)
             {
-                unsafe
-                {
-                    //fixed (int* head = imgBuffer.Ptr)
-
-                    int* head = (int*)imgBuffer.Ptr;
-                    {
-                        s_saveToFile((IntPtr)head, stride, width, height, filename);
-                    }
-                }
+                s_saveToFile(mem.GetRawBufferHead(), stride, width, height, filename);
             }
         }
         static SaveImageBufferToFileDel s_saveToFile;
@@ -41,7 +33,7 @@ namespace PixelFarm.CpuBlit.Imaging
         public static void dbugSaveToPngFile(this MemBitmap bmp, string filename)
         {
 
-            SaveImgBufferToPngFile(MemBitmap.GetBufferPtr(bmp),
+            SaveImgBufferToPngFile(bmp,
                 bmp.Stride,
                 bmp.Width,
                 bmp.Height,
@@ -79,7 +71,7 @@ namespace PixelFarm.CpuBlit.Imaging
             }
         }
         public static unsafe void SaveImgBufferToJpgFileUnsafe(
-           TempMemPtr tmpMem,
+           int* head,
            int stride,
            int width,
            int height,
@@ -89,11 +81,7 @@ namespace PixelFarm.CpuBlit.Imaging
             {
                 unsafe
                 {
-                    //fixed (int* head = &imgBuffer[0])
-                    int* head = (int*)tmpMem.Ptr;
-                    {
-                        s_saveToFile((IntPtr)head, stride, width, height, filename);
-                    }
+                    s_saveToFile((IntPtr)head, stride, width, height, filename);
                 }
             }
         }
@@ -112,13 +100,14 @@ namespace PixelFarm.CpuBlit.Imaging
 #if DEBUG
         public static void dbugSaveToJpgFile(this MemBitmap bmp, string filename)
         {
-            TempMemPtr tmpMem = MemBitmap.GetBufferPtr(bmp);
-            SaveImgBufferToJpgFileUnsafe(tmpMem,
-                bmp.Stride,
-                bmp.Width,
-                bmp.Height,
-                filename);
-            tmpMem.Dispose();
+            unsafe
+            {
+                SaveImgBufferToJpgFileUnsafe(bmp.GetRawInt32BufferHead(),
+                    bmp.Stride,
+                    bmp.Width,
+                    bmp.Height,
+                    filename);
+            }
         }
 #endif
     }

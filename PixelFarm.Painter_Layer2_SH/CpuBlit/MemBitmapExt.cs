@@ -47,24 +47,6 @@ namespace PixelFarm.CpuBlit
 
     public static class MemBitmapExt
     {
-        //---------------
-        //helper...
-        public static TempMemPtr FromBmp(MemBitmap memBmp)
-        {
-            return MemBitmap.GetBufferPtr(memBmp);
-        }
-        public unsafe static TempMemPtr FromBmp(MemBitmap memBmp, out int* headPtr)
-        {
-            TempMemPtr ptr = MemBitmap.GetBufferPtr(memBmp);
-            headPtr = (int*)ptr.Ptr;
-            return ptr;
-        }
-        public unsafe static TempMemPtr FromBmp(MemBitmap bmp, out byte* headPtr)
-        {
-            TempMemPtr ptr = MemBitmap.GetBufferPtr(bmp);
-            headPtr = (byte*)ptr.Ptr;
-            return ptr;
-        }
 
 
         public static int[] CopyImgBuffer(this MemBitmap memBmp, int width, int height, bool flipY = false)
@@ -77,44 +59,42 @@ namespace PixelFarm.CpuBlit
             unsafe
             {
 
-                using (TempMemPtr srcBufferPtr = MemBitmap.GetBufferPtr(memBmp))
+                byte* srcBuffer = (byte*)memBmp.GetRawUInt8BufferHead();
+                int srcIndex = 0;
+                int srcStride = memBmp.Stride;
+
+                if (flipY)
                 {
-                    byte* srcBuffer = (byte*)srcBufferPtr.Ptr;
-                    int srcIndex = 0;
-                    int srcStride = memBmp.Stride;
-
-                    if (flipY)
+                    fixed (int* destHead = &buff2[0])
                     {
-                        fixed (int* destHead = &buff2[0])
-                        {
-                            byte* destHead2 = (byte*)destHead;
+                        byte* destHead2 = (byte*)destHead;
 
-                            srcBuffer += (height - 1) * srcStride;
-                            for (int line = 0; line < height; ++line)
-                            {
-                                //System.Runtime.InteropServices.Marshal.Copy(srcBuffer, srcIndex, (IntPtr)destHead2, destStride);
-                                MemMx.memcpy((byte*)destHead2, srcBuffer + srcIndex, destStride);
-                                srcIndex -= srcStride;
-                                destHead2 += destStride;
-                            }
+                        srcBuffer += (height - 1) * srcStride;
+                        for (int line = 0; line < height; ++line)
+                        {
+                            //System.Runtime.InteropServices.Marshal.Copy(srcBuffer, srcIndex, (IntPtr)destHead2, destStride);
+                            MemMx.memcpy((byte*)destHead2, srcBuffer + srcIndex, destStride);
+                            srcIndex -= srcStride;
+                            destHead2 += destStride;
                         }
                     }
-                    else
-                    {
-                        fixed (int* destHead = &buff2[0])
-                        {
-                            byte* destHead2 = (byte*)destHead;
-                            for (int line = 0; line < height; ++line)
-                            {
-                                //System.Runtime.InteropServices.Marshal.Copy(srcBuffer, srcIndex, (IntPtr)destHead2, destStride);
-                                MemMx.memcpy((byte*)destHead2, srcBuffer + srcIndex, destStride);
-                                srcIndex += srcStride;
-                                destHead2 += destStride;
-                            }
-                        }
-                    }
-
                 }
+                else
+                {
+                    fixed (int* destHead = &buff2[0])
+                    {
+                        byte* destHead2 = (byte*)destHead;
+                        for (int line = 0; line < height; ++line)
+                        {
+                            //System.Runtime.InteropServices.Marshal.Copy(srcBuffer, srcIndex, (IntPtr)destHead2, destStride);
+                            MemMx.memcpy((byte*)destHead2, srcBuffer + srcIndex, destStride);
+                            srcIndex += srcStride;
+                            destHead2 += destStride;
+                        }
+                    }
+                }
+
+
             }
             return buff2;
         }
@@ -141,20 +121,17 @@ namespace PixelFarm.CpuBlit
             MemBitmap copyBmp = new MemBitmap(toCopyRect.Width, toCopyRect.Height);
             unsafe
             {
-                using (TempMemPtr srcBufferPtr = MemBitmap.GetBufferPtr(src))
-                using (TempMemPtr dstBufferPtr = MemBitmap.GetBufferPtr(copyBmp))
-                {
 
-                    int* srcPtr = (int*)srcBufferPtr.Ptr;
-                    int* dstPtr = (int*)dstBufferPtr.Ptr;
-                    int lineEnd = srcY + srcH;
-                    int orgSrcW = src.Width;
-                    for (int line = toCopyRect.Top; line < toCopyRect.Bottom; ++line)
-                    {
-                        MemMx.memcpy((byte*)dstPtr, (byte*)(srcPtr + ((line * orgSrcW) + toCopyRect.Left)), toCopyRect.Width * 4);
-                        dstPtr += toCopyRect.Width;
-                    }
+                int* srcPtr = src.GetRawInt32BufferHead();
+                int* dstPtr = copyBmp.GetRawInt32BufferHead();
+                int lineEnd = srcY + srcH;
+                int orgSrcW = src.Width;
+                for (int line = toCopyRect.Top; line < toCopyRect.Bottom; ++line)
+                {
+                    MemMx.memcpy((byte*)dstPtr, (byte*)(srcPtr + ((line * orgSrcW) + toCopyRect.Left)), toCopyRect.Width * 4);
+                    dstPtr += toCopyRect.Width;
                 }
+
             }
 
             return copyBmp;
@@ -241,19 +218,19 @@ namespace PixelFarm.CpuBlit
         //    }
         //}
 
-        internal static void Clear(PixelFarm.CpuBlit.TempMemPtr tmp, Color color, int left, int top, int width, int height)
+        internal static void Clear(Span<int> bufferspan, Color color, int left, int top, int width, int height)
         {
             unsafe
             {
-                int* buffer = (int*)tmp.Ptr;
-                //------------------------------
-                //fast clear buffer
-                //skip clipping ****
-                //TODO: reimplement clipping***
-                //------------------------------  
-
-                unsafe
+                fixed (int* buffer = bufferspan)
                 {
+                    //------------------------------
+                    //fast clear buffer
+                    //skip clipping ****
+                    //TODO: reimplement clipping***
+                    //------------------------------  
+
+
                     //clear only 1st row 
                     uint* head_i32 = (uint*)buffer;
                     //first line
@@ -274,7 +251,7 @@ namespace PixelFarm.CpuBlit
 
 
                     head_i32 += top * width;//move to first line 
-                    //and first line only
+                                            //and first line only
                     uint* head_i32_1 = head_i32 + left;
                     for (int i = width - 1; i >= 0; --i)
                     {
@@ -283,7 +260,7 @@ namespace PixelFarm.CpuBlit
                     }
 
                     int stride = width * 4;//bytes
-                    //and copy to another line
+                                           //and copy to another line
                     head_i32 += width;//move to another line
 
                     for (int i = height - 2; i >= 0; --i)
@@ -292,63 +269,66 @@ namespace PixelFarm.CpuBlit
                         head_i32 += width;
                     }
                 }
+
+
             }
         }
 
-        internal static void Clear(PixelFarm.CpuBlit.TempMemPtr tmp, Color color, int width, int height)
+        internal static void Clear(Span<int> bufferSpan, Color color, int width, int height)
         {
             unsafe
             {
-                int* buffer = (int*)tmp.Ptr;
-
-
-                //------------------------------
-                //fast clear buffer
-                //skip clipping ****
-                //TODO: reimplement clipping***
-                //------------------------------ 
-
-
-                unsafe
+                fixed (int* buffer = bufferSpan)
                 {
-                    //clear only 1st row 
-                    uint* head_i32 = (uint*)buffer;
-                    //first line
 
-                    //other color
-                    //#if WIN32
-                    //  uint colorARGB = (uint)((color.alpha << 24) | ((color.red << 16) | (color.green << 8) | color.blue));
-                    //#else
-                    //  uint colorARGB = (uint)((color.alpha << 24) | ((color.blue << 16) | (color.green << 8) | color.red));
-                    //#endif
+                    //------------------------------
+                    //fast clear buffer
+                    //skip clipping ****
+                    //TODO: reimplement clipping***
+                    //------------------------------  
+                    unsafe
+                    {
+                        //clear only 1st row 
+                        uint* head_i32 = (uint*)buffer;
+                        //first line
 
-                    //ARGB
-                    uint colorARGB = 0;//empty
-                    if (color != Color.Empty)
-                    {
-                        colorARGB = (uint)((color.A << CO.A_SHIFT) | ((color.R << CO.R_SHIFT) | (color.G << CO.G_SHIFT) | color.B << CO.B_SHIFT));
-                    }
+                        //other color
+                        //#if WIN32
+                        //  uint colorARGB = (uint)((color.alpha << 24) | ((color.red << 16) | (color.green << 8) | color.blue));
+                        //#else
+                        //  uint colorARGB = (uint)((color.alpha << 24) | ((color.blue << 16) | (color.green << 8) | color.red));
+                        //#endif
 
-                    //first line only
-                    for (int i = width - 1; i >= 0; --i)
-                    {
-                        *head_i32 = colorARGB; //black (ARGB)
-                        head_i32++;
-                    }
-                    //and copy to another line
-                    int stride = width * 4;
-                    for (int i = height - 2; i >= 0; --i)
-                    {
-                        //copy from first line to another line
-                        MemMx.memcpy((byte*)head_i32, (byte*)buffer, stride);
-                        head_i32 += width;
+                        //ARGB
+                        uint colorARGB = 0;//empty
+                        if (color != Color.Empty)
+                        {
+                            colorARGB = (uint)((color.A << CO.A_SHIFT) | ((color.R << CO.R_SHIFT) | (color.G << CO.G_SHIFT) | color.B << CO.B_SHIFT));
+                        }
+
+                        //first line only
+                        for (int i = width - 1; i >= 0; --i)
+                        {
+                            *head_i32 = colorARGB; //black (ARGB)
+                            head_i32++;
+                        }
+                        //and copy to another line
+                        int stride = width * 4;
+                        for (int i = height - 2; i >= 0; --i)
+                        {
+                            //copy from first line to another line
+                            MemMx.memcpy((byte*)head_i32, (byte*)buffer, stride);
+                            head_i32 += width;
+                        }
                     }
                 }
+
+
             }
         }
         public static void Clear(this MemBitmap bmp, Color color)
         {
-            Clear(MemBitmap.GetBufferPtr(bmp), color, bmp.Width, bmp.Height);
+            Clear(bmp.GetInt32BufferSpan(), color, bmp.Width, bmp.Height);
         }
         /// <summary>
         /// create thumbnail img with super-sampling technique,(Expensive, High quality thumb)
@@ -380,7 +360,7 @@ namespace PixelFarm.CpuBlit
                 int srcH = source.Height;
                 int srcW = source.Width;
 
-                TempMemPtr dstMemPtr = MemBitmap.GetBufferPtr(thumbBitmap);
+                int* dstMemPtr = thumbBitmap.GetRawInt32BufferHead();
                 int dstStrideInt32 = newBmpW;
 
                 for (int dstY = dstRoi2.Top; dstY < dstRoi2.Bottom; ++dstY)
@@ -400,10 +380,10 @@ namespace PixelFarm.CpuBlit
                     int srcBottomInt = (int)srcBottomFloor;
 
 
-                    int* srcBuffer = (int*)(MemBitmap.GetBufferPtr(source)).Ptr;
+                    int* srcBuffer = source.GetRawInt32BufferHead();
                     int srcStrideInt32 = source.Width;//***
 
-                    int* dstAddr = (int*)dstMemPtr.Ptr + (dstStrideInt32 * dstY); //begin at
+                    int* dstAddr = dstMemPtr + (dstStrideInt32 * dstY); //begin at
 
                     for (int dstX = dstRoi2.Left; dstX < dstRoi2.Right; ++dstX)
                     {

@@ -154,7 +154,7 @@ namespace PixelFarm.CpuBlit
             if (destImage.BitDepth != 32) throw new NotSupportedException();
 #endif
 
-            MemBitmapExt.Clear(destImage.GetBufferPtr(), color, left, top, width, height);
+            MemBitmapExt.Clear(destImage.GetInt32BufferSpan(), color, left, top, width, height);
         }
         public void Clear(Color color)
         {
@@ -164,7 +164,7 @@ namespace PixelFarm.CpuBlit
             if (destImage.BitDepth != 32) throw new NotSupportedException();
 #endif
 
-            MemBitmapExt.Clear(destImage.GetBufferPtr(), color, destImage.Width, destImage.Height);
+            MemBitmapExt.Clear(destImage.GetInt32BufferSpan(), color, destImage.Width, destImage.Height);
         }
 
 
@@ -266,7 +266,7 @@ namespace PixelFarm.CpuBlit
             {
                 _bmp = bmp;
             }
-            public override void WriteBuffer(int[] newbuffer)
+            public override void WriteBuffer(ReadOnlySpan<int> newbuffer)
             {
                 MemBitmap.ReplaceBuffer(_bmp, newbuffer);
             }

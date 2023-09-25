@@ -27,7 +27,7 @@ namespace PixelFarm.CpuBlit.Imaging
                 _memBmp = bmp;
                 Attach(bmp);
             }
-            public override void WriteBuffer(int[] newbuffer)
+            public override void WriteBuffer(ReadOnlySpan<int> newbuffer)
             {
                 MemBitmap.ReplaceBuffer(_memBmp, newbuffer);
             }
@@ -52,7 +52,7 @@ namespace PixelFarm.CpuBlit.Imaging
 
         public InterpolationMode Interpolation { get; set; }
         //
-        public int ImageWidth => _destBounds.Width; 
+        public int ImageWidth => _destBounds.Width;
         public int ImageHeight => _destBounds.Height;
         //
         public PointF VertexLeftTop => _p0;
@@ -179,10 +179,9 @@ namespace PixelFarm.CpuBlit.Imaging
 
             unsafe
             {
-                using (TempMemPtr.FromBmp(_srcBmp, out int* bufferPtr))
+                fixed (int* bufferPtr = _srcBmp.GetInt32BufferSpan())
                 {
                     BufferReader4 reader = new BufferReader4(bufferPtr, _srcBmp.Width, _srcBmp.Height);
-
                     for (int y = 0; y < rectHeight; ++y)
                     {
                         for (int x = 0; x < rectWidth; ++x)
@@ -237,7 +236,8 @@ namespace PixelFarm.CpuBlit.Imaging
             int srcW_lim = _srcW - 1;
             int srcH_lim = _srcH - 1;
 
-            using (TempMemPtr.FromBmp(_srcBmp, out int* bufferPtr))
+
+            fixed (int* bufferPtr = _srcBmp.GetInt32BufferSpan())
             {
                 BufferReader4 reader = new BufferReader4(bufferPtr, _srcBmp.Width, _srcBmp.Height);
                 for (int y = 0; y < rectHeight; ++y)
@@ -409,7 +409,7 @@ namespace PixelFarm.CpuBlit.Imaging
             Vector cd_vec = _CD;
             Vector da_vec = _DA;
 
-            using (TempMemPtr.FromBmp(_srcBmp, out int* bufferPtr))
+            fixed (int* bufferPtr = _srcBmp.GetInt32BufferSpan())
             {
                 BufferReader4 reader = new BufferReader4(bufferPtr, _srcBmp.Width, _srcBmp.Height);
 
@@ -454,7 +454,6 @@ namespace PixelFarm.CpuBlit.Imaging
                             //do interpolate 
                             //find src pixel and approximate   
                             destWriter.SetPixel(x, y,
-
                                   GetApproximateColor_Bicubic(reader,
                                     colors,
                                     ptInPlane.X,

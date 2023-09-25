@@ -12,7 +12,7 @@ namespace PixelFarm.PathReconstruction
         bool _evalBounds;
         PixelFarm.Drawing.Rectangle _cacheBounds;
         public ReconstructedRegionData(bool copyHSpans = true)
-        {   
+        {
             WithHSpansTable = copyHSpans;
         }
 
@@ -21,7 +21,7 @@ namespace PixelFarm.PathReconstruction
         /// <summary>
         /// (must be) sorted hSpans, from reconstruction
         /// </summary>
-        public HSpan[] HSpans { get;  set; }
+        public HSpan[] HSpans { get; set; }
         /// <summary>
         /// reconstructed outline
         /// </summary>
@@ -157,10 +157,10 @@ namespace PixelFarm.PathReconstruction
                    (holeColor.G << CO.G_SHIFT) |
                    (holeColor.R << CO.R_SHIFT);
 
-            var memPtr = MemBitmap.GetBufferPtr(maskBmp);
+
             unsafe
             {
-                int* buffer = (int*)memPtr.Ptr;
+                int* buffer = maskBmp.GetRawInt32BufferHead();
                 //fill
                 HSpan[] hspans = rgnData.HSpans;
                 if (useFitBounds)

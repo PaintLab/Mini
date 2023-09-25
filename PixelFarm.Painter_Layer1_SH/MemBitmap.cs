@@ -22,6 +22,8 @@ using System;
 using PixelFarm.Drawing;
 using PixelFarm.Drawing.Internal;
 using PixelFarm.CpuBlit.VertexProcessing;
+using System.Runtime.CompilerServices;
+
 namespace PixelFarm.CpuBlit
 {
 
@@ -173,7 +175,10 @@ namespace PixelFarm.CpuBlit
             : this(width, height, System.Runtime.InteropServices.Marshal.AllocHGlobal(width * height * 4))
         {
             _pixelBufferFromExternalSrc = false;//** if we alloc then we are the owner of this MemBmp
-            MemMx.memset_unsafe(_pixelBuffer, 0, _pixelBufferInBytes); //set 
+            unsafe
+            {
+                (new Span<byte>((void*)_pixelBuffer, _pixelBufferInBytes)).Clear();
+            }
         }
         public MemBitmap(int width, int height, IntPtr externalNativeInt32Ptr)
         {
@@ -193,7 +198,14 @@ namespace PixelFarm.CpuBlit
             dbugMemBitmapMonitor.dbugRegisterMemBitmap(this, width + "x" + height + ": " + DateTime.Now.ToString("u"));
 #endif
         }
+
         public override IntPtr GetRawBufferHead() => _pixelBuffer;
+
+        public unsafe int* GetRawInt32BufferHead() => (int*)_pixelBuffer;
+        public unsafe byte* GetRawUInt8BufferHead() => (byte*)_pixelBuffer;
+
+        public int BufferLengthInBytes => _pixelBufferInBytes;
+
         public override void ReleaseRawBufferHead(IntPtr ptr)
         {
         }
@@ -243,14 +255,27 @@ namespace PixelFarm.CpuBlit
         public int BitDepth => _bitDepth;
         //
         public bool IsBigEndian { get; set; }
-        public static TempMemPtr GetBufferPtr(MemBitmap bmp)
+        public Span<byte> GetBufferSpan()
         {
-            return new TempMemPtr(bmp._pixelBuffer, bmp._pixelBufferInBytes);
+            unsafe
+            {
+                return new Span<byte>((byte*)_pixelBuffer, _pixelBufferInBytes);
+            }
         }
-
-        public static void ReplaceBuffer(MemBitmap bmp, int[] pixelBuffer)
+        public Span<int> GetInt32BufferSpan()
         {
-            System.Runtime.InteropServices.Marshal.Copy(pixelBuffer, 0, bmp._pixelBuffer, pixelBuffer.Length);
+            unsafe
+            {
+                return new Span<int>((int*)_pixelBuffer, _pixelBufferInBytes / 4);
+            }
+        }
+        public static void ReplaceBuffer(MemBitmap bmp, ReadOnlySpan<int> pixelBuffer)
+        {
+            unsafe
+            {
+                pixelBuffer.CopyTo(bmp.GetInt32BufferSpan());
+            }
+
         }
         /// <summary>
         /// create mem bitmap by copy data from managed int32 array pixel data to unmanged side
@@ -297,8 +322,45 @@ namespace PixelFarm.CpuBlit
             //System.Runtime.InteropServices.Marshal.Copy(totalBuffer, bmp._pixelBuffer, 0, totalLen);
             unsafe
             {
-                MemMx.memcpy((byte*)(bmp._pixelBuffer), (byte*)totalBuffer, totalLen);
+                (new Span<byte>((void*)totalBuffer, totalLen)).CopyTo(bmp.GetBufferSpan());
             }
+            //if (doFlipY)
+            //{
+            //    //flip vertical Y  
+            //    int[] totalBufferFlipY = new int[totalBuffer.Length];
+            //    int srcRowIndex = height - 1;
+            //    int strideInBytes = width * 4;//32 bpp
+            //    for (int i = 0; i < height; ++i)
+            //    {
+            //        //copy each row from src to dst
+            //        System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
+            //        srcRowIndex--;
+            //    }
+            //    totalBuffer = totalBufferFlipY;
+            //}
+            //unsafe
+            //{
+
+            //}
+            return bmp;
+        }
+        public static MemBitmap CreateFromCopy(int width, int height, ReadOnlySpan<byte> totalBuffer, int totalLen, bool doFlipY = false)
+        {
+
+            var bmp = new MemBitmap(width, height);
+#if DEBUG
+            bmp._dbugNote = "MemBitmap.CreateFromCopy";
+#endif
+            //System.Runtime.InteropServices.Marshal.Copy(totalBuffer, bmp._pixelBuffer, 0, totalLen);
+            //unsafe
+            //{ 
+            //    //MemMx.memcpy((byte*)(bmp._pixelBuffer), (byte*)totalBuffer, totalLen);
+            //}
+            unsafe
+            {
+                totalBuffer.CopyTo(new Span<byte>((byte*)bmp._pixelBuffer, bmp._strideBytes * bmp.Height));
+            }
+
             //if (doFlipY)
             //{
             //    //flip vertical Y  
@@ -345,12 +407,9 @@ namespace PixelFarm.CpuBlit
             }
             return memBmp;
         }
-
-
         public static int CalculateStride(int width, CpuBlit.PixelFormat format)
         {
-            int bitDepth, bytesPerPixel;
-            return CalculateStride(width, format, out bitDepth, out bytesPerPixel);
+            return CalculateStride(width, format, out int bitDepth, out int bytesPerPixel);
         }
         public static int CalculateStride(int width, CpuBlit.PixelFormat format, out int bitDepth, out int bytesPerPixel)
         {
@@ -387,14 +446,7 @@ namespace PixelFarm.CpuBlit
             unsafe
             {
 
-                using (TempMemPtr pixBuffer = MemBitmap.GetBufferPtr(memBmp))
-                {
-                    //fixed (byte* header = &pixelBuffer[0])
-                    byte* header = (byte*)pixBuffer.Ptr;
-                    {
-                        System.Runtime.InteropServices.Marshal.Copy((IntPtr)header, buff2, 0, buff2.Length);//length in bytes
-                    }
-                }
+                System.Runtime.InteropServices.Marshal.Copy(memBmp.GetRawBufferHead(), buff2, 0, buff2.Length);//length in bytes 
             }
 
             return buff2;
@@ -409,16 +461,17 @@ namespace PixelFarm.CpuBlit
         int IBitmapSrc.BitDepth => _bitDepth;
         //
         int IBitmapSrc.GetBufferOffsetXY32(int x, int y) => (y * _width) + x;
-        TempMemPtr IBitmapSrc.GetBufferPtr()
-        {
-            return new TempMemPtr(_pixelBuffer, _pixelBufferInBytes);
-        }
+
         //
-        void IBitmapSrc.WriteBuffer(int[] newBuffer)
+        void IBitmapSrc.WriteBuffer(ReadOnlySpan<int> newBuffer)
         {
             //TODO: review here 2018-08-26
             //pixelBuffer = newBuffer;
-            System.Runtime.InteropServices.Marshal.Copy(newBuffer, 0, _pixelBuffer, newBuffer.Length);
+            unsafe
+            {
+                newBuffer.CopyTo(new Span<int>((void*)_pixelBuffer, _pixelBufferInBytes / 4));
+            }
+
         }
 
         Color IBitmapSrc.GetPixel(int x, int y)

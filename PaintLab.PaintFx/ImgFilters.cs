@@ -6,7 +6,7 @@ using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.Imaging;
 using PixelFarm.CpuBlit.PixelProcessing;
 using CO = PixelFarm.Drawing.Internal.CO;
-
+using PixelFarm.CpuBlit;
 
 namespace PaintFx.Effects
 {
@@ -45,23 +45,23 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
+                Span<int> bufferPtr = _target.GetInt32BufferSpan();
                 {
-                    int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
+                    int[] output = new int[bufferPtr.Length]; //TODO: review here again
 
                     fixed (int* outputPtr = &output[0])
                     {
-                        byte* srcBuffer = (byte*)bufferPtr.Ptr;
+                        byte* srcBuffer = (byte*)_target.GetRawBufferHead();
                         int* srcBuffer1 = (int*)srcBuffer;
                         int* outputBuffer1 = (int*)outputPtr;
                         int stride = _target.Stride;
                         int w = _target.Width;
                         int h = _target.Height;
 
-                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, bufferPtr.LengthInBytes / 4);//
+                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, output.Length);//
                         Surface srcSurface = new Surface(stride, w, h, srcMemHolder);
                         //
-                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, bufferPtr.LengthInBytes / 4);
+                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, output.Length);
                         Surface destSurface = new Surface(stride, w, h, destMemHolder);
                         //
 
@@ -70,8 +70,6 @@ namespace PaintFx.Effects
                             new PixelFarm.Drawing.Rectangle(0,0,w,h)
                         }, 0, 1);
                     }
-
-
                     _target.WriteBuffer(output);
                 }
             }
@@ -98,24 +96,23 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-
-                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
+                Span<int> buffer_span = _target.GetInt32BufferSpan();
                 {
-                    int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
+                    int[] output = new int[buffer_span.Length]; //TODO: review here again
 
                     fixed (int* outputPtr = &output[0])
                     {
-                        byte* srcBuffer = (byte*)bufferPtr.Ptr;
+                        byte* srcBuffer = (byte*)_target.GetRawBufferHead();
                         int* srcBuffer1 = (int*)srcBuffer;
                         int* outputBuffer1 = (int*)outputPtr;
                         int stride = _target.Stride;
                         int w = _target.Width;
                         int h = _target.Height;
 
-                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, bufferPtr.LengthInBytes / 4);//
+                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, output.Length);//
                         Surface srcSurface = new Surface(stride, w, h, srcMemHolder);
                         //
-                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, bufferPtr.LengthInBytes / 4);
+                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, output.Length);
                         Surface destSurface = new Surface(stride, w, h, destMemHolder);
                         //
 
@@ -148,23 +145,24 @@ namespace PaintFx.Effects
 
                 _edge.SetAngle(Angle);
 
-                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
+                Span<int> target_buffer = _target.GetInt32BufferSpan();
+
                 {
-                    int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
+                    int[] output = new int[target_buffer.Length]; //TODO: review here again
 
                     fixed (int* outputPtr = &output[0])
                     {
-                        byte* srcBuffer = (byte*)bufferPtr.Ptr;
+                        byte* srcBuffer = (byte*)_target.GetRawBufferHead();
                         int* srcBuffer1 = (int*)srcBuffer;
                         int* outputBuffer1 = (int*)outputPtr;
                         int stride = _target.Stride;
                         int w = _target.Width;
                         int h = _target.Height;
 
-                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, bufferPtr.LengthInBytes / 4);//
+                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, output.Length);//
                         Surface srcSurface = new Surface(stride, w, h, srcMemHolder);
                         //
-                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, bufferPtr.LengthInBytes / 4);
+                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, output.Length);
                         Surface destSurface = new Surface(stride, w, h, destMemHolder);
                         //
                         _edge.Render(
@@ -174,8 +172,7 @@ namespace PaintFx.Effects
                             new PixelFarm.Drawing.Rectangle(0,0,w,h)
                         }, 0, 1);
                     }
-
-                    //ActualImage.SaveImgBufferToPngFile(output, img.Stride, img.Width + 1, img.Height + 1, "test_1.png");
+;
                     _target.WriteBuffer(output);
                 }
             }
@@ -194,23 +191,24 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
+
+                Span<int> bufferInt32Ptr = _target.GetInt32BufferSpan();
                 {
-                    int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
+                    int[] output = new int[bufferInt32Ptr.Length]; //TODO: review here again
 
                     fixed (int* outputPtr = &output[0])
                     {
-                        byte* srcBuffer = (byte*)bufferPtr.Ptr;
+                        byte* srcBuffer = (byte*)_target.GetRawBufferHead();
                         int* srcBuffer1 = (int*)srcBuffer;
                         int* outputBuffer1 = (int*)outputPtr;
                         int stride = _target.Stride;
                         int w = _target.Width;
                         int h = _target.Height;
 
-                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, bufferPtr.LengthInBytes / 4);//
+                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, bufferInt32Ptr.Length);//
                         Surface srcSurface = new Surface(stride, w, h, srcMemHolder);
                         //
-                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, bufferPtr.LengthInBytes / 4);
+                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, bufferInt32Ptr.Length);
                         Surface destSurface = new Surface(stride, w, h, destMemHolder);
                         // 
 
@@ -239,23 +237,22 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
+                Span<int> bufferPtr = _target.GetInt32BufferSpan();
                 {
-                    int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
-
+                    int[] output = new int[bufferPtr.Length]; //TODO: review here again
                     fixed (int* outputPtr = &output[0])
                     {
-                        byte* srcBuffer = (byte*)bufferPtr.Ptr;
+                        byte* srcBuffer = _target.GetRawUInt8BufferHead();
                         int* srcBuffer1 = (int*)srcBuffer;
                         int* outputBuffer1 = (int*)outputPtr;
                         int stride = _target.Stride;
                         int w = _target.Width;
                         int h = _target.Height;
 
-                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, bufferPtr.LengthInBytes / 4);//
+                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, output.Length);//
                         Surface srcSurface = new Surface(stride, w, h, srcMemHolder);
                         //
-                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, bufferPtr.LengthInBytes / 4);
+                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, output.Length);
                         Surface destSurface = new Surface(stride, w, h, destMemHolder);
                         // 
 
@@ -268,9 +265,6 @@ namespace PaintFx.Effects
             }
         }
     }
-
-
-
     public class ImgFilterAutoLevel : CpuBlitImgFilter
     {
         AutoLevelRenderer _autoLevelRenderer = new AutoLevelRenderer();
@@ -282,23 +276,24 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
+                Span<int> buff_span = _target.GetInt32BufferSpan();
+
                 {
-                    int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
+                    int[] output = new int[buff_span.Length]; //TODO: review here again
 
                     fixed (int* outputPtr = &output[0])
                     {
-                        byte* srcBuffer = (byte*)bufferPtr.Ptr;
+                        byte* srcBuffer = (byte*)_target.GetRawBufferHead();
                         int* srcBuffer1 = (int*)srcBuffer;
                         int* outputBuffer1 = (int*)outputPtr;
                         int stride = _target.Stride;
                         int w = _target.Width;
                         int h = _target.Height;
 
-                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, bufferPtr.LengthInBytes / 4);//
+                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, output.Length);//
                         Surface srcSurface = new Surface(stride, w, h, srcMemHolder);
                         //
-                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, bufferPtr.LengthInBytes / 4);
+                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, output.Length);
                         Surface destSurface = new Surface(stride, w, h, destMemHolder);
                         // 
                         _autoLevelRenderer.SetParameters(srcSurface, new PixelFarm.Drawing.Rectangle(0, 0, w, h));
@@ -349,10 +344,9 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                using (PixelFarm.CpuBlit.TempMemPtr bufferPtr = _target.GetBufferPtr())
+                Span<int> bufferPtr = _target.GetInt32BufferSpan();
                 {
-
-                    byte* srcBuffer = (byte*)bufferPtr.Ptr;
+                    byte* srcBuffer = (byte*)_target.GetRawBufferHead();
                     int* srcBuffer1 = (int*)srcBuffer;
 
                     int stride = _target.Stride;

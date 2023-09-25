@@ -107,9 +107,9 @@ namespace PixelFarm.CpuBlit.Rasterization
             unsafe
             {
 
-                using (TempMemPtr dest_bufferPtr = dest.GetBufferPtr())
+                fixed (byte* dest_buffer = dest.GetBufferSpan())
                 {
-                    byte* dest_buffer = (byte*)dest_bufferPtr.Ptr;
+                    
                     int dest_stride = _destImgStride = dest.Stride;
                     //*** set color before call Blend()
                     _color = color;

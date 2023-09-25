@@ -28,6 +28,7 @@
 #define USE_BLENDER
 
 using PixelFarm.Drawing;
+using System;
 using CO = PixelFarm.Drawing.Internal.CO;
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
@@ -51,7 +52,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="dstBuffer"></param>
         /// <param name="arrayOffset"></param>
         /// <param name="srcColor"></param>
-        internal abstract void BlendPixels(TempMemPtr dstBuffer, int arrayOffset, Color srcColor);
+        internal abstract void BlendPixels(Span<int> dstBuffer, int arrayOffset, Color srcColor);
 
         internal abstract void BlendPixels(
             int[] dstBuffer, int arrayElemOffset,
@@ -69,7 +70,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="firstCoverForAll"></param>
         /// <param name="count"></param>
         internal abstract void BlendPixels(
-           TempMemPtr dstBuffer, int arrayElemOffset,
+           Span<int> dstBuffer, int arrayElemOffset,
            Color[] sourceColors, int sourceColorsOffset,
            byte[] covers, int coversIndex, bool firstCoverForAll, int count);
 
@@ -81,6 +82,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="srcColor"></param>
         /// <param name="count"></param>
         internal abstract void CopyPixels(int[] dstBuffer, int arrayOffset, Color srcColor, int count);
+        
         /// <summary>
         /// copy single pixel
         /// </summary>
@@ -96,14 +98,15 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="arrayOffset"></param>
         /// <param name="srcColor"></param>
         /// <param name="count"></param>
-        internal abstract void CopyPixels(TempMemPtr dstBuffer, int arrayOffset, Color srcColor, int count);
+        internal abstract void CopyPixels(Span<int> dstBuffer, int arrayOffset, Color srcColor, int count);
+
         /// <summary>
         /// copy single pixel
         /// </summary>
         /// <param name="dstBuffer"></param>
         /// <param name="arrayOffset"></param>
         /// <param name="srcColor"></param>
-        internal abstract void CopyPixel(TempMemPtr dstBuffer, int arrayOffset, Color srcColor);
+        internal abstract unsafe void CopyPixel(int* dstBuffer, int arrayOffset, Color srcColor);
 
 
         internal abstract unsafe void BlendPixel32(int* ptr, Color sc);

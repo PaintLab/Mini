@@ -35,11 +35,17 @@ namespace PixelFarm.CpuBlit
 
         int GetBufferOffsetXY32(int x, int y);
 
-        TempMemPtr GetBufferPtr();
 
+
+        Span<int> GetInt32BufferSpan();
+        Span<byte> GetBufferSpan();
+        int BufferLengthInBytes { get; }
+        
+        
+        IntPtr GetRawBufferHead();
 
         int BytesBetweenPixelsInclusive { get; }
-        void WriteBuffer(int[] newBuffer);
+        void WriteBuffer(ReadOnlySpan<int> newBuffer);
         Color GetPixel(int x, int y);
     }
 

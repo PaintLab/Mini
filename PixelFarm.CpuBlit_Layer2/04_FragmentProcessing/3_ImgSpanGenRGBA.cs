@@ -114,9 +114,10 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         }
         internal unsafe static void NN_StepXBy1(IBitmapSrc bmpsrc, int srcIndex, Drawing.Color[] outputColors, int dstIndex, int len)
         {
-            using (CpuBlit.TempMemPtr srcBufferPtr = bmpsrc.GetBufferPtr())
+            Span<int> srcBufferPtr = bmpsrc.GetInt32BufferSpan();
+            fixed (int* h = srcBufferPtr)
             {
-                int* pSource = (int*)srcBufferPtr.Ptr + srcIndex;
+                int* pSource = h + srcIndex;
                 do
                 {
                     int srcColor = *pSource;
@@ -134,6 +135,8 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
                 } while (--len != 0);
             }
+
+
 
         }
         public override void GenerateColors(Drawing.Color[] outputColors, int startIndex, int x, int y, int len)
@@ -155,7 +158,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                 spanInterpolator.Begin(x + dx, y + dy, len);
                 unsafe
                 {
-                    using ( TempMemPtr.FromBmp(_bmpSrc, out int* srcBuffer))
+                    fixed (int* srcBuffer = _bmpSrc.GetInt32BufferSpan())
                     {
                         //TODO: if no any transformation,=> skip spanInterpolator (see above example)
                         do
@@ -202,7 +205,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             _noTransformation = (base.Interpolator is SpanInterpolatorLinear spanInterpolatorLinear &&
                spanInterpolatorLinear.Transformer is VertexProcessing.Affine aff &&
                aff.IsIdentity);
-             
+
         }
         public sealed override void GenerateColors(Drawing.Color[] outputColors, int startIndex, int x, int y, int len)
         {
@@ -215,7 +218,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
                 if (_noTransformation)
                 {
-                    using (CpuBlit.TempMemPtr.FromBmp(_bmpSrc, out int* srcBuffer))
+                    fixed (int* srcBuffer = _bmpSrc.GetInt32BufferSpan())
                     {
                         int bufferIndex = _bmpSrc.GetBufferOffsetXY32(x, y);
                         do
@@ -238,10 +241,10 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                 {
                     //Bilinear interpolation, without lookup table
                     ISpanInterpolator spanInterpolator = base.Interpolator;
-                    using (CpuBlit.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr())
-                    {
-                        int* srcBuffer = (int*)srcBufferPtr.Ptr;
 
+
+                    fixed (int* srcBuffer = _bmpSrc.GetInt32BufferSpan())
+                    {
                         spanInterpolator.Begin(x + base.dx, y + base.dy, len);
 
                         //accumulated color component
@@ -482,6 +485,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
                         } while (--len != 0);
 
+
                     }//using
                 }//else
             }//unsafe
@@ -516,9 +520,9 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
             unsafe
             {
-                using (CpuBlit.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr())
+                Span<int> srcBufferPtr = _bmpSrc.GetInt32BufferSpan();
+                fixed (int* srcBuffer = srcBufferPtr)
                 {
-                    int* srcBuffer = (int*)srcBufferPtr.Ptr;
                     spanInterpolator.Begin(x + base.dx, y + base.dy, len);
 
                     do
@@ -624,6 +628,9 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                         spanInterpolator.Next();
                     } while (--len != 0);
                 }
+
+
+
             }
         }
     }

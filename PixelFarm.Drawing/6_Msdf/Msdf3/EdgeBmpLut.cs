@@ -82,7 +82,7 @@ namespace Msdfgen
         const int RED = (255 << 24) | (255 << 16);
 
 
-        struct OverlapPart
+        readonly struct OverlapPart
         {
             readonly int _edgeA;
             readonly int _edgeB;

@@ -60,10 +60,10 @@ namespace PixelFarm.PathReconstruction
         public void SetSourceBitmap(MemBitmap bmpSrc)
         {
             ((IPixelEvaluator)this).SetSourceDimension(bmpSrc.Width, bmpSrc.Height);
-            var memPtr = MemBitmap.GetBufferPtr(bmpSrc);
+             
             unsafe
             {
-                _currentAddr = _destBuffer = (int*)memPtr.Ptr;
+                _currentAddr = _destBuffer = bmpSrc.GetRawInt32BufferHead();
             }
             OnSetSoureBitmap();
         }

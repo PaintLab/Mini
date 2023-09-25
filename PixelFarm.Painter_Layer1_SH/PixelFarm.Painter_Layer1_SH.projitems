@@ -16,8 +16,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)IBitmapSrc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MemBitmap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MemMx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)NativeMemMx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TempMemPtr.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)VertexStore.cs" />
   </ItemGroup>
 </Project>

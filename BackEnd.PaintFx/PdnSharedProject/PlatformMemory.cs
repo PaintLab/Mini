@@ -34,18 +34,7 @@ namespace System
         {
             s_platformMem.FreeImpl(hmem);
         }
-        //public static void FreeLarge(IntPtr hmem, ulong len)
-        //{
-        //    platformMem.FreeLargeImpl(hmem, len);
-        //}
-        //public static void FreeBitmap(IntPtr hbmp, int w, int h)
-        //{
-        //    platformMem.FreeBitmapImpl(hbmp, w, h);
-        //}
-        //public static IntPtr AllocateLarge(ulong bytes)
-        //{
-        //    return platformMem.AllocateLargeImpl(bytes);
-        //}
+
         public static IntPtr Allocate(ulong bytes)
         {
             return s_platformMem.AllocateImpl(bytes);
@@ -54,19 +43,11 @@ namespace System
         {
             return s_platformMem.AllocateBitmapImpl(w, h, out handle);
         }
-        //public static void SetToZero(IntPtr ptr, ulong len)
-        //{
-        //    platformMem.SetToZeroImpl(ptr, len);
-        //}
-        public static unsafe void SetToZero(void* ptr, int len)
-        {
-            PixelFarm.Drawing.Internal.MemMx.memset_unsafe((IntPtr)ptr, 0, (int)len);
-            //platformMem.SetToZeroImpl(ptr, len);
-        }
+
         public static unsafe void SetToZero(void* ptr, ulong len)
         {
-            PixelFarm.Drawing.Internal.MemMx.memset_unsafe((IntPtr)ptr, 0, (int)len);
-            //platformMem.SetToZeroImpl(ptr, len);
+            //TODO: review here
+            (new Span<byte>(ptr, (int)len)).Clear();
         }
     }
 }
