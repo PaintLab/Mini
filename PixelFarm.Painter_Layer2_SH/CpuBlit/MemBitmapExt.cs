@@ -713,6 +713,7 @@ namespace PixelFarm.CpuBlit
         public abstract MemBitmap LoadImage(System.IO.Stream input);
         public abstract void SaveImage(MemBitmap bitmap, System.IO.Stream output, OutputImageFormat outputFormat, object saveParameters);
         public abstract void SaveImage(MemBitmap bitmap, string filename, OutputImageFormat outputFormat, object saveParameters);
+        public abstract bool WriteToPlatformBitmap(MemBitmap bitmap, object platformBmp);
         public abstract PixelFarm.CpuBlit.MemBitmap ScaleImage(PixelFarm.CpuBlit.MemBitmap bmp, float x_scale, float y_scale);
     }
 }
