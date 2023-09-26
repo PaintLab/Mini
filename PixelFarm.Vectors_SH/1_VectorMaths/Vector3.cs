@@ -22,6 +22,8 @@ SOFTWARE.
 
 using System;
 using System.Runtime.InteropServices;
+using Vector3Float = System.Numerics.Vector3;
+
 namespace PixelFarm.VectorMath
 {
     public class JsonIgnoreAttribute : Attribute
@@ -86,9 +88,9 @@ namespace PixelFarm.VectorMath
 
         public Vector3(Vector3Float v)
         {
-            x = v.x;
-            y = v.y;
-            z = v.z;
+            x = v.X;
+            y = v.Y;
+            z = v.Z;
         }
 
         public Vector3(double[] doubleArray)

@@ -56,7 +56,7 @@ namespace PixelFarm.VectorMath
         /// Defines the size of the Vector2d struct in bytes.
         /// </summary>
         public static readonly int SizeInBytes = Marshal.SizeOf(new Vector2d());
-
+        public double Magnitude => Math.Sqrt(x * x + y * y);
 
         /// <summary>Constructs left vector with the given coordinates.</summary>
         /// <param name="x">The X coordinate.</param>
@@ -513,7 +513,10 @@ namespace PixelFarm.VectorMath
         {
             return left.x * right.y - left.y * right.x;
         }
-
+        public double CrossProduct(Vector2d right)
+        {
+            return Cross(this, right);
+        }
 
         //public static Vector2 Rotate(Vector2 toRotate, double radians)
         //{

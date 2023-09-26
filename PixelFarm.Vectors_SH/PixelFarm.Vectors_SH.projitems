@@ -22,7 +22,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Ray.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Vector2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Vector3.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Vector3Float.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Vector4.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)2_Geometry\Arc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)2_Geometry\BezireCurve.cs" />

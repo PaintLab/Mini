@@ -37,7 +37,7 @@ namespace PixelFarm.CpuBlit.Imaging
 
 
         PointF _p0, _p1, _p2, _p3;
-        Vector _AB, _BC, _CD, _DA;
+        Vector2d _AB, _BC, _CD, _DA;
         PixelFarm.Drawing.Rectangle _destBounds;
         int _srcW = 0;
         int _srcH = 0;
@@ -170,10 +170,10 @@ namespace PixelFarm.CpuBlit.Imaging
 
             int rectWidth = _destBounds.Width;
             int rectHeight = _destBounds.Height;
-            Vector ab_vec = _AB;
-            Vector bc_vec = _BC;
-            Vector cd_vec = _CD;
-            Vector da_vec = _DA;
+            Vector2d ab_vec = _AB;
+            Vector2d bc_vec = _BC;
+            Vector2d cd_vec = _CD;
+            Vector2d da_vec = _DA;
             int rectLeft = _destBounds.Left;
             int rectTop = _destBounds.Top;
 
@@ -228,10 +228,10 @@ namespace PixelFarm.CpuBlit.Imaging
             float dx1, dx2, dy1, dy2, dx1y1, dx1y2, dx2y1, dx2y2;
             int rectWidth = _destBounds.Width;
             int rectHeight = _destBounds.Height;
-            Vector ab_vec = _AB;
-            Vector bc_vec = _BC;
-            Vector cd_vec = _CD;
-            Vector da_vec = _DA;
+            Vector2d ab_vec = _AB;
+            Vector2d bc_vec = _BC;
+            Vector2d cd_vec = _CD;
+            Vector2d da_vec = _DA;
             int rectLeft = _destBounds.Left;
             int rectTop = _destBounds.Top;
 
@@ -410,10 +410,10 @@ namespace PixelFarm.CpuBlit.Imaging
             //float dx1, dx2, dy1, dy2, dx1y1, dx1y2, dx2y1, dx2y2;
             int destRectWidth = _destBounds.Width;
             int dectRectHeight = _destBounds.Height;
-            Vector ab_vec = _AB;
-            Vector bc_vec = _BC;
-            Vector cd_vec = _CD;
-            Vector da_vec = _DA;
+            Vector2d ab_vec = _AB;
+            Vector2d bc_vec = _BC;
+            Vector2d cd_vec = _CD;
+            Vector2d da_vec = _DA;
 
             fixed (int* bufferPtr = _srcBmp.GetInt32BufferSpan())
             {

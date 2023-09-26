@@ -158,8 +158,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
 
         public void BuildJointVertex(
-            List<Vector> positiveSideVectors,
-            List<Vector> negativeSideVectors)
+            List<Vector2d> positiveSideVectors,
+            List<Vector2d> negativeSideVectors)
         {
             if (LineJoinKind == LineJoin.Bevel) return;
 
@@ -200,7 +200,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //v0v1 => v1v2 is inner angle for positive side
                         //and is outter angle of negative side 
                         //inside joint share the same cutpoint
-                        positiveSideVectors.Add(new Vector(cutPoint.x, cutPoint.y));
+                        positiveSideVectors.Add(new Vector2d(cutPoint.x, cutPoint.y));
                     }
                     else if (angle_rad_diff < 0)
                     {
@@ -238,7 +238,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                                                 out lim_cutPoint))
                                         {
 
-                                            positiveSideVectors.Add(new Vector(lim_cutPoint.x, lim_cutPoint.y));
+                                            positiveSideVectors.Add(new Vector2d(lim_cutPoint.x, lim_cutPoint.y));
                                         }
                                         else
                                         {
@@ -250,7 +250,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                                                 out lim_cutPoint))
                                         {
 
-                                            positiveSideVectors.Add(new Vector(lim_cutPoint.x, lim_cutPoint.y));
+                                            positiveSideVectors.Add(new Vector2d(lim_cutPoint.x, lim_cutPoint.y));
                                         }
                                         else
                                         {
@@ -259,7 +259,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                                     }
                                     else
                                     {
-                                        positiveSideVectors.Add(new Vector(cutPoint.x, cutPoint.y));
+                                        positiveSideVectors.Add(new Vector2d(cutPoint.x, cutPoint.y));
                                     }
                                 }
                                 break;
@@ -332,7 +332,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                                                 out lim_cutPoint))
                                         {
 
-                                            negativeSideVectors.Add(new Vector(lim_cutPoint.x, lim_cutPoint.y));
+                                            negativeSideVectors.Add(new Vector2d(lim_cutPoint.x, lim_cutPoint.y));
                                         }
                                         else
                                         {
@@ -344,7 +344,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                                                 out lim_cutPoint))
                                         {
 
-                                            negativeSideVectors.Add(new Vector(lim_cutPoint.x, lim_cutPoint.y));
+                                            negativeSideVectors.Add(new Vector2d(lim_cutPoint.x, lim_cutPoint.y));
                                         }
                                         else
                                         {
@@ -353,7 +353,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                                     }
                                     else
                                     {
-                                        negativeSideVectors.Add(new Vector(cutPoint.x, cutPoint.y));
+                                        negativeSideVectors.Add(new Vector2d(cutPoint.x, cutPoint.y));
                                     }
                                 }
                                 break;
@@ -365,7 +365,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //------------ 
                         //for negative side, this is outter join
                         //inner join share the same cutpoint
-                        negativeSideVectors.Add(new Vector(cutPoint.x, cutPoint.y));
+                        negativeSideVectors.Add(new Vector2d(cutPoint.x, cutPoint.y));
                     }
                     else
                     {
@@ -391,10 +391,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         double _positiveSide;
         //line core (x0,y0) ->  (x1,y1) -> (x2,y2)
         double _x0, _y0, _x1, _y1;
-        Vector _delta0, _delta1;
-        Vector _e1_positive;
-        Vector _e1_negative;
-        Vector _line_vector; //latest line vector
+        Vector2d _delta0, _delta1;
+        Vector2d _e1_positive;
+        Vector2d _e1_negative;
+        Vector2d _line_vector; //latest line vector
         int _coordCount = 0;
         double _first_lineto_x, _first_lineto_y;
 
@@ -431,8 +431,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
 
         public void LineTo(double x1, double y1,
-            List<Vector> outputPositiveSideList,
-            List<Vector> outputNegativeSideList)
+            List<Vector2d> outputPositiveSideList,
+            List<Vector2d> outputNegativeSideList)
         {
             double ex0, ey0, ex0_n, ey0_n;
             if (_coordCount > 0)
@@ -445,10 +445,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 //consider create joint here
                 GetEdge0(out ex0, out ey0, out ex0_n, out ey0_n);
                 //add to vectors
-                outputPositiveSideList.Add(new Vector(ex0, ey0));
+                outputPositiveSideList.Add(new Vector2d(ex0, ey0));
                 outputPositiveSideList.Add(_e1_positive);
                 //
-                outputNegativeSideList.Add(new Vector(ex0_n, ey0_n));
+                outputNegativeSideList.Add(new Vector2d(ex0_n, ey0_n));
                 outputNegativeSideList.Add(_e1_negative);
             }
             else
@@ -456,13 +456,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 ExactLineTo(_first_lineto_x = x1, _first_lineto_y = y1);
                 GetEdge0(out ex0, out ey0, out ex0_n, out ey0_n);
                 //add to vectors
-                outputPositiveSideList.Add(new Vector(ex0, ey0));
-                outputNegativeSideList.Add(new Vector(ex0_n, ey0_n));
+                outputPositiveSideList.Add(new Vector2d(ex0, ey0));
+                outputNegativeSideList.Add(new Vector2d(ex0_n, ey0_n));
             }
         }
         public void Close(
-            List<Vector> outputPositiveSideList,
-            List<Vector> outputNegativeSideList)
+            List<Vector2d> outputPositiveSideList,
+            List<Vector2d> outputNegativeSideList)
         {
             double ex0, ey0, ex0_n, ey0_n;
             CreateLineJoin(_latest_moveto_x, _latest_moveto_y, outputPositiveSideList, outputNegativeSideList);
@@ -474,20 +474,20 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 //consider create joint here
                 GetEdge0(out ex0, out ey0, out ex0_n, out ey0_n);
                 //add to vectors
-                outputPositiveSideList.Add(new Vector(ex0, ey0));
+                outputPositiveSideList.Add(new Vector2d(ex0, ey0));
                 outputPositiveSideList.Add(_e1_positive);
                 //
-                outputNegativeSideList.Add(new Vector(ex0_n, ey0_n));
+                outputNegativeSideList.Add(new Vector2d(ex0_n, ey0_n));
                 outputNegativeSideList.Add(_e1_negative);
             }
             else
             {
                 GetEdge0(out ex0, out ey0, out ex0_n, out ey0_n);
                 //add to vectors
-                outputPositiveSideList.Add(new Vector(ex0, ey0));
+                outputPositiveSideList.Add(new Vector2d(ex0, ey0));
                 outputPositiveSideList.Add(_e1_positive);
                 //
-                outputNegativeSideList.Add(new Vector(ex0_n, ey0_n));
+                outputNegativeSideList.Add(new Vector2d(ex0_n, ey0_n));
                 outputNegativeSideList.Add(_e1_negative);
             }
 
@@ -509,14 +509,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             //perpendicular line
             //create line vector
-            _line_vector = _delta0 = new Vector(x1 - _x0, y1 - _y0);
+            _line_vector = _delta0 = new Vector2d(x1 - _x0, y1 - _y0);
             _delta1 = _delta0 = _delta0.Rotate(90).NewLength(_positiveSide);
 
             _x1 = x1;
             _y1 = y1;
             //------------------------------------------------------
-            _e1_positive = new Vector(x1 + _delta1.X, y1 + _delta1.Y);
-            _e1_negative = new Vector(x1 - _delta1.X, y1 - _delta1.Y);
+            _e1_positive = new Vector2d(x1 + _delta1.X, y1 + _delta1.Y);
+            _e1_negative = new Vector2d(x1 - _delta1.X, y1 - _delta1.Y);
             //------------------------------------------------------
             //create both positive and negative edge 
             _coordCount++;
@@ -524,13 +524,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         void CreateLineJoin(
            double previewX1,
            double previewY1,
-           List<Vector> outputPositiveSideList,
-           List<Vector> outputNegativeSideList)
+           List<Vector2d> outputPositiveSideList,
+           List<Vector2d> outputNegativeSideList)
         {
 
             if (_lineJoiner.LineJoinKind == LineJoin.Bevel)
             {
-                Vector p = new Vector(_x1, _y1);
+                Vector2d p = new Vector2d(_x1, _y1);
                 outputPositiveSideList.Add(p + _delta0);
                 outputNegativeSideList.Add(p - _delta0);
 
@@ -550,9 +550,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //UNDER CONSTRUCTION **
 
         LineStrokeGenerator _lineGen = new LineStrokeGenerator();
-        List<Vector> _positiveSideVectors = new List<Vector>();
-        List<Vector> _negativeSideVectors = new List<Vector>();
-        List<Vector> _capVectors = new List<Vector>(); //temporary  
+        List<Vector2d> _positiveSideVectors = new List<Vector2d>();
+        List<Vector2d> _negativeSideVectors = new List<Vector2d>();
+        List<Vector2d> _capVectors = new List<Vector2d>(); //temporary  
         public StrokeGen2()
         {
             this.LineCapStyle = LineCap.Square;
@@ -631,7 +631,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 int negative_edgeCount = _negativeSideVectors.Count;
 
                 int n = positive_edgeCount - 1;
-                Vector v = _positiveSideVectors[n];
+                Vector2d v = _positiveSideVectors[n];
                 outputVxs.AddMoveTo(v.X, v.Y);
                 for (; n >= 0; --n)
                 {
@@ -664,7 +664,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 //create line cap for this
                 //
                 //positive
-                Vector v = _positiveSideVectors[0];
+                Vector2d v = _positiveSideVectors[0];
                 //----------- 
                 //1. moveto
 
@@ -705,7 +705,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
 
 
-        void CreateStartLineCap(VertexStore outputVxs, Vector v0, Vector v1, double edgeWidth)
+        void CreateStartLineCap(VertexStore outputVxs, Vector2d v0, Vector2d v1, double edgeWidth)
         {
             switch (this.LineCapStyle)
             {
@@ -716,7 +716,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     break;
                 case LineCap.Square:
                     {
-                        Vector delta = (v0 - v1).Rotate(90).NewLength(edgeWidth);
+                        Vector2d delta = (v0 - v1).Rotate(90).NewLength(edgeWidth);
                         //------------------------
                         outputVxs.AddMoveTo(v1.X + delta.X, v1.Y + delta.Y);
                         outputVxs.AddLineTo(v0.X + delta.X, v0.Y + delta.Y);
@@ -730,13 +730,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     outputVxs.AddMoveTo(v1.X, v1.Y);
                     for (int i = j - 1; i >= 0; --i)
                     {
-                        Vector v = _capVectors[i];
+                        Vector2d v = _capVectors[i];
                         outputVxs.AddLineTo(v.X, v.Y);
                     }
                     break;
             }
         }
-        void CreateEndLineCap(VertexStore outputVxs, Vector v0, Vector v1, double edgeWidth)
+        void CreateEndLineCap(VertexStore outputVxs, Vector2d v0, Vector2d v1, double edgeWidth)
         {
             switch (this.LineCapStyle)
             {
@@ -748,7 +748,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     break;
                 case LineCap.Square:
                     {
-                        Vector delta = (v1 - v0).Rotate(90).NewLength(edgeWidth);
+                        Vector2d delta = (v1 - v0).Rotate(90).NewLength(edgeWidth);
                         outputVxs.AddLineTo(v0.X + delta.X, v0.Y + delta.Y);
                         outputVxs.AddLineTo(v1.X + delta.X, v1.Y + delta.Y);
                     }
@@ -760,7 +760,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         int j = _capVectors.Count;
                         for (int i = j - 1; i >= 0; --i)
                         {
-                            Vector v = _capVectors[i];
+                            Vector2d v = _capVectors[i];
                             outputVxs.AddLineTo(v.X, v.Y);
                         }
                     }
@@ -772,7 +772,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         void BuildBeginCap(
           double x0, double y0,
           double x1, double y1,
-          List<Vector> outputVectors)
+          List<Vector2d> outputVectors)
         {
             switch (LineCapStyle)
             {
@@ -802,7 +802,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         void BuildEndCap(
           double x0, double y0,
           double x1, double y1,
-          List<Vector> outputVectors)
+          List<Vector2d> outputVectors)
         {
             switch (LineCapStyle)
             {
@@ -833,7 +833,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     {
         //helper class for generate arc
         //
-        public static void GenerateArcNew(List<Vector> output, double cx,
+        public static void GenerateArcNew(List<Vector2d> output, double cx,
             double cy,
             Vector2d startDelta,
             double sweepAngleRad)
@@ -848,7 +848,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
                 Vector2d newPerpend = startDelta.RotateInDegree(angle);
                 Vector2d newpos = new Vector2d(cx + newPerpend.x, cy + newPerpend.y);
-                output.Add(new Vector(newpos.x, newpos.y));
+                output.Add(new Vector2d(newpos.x, newpos.y));
                 angle += eachStep;
             }
         }
