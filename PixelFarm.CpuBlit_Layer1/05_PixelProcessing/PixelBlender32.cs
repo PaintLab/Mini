@@ -59,12 +59,12 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="coversIndex"></param>
         /// <param name="firstCoverForAll"></param>
         /// <param name="count"></param>
-        internal abstract void BlendPixels(
-           Span<int> dstBuffer, int arrayElemOffset,
+        internal unsafe abstract void BlendPixels(
+           int* dstBuffer, int arrayElemOffset,
            Color[] sourceColors, int sourceColorsOffset,
            byte[] covers, int coversIndex, bool firstCoverForAll, int count);
 
-  
+
 
         /// <summary>
         /// copy multiple pixels
@@ -73,7 +73,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="arrayOffset"></param>
         /// <param name="srcColor"></param>
         /// <param name="count"></param>
-        internal abstract void CopyPixels(Span<int> dstBuffer, int arrayOffset, Color srcColor, int count);
+        internal unsafe abstract void CopyPixels(int* dstBuffer, int arrayOffset, Color srcColor, int count);
 
         /// <summary>
         /// copy single pixel
@@ -94,7 +94,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                (byte)((value >> (CO.B_SHIFT)) & 0xff));
 
         }
-       
+
     }
 
 }

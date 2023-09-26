@@ -422,7 +422,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             unsafe
             {
-                _outputPxBlender.CopyPixels(new Span<int>((void*)_raw_buffer32, _rawBufferLenInBytes / 4), GetBufferOffsetXY32(x, y), sourceColor, len);
+                _outputPxBlender.CopyPixels((int*)_raw_buffer32, GetBufferOffsetXY32(x, y), sourceColor, len);
             }
         }
 
@@ -604,7 +604,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             {
                 unsafe
                 {
-                    _outputPxBlender.BlendPixels(new Span<int>((void*)_raw_buffer32, _rawBufferLenInBytes / 4), bufferOffset32, colors, colorsIndex, covers, coversIndex, firstCoverForAll, len);
+                    _outputPxBlender.BlendPixels((int*)_raw_buffer32, bufferOffset32, colors, colorsIndex, covers, coversIndex, firstCoverForAll, len);
                 }
             }
             else
@@ -640,7 +640,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                 _outputPxBlender.BlendPixel32(dstBuffer + bufferOffset32, colors[colorsIndex].NewFromChangeCoverage(cover));
                             }
                             //-----------------------
-
+                            //TODO: review here
                             //bufferOffset += actualWidth;
                             bufferOffset32++;
                             ++colorsIndex;
@@ -751,25 +751,25 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             if (alpha == BASE_MASK)
             {
                 //full 
-                _outputPxBlender.CopyPixels(this.GetInt32BufferSpan(), bufferOffset, srcColor, len); ;
-
+                unsafe
+                {
+                    _outputPxBlender.CopyPixels((int*)_raw_buffer32, bufferOffset, srcColor, len);
+                }
             }
             else
             {
                 Color c2 = Color.FromArgb(alpha, srcColor);
                 unsafe
                 {
-                    fixed (int* buffer = this.GetInt32BufferSpan())
+                    int* buffer = (int*)_raw_buffer32;
+                    do
                     {
-                        do
-                        {
-                            //copy pixel-by-pixel
-                            _outputPxBlender.BlendPixel(buffer, bufferOffset, c2);
-                            bufferOffset++;
-                            //TODO: review here
-                        }
-                        while (--len != 0);
+                        //copy pixel-by-pixel
+                        _outputPxBlender.BlendPixel(buffer, bufferOffset, c2);
+                        bufferOffset++;
+                        //TODO: review here
                     }
+                    while (--len != 0);
                 }
 
             }
@@ -809,7 +809,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             if (alpha == BASE_MASK)
             {
                 //full
-                _outputPxBlender.CopyPixels(this.GetInt32BufferSpan(), bufferOffset, srcColor, len);
+                unsafe
+                {
+                    _outputPxBlender.CopyPixels((int*)_raw_buffer32, bufferOffset, srcColor, len);
+                }
 
             }
             else
@@ -817,17 +820,13 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 Color c2 = Color.FromArgb(alpha, srcColor);
                 unsafe
                 {
-                    fixed (int* buffer = this.GetInt32BufferSpan())
+                    do
                     {
-                        do
-                        {
-                            //copy pixel-by-pixel
-                            _outputPxBlender.BlendPixel(buffer, bufferOffset, c2);
-                            bufferOffset++;
-                        }
-                        while (--len != 0);
+                        //copy pixel-by-pixel
+                        _outputPxBlender.BlendPixel((int*)_raw_buffer32, bufferOffset, c2);
+                        bufferOffset++;
                     }
-
+                    while (--len != 0);
                 }
 
             }

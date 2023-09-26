@@ -80,8 +80,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
 
         internal override unsafe void BlendPixel(int* dstBuffer, int arrayOffset, Color srcColor)
-        { 
-            BlendPixel32Internal(dstBuffer + arrayOffset, srcColor); 
+        {
+            BlendPixel32Internal(dstBuffer + arrayOffset, srcColor);
 
         }
         internal override unsafe void BlendPixel32(int* ptr, Color sc)
@@ -149,7 +149,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
 
 
-        internal override void BlendPixels(Span<int> dstBuffer, int arrayElemOffset, Color[] srcColors, int srcColorOffset, byte[] covers, int coversIndex, bool firstCoverForAll, int count)
+        internal unsafe override void BlendPixels(int* dstBuffer, int arrayElemOffset, Color[] srcColors, int srcColorOffset, byte[] covers, int coversIndex, bool firstCoverForAll, int count)
         {
             if (firstCoverForAll)
             {
@@ -180,42 +180,34 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     //}
                     //------------------------------
                     //version 3: similar to version 2, but have a plan
-                    unsafe
+
+                    int* header2 = dstBuffer + arrayElemOffset;
+
+                    if (count % 2 != 0)
                     {
-                        //int* dstBuff = (int*)dstBuffer.Ptr;
-                        //int* head = &dstBuff[arrayElemOffset];
-
-                        fixed (int* head = dstBuffer)
-                        {
-                            int* header2 = head + arrayElemOffset;
-
-                            if (count % 2 != 0)
-                            {
-                                //odd
-                                //
-                                BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
-                                header2++;//move next
-                                count--;
-                            }
-
-                            //now count is even number
-                            while (count > 0)
-                            {
-                                //now count is even number
-                                //---------
-                                //1
-                                BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
-                                header2++;//move next
-                                count--;
-                                //---------
-                                //2
-                                BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
-                                header2++;//move next
-                                count--;
-                            }
-
-                        }
+                        //odd
+                        //
+                        BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
+                        header2++;//move next
+                        count--;
                     }
+
+                    //now count is even number
+                    while (count > 0)
+                    {
+                        //now count is even number
+                        //---------
+                        //1
+                        BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
+                        header2++;//move next
+                        count--;
+                        //---------
+                        //2
+                        BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
+                        header2++;//move next
+                        count--;
+                    }
+
                 }
                 else
                 {
@@ -246,108 +238,83 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     //}
                     //------------------------------
                     //version 3: similar to version 2, but have a plan
-                    unsafe
-                    {
-                        //int* dstBuff = (int*)dstBuffer.Ptr;
-                        //int* head = &dstBuff[arrayElemOffset];
-                        fixed (int* head = dstBuffer)
-                        {
-                            //int* header2 = (int*)(IntPtr)head;
-                            int* header2 = head + arrayElemOffset;
-                            if (count % 2 != 0)
-                            {
-                                //odd
-                                //
-                                BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
-                                header2++;//move next
-                                count--;
-                            }
-                            while (count > 0)
-                            {
-                                //Blend32PixelInternal(header2, sourceColors[sourceColorsOffset++].NewFromChangeCoverage(cover));
-                                //1.
-                                BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
-                                header2++;//move next
-                                count--;
-                                //2.
-                                BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
-                                header2++;//move next
-                                count--;
-                            }
 
-                        }
+                    //int* header2 = (int*)(IntPtr)head;
+                    int* header2 = dstBuffer + arrayElemOffset;
+                    if (count % 2 != 0)
+                    {
+                        //odd
+                        //
+                        BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                        header2++;//move next
+                        count--;
                     }
+                    while (count > 0)
+                    {
+                        //Blend32PixelInternal(header2, sourceColors[sourceColorsOffset++].NewFromChangeCoverage(cover));
+                        //1.
+                        BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                        header2++;//move next
+                        count--;
+                        //2.
+                        BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                        header2++;//move next
+                        count--;
+                    }
+
+
                 }
             }
             else
-            {
-                unsafe
+            { 
+                int* dstBufferPtr = dstBuffer + arrayElemOffset;
+                do
                 {
-                    //int* dstBuff = (int*)dstBuffer.Ptr;
-                    //int* dstHead = &dstBuff[arrayElemOffset];
-                    fixed (int* dstHead = dstBuffer)
+                    //cover may diff in each loop
+                    int cover = covers[coversIndex++];
+                    if (cover == 255)
                     {
-                        int* dstBufferPtr = dstHead + arrayElemOffset;
-                        do
-                        {
-                            //cover may diff in each loop
-                            int cover = covers[coversIndex++];
-                            if (cover == 255)
-                            {
-                                BlendPixel32Internal(dstBufferPtr, srcColors[srcColorOffset]);
-                            }
-                            else
-                            {
-                                BlendPixel32Internal(dstBufferPtr, srcColors[srcColorOffset].NewFromChangeCoverage(cover));
-                            }
-                            dstBufferPtr++;
-                            ++srcColorOffset;
-                        }
-                        while (--count != 0);
+                        BlendPixel32Internal(dstBufferPtr, srcColors[srcColorOffset]);
                     }
+                    else
+                    {
+                        BlendPixel32Internal(dstBufferPtr, srcColors[srcColorOffset].NewFromChangeCoverage(cover));
+                    }
+                    dstBufferPtr++;
+                    ++srcColorOffset;
                 }
+                while (--count != 0); 
             }
         }
 
-        internal override void CopyPixels(Span<int> dstBuffer, int arrayOffset, Color srcColor, int count)
+        internal unsafe override void CopyPixels(int* dstBuffer, int arrayOffset, Color srcColor, int count)
         {
-            unsafe
+
+            int* ptr = dstBuffer + arrayOffset;
+            int argb = srcColor.ToARGB();
+            //---------
+            if ((count % 2) != 0)
             {
-                unchecked
-                {
-                    fixed (int* ptr1 = dstBuffer)
-                    {
-                        int* ptr = ptr1 + arrayOffset;
-
-                        //TODO: consider use memcpy() impl*** 
-                        int argb = srcColor.ToARGB();
-                        //---------
-                        if ((count % 2) != 0)
-                        {
-                            *ptr = argb;
-                            ptr++; //move next
-                            count--;
-                        }
-
-                        while (count > 0)
-                        {
-                            //-----------
-                            //1.
-                            *ptr = argb;
-                            ptr++; //move next
-                            count--;
-                            //-----------
-                            //2
-                            *ptr = argb;
-                            ptr++; //move next
-                            count--;
-                        }
-
-
-                    }
-
-                }
+                *ptr = argb;
+                ptr++; //move next
+                count--;
             }
+
+            while (count > 0)
+            {
+                //-----------
+                //1.
+                *ptr = argb;
+                ptr++; //move next
+                count--;
+                //-----------
+                //2
+                *ptr = argb;
+                ptr++; //move next
+                count--;
+            }
+
+
         }
 
         internal override unsafe void CopyPixel(int* dstBuffer, int arrayOffset, Color srcColor)
