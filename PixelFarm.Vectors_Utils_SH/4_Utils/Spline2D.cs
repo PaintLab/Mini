@@ -19,6 +19,7 @@ using System.Collections.Generic;
 // This object is not a MonoBehaviour to keep it flexible. If you want to
 // save/display one in a scene, use the wrapper Spline2DComponent class.
 
+using PointF = System.Numerics.Vector2;
 using PixelFarm.VectorMath;
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
@@ -27,9 +28,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         bool _tangentsDirty = true;
         bool _lenSampleDirty = true;
         // Points which the curve passes through.
-        List<Vector2> _points = new List<Vector2>();
+        List<Vector2d> _points = new List<Vector2d>();
         // Tangents at each point; automatically calculated
-        List<Vector2> _tangents = new List<Vector2>();
+        List<Vector2d> _tangents = new List<Vector2d>();
         bool _closed;
         /// Whether the spline is closed; if so, the first point is also the last
         public bool IsClosed
@@ -103,7 +104,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
         }
 
-        public Spline2D(List<Vector2> intersectionPoints, bool isClosed = false,
+        public Spline2D(List<Vector2d> intersectionPoints, bool isClosed = false,
             float curve = 0.5f, int samplesPerSegment = 5)
         {
             _points = intersectionPoints;
@@ -115,7 +116,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
 
         /// Add a point to the curve
-        public void AddPoint(Vector2 p)
+        public void AddPoint(Vector2d p)
         {
             _points.Add(p);
             _tangentsDirty = true;
@@ -133,7 +134,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// before calling this method, for example (or for plain `t` interpolation,
         /// reduce `t` by 1f/Count)
         /// This method cannot be used on closed splines
-        public void AddPointScroll(Vector2 p)
+        public void AddPointScroll(Vector2d p)
         {
             //Assert.IsFalse(closed, "Cannot use AddPointScroll on closed splines!");
 
@@ -154,7 +155,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
 
         /// Add a list of points to the end of the spline, in order
-        public void AddPoints(IEnumerable<Vector2> plist)
+        public void AddPoints(IEnumerable<Vector2d> plist)
         {
             _points.AddRange(plist);
             _tangentsDirty = true;
@@ -162,7 +163,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
 
         /// Replace all the points in the spline from fromIndex onwards with a new set
-        public void ReplacePoints(IEnumerable<Vector2> plist, int fromIndex = 0)
+        public void ReplacePoints(IEnumerable<Vector2d> plist, int fromIndex = 0)
         {
             //Assert.IsTrue(fromIndex < points.Count, "Spline2D: point index out of range");
 
@@ -173,7 +174,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
 
         /// Change a point on the curve
-        public void SetPoint(int index, Vector2 p)
+        public void SetPoint(int index, Vector2d p)
         {
             //Assert.IsTrue(index < points.Count, "Spline2D: point index out of range");
 
@@ -192,7 +193,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
 
         /// Insert a point on the curve before the given index
-        public void InsertPoint(int index, Vector2 p)
+        public void InsertPoint(int index, Vector2d p)
         {
             //Assert.IsTrue(index <= points.Count && index >= 0, "Spline2D: point index out of range");
             _points.Insert(index, p);
@@ -211,7 +212,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             _lenSampleDirty = true;
         }
         /// Get a single point
-        public Vector2 GetPoint(int index)
+        public Vector2d GetPoint(int index)
         {
             //Assert.IsTrue(index < points.Count, "Spline2D: point index out of range");
 
@@ -220,7 +221,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         /// Interpolate a position on the entire curve. Note that if the control
         /// points are not evenly spaced, this may result in varying speeds.
-        public Vector2 Interpolate(float t)
+        public Vector2d Interpolate(float t)
         {
             Recalculate(false);
             ToSegment(t, out int segIdx, out float tSeg);
@@ -245,7 +246,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// Interpolate a position between one point on the curve and the next
         /// Rather than interpolating over the entire curve, this simply interpolates
         /// between the point with fromIndex and the next point
-        public Vector2 Interpolate(int fromIndex, float t)
+        public Vector2d Interpolate(int fromIndex, float t)
         {
             Recalculate(false);
 
@@ -297,7 +298,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// Get derivative of the curve at a point. Note that if the control
         /// points are not evenly spaced, this may result in varying speeds.
         /// This is not normalised by default in case you don't need that
-        public Vector2 Derivative(float t)
+        public Vector2d Derivative(float t)
         {
             Recalculate(false);
 
@@ -310,7 +311,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// Rather than interpolating over the entire curve, this simply interpolates
         /// between the point with fromIndex and the next segment
         /// This is not normalised by default in case you don't need that
-        public Vector2 Derivative(int fromIndex, float t)
+        public Vector2d Derivative(int fromIndex, float t)
         {
             Recalculate(false);
 
@@ -432,7 +433,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         /// Interpolate a position on the entire curve based on distance. This is
         /// approximate, the accuracy of can be changed via LengthSamplesPerSegment
-        public Vector2 InterpolateDistance(float dist)
+        public Vector2d InterpolateDistance(float dist)
         {
             float t = DistanceToLinearT(dist);
             return Interpolate(t);
@@ -441,7 +442,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// Get derivative of the curve at a point long the curve at a distance. This
         /// is approximate, the accuracy of this can be changed via
         /// LengthSamplesPerSegment
-        public Vector2 DerivativeDistance(float dist)
+        public Vector2d DerivativeDistance(float dist)
         {
             float t = DistanceToLinearT(dist);
             return Derivative(t);
@@ -494,7 +495,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             for (int i = 0; i < numPoints; ++i)
             {
-                Vector2 tangent;
+                Vector2d tangent;
                 if (i == 0)
                 {
                     // Special case start
@@ -532,7 +533,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         }
 
-        Vector2 MakeTangent(Vector2 p1, Vector2 p2) => _curvature * (p2 - p1);
+        Vector2d MakeTangent(Vector2d p1, Vector2d p2) => _curvature * (p2 - p1);
 
 
         void RecalcLength()
@@ -557,11 +558,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             float distanceSoFar = 0.0f;
             float tinc = 1.0f / (float)samples;
             float t = tinc; // we don't start at 0 since that's easy
-            Vector2 lastPos = _points[0];
+            Vector2d lastPos = _points[0];
             for (int i = 1; i <= samples; ++i)
             {
-                Vector2 pos = Interpolate(t);
-                float distInc = (float)(new Vector2(lastPos.x - pos.x, lastPos.y - pos.y)).Length;// Vector2.Distance(lastPos, pos);
+                Vector2d pos = Interpolate(t);
+                float distInc = (float)(new Vector2d(lastPos.x - pos.x, lastPos.y - pos.y)).Length;// Vector2.Distance(lastPos, pos);
                 distanceSoFar += distInc;
                 _distanceToTList.Add(new DistanceToT(distanceSoFar, t));
                 lastPos = pos;

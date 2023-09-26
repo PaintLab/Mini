@@ -11,17 +11,17 @@ namespace PixelFarm.PathReconstruction
 {
     public class BezierControllerArmPair
     {
-        public Vector2 left;
-        public Vector2 mid;
-        public Vector2 right;
+        public Vector2d left;
+        public Vector2d mid;
+        public Vector2d right;
 
-        Vector2 _left_bk; //backup
-        Vector2 _mid_bk; //backup
-        Vector2 _right_bk; //backup
+        Vector2d _left_bk; //backup
+        Vector2d _mid_bk; //backup
+        Vector2d _right_bk; //backup
 
 
         float _smooth_coeff;//0-1 coefficiency value
-        public BezierControllerArmPair(Vector2 left, Vector2 mid, Vector2 right)
+        public BezierControllerArmPair(Vector2d left, Vector2d mid, Vector2d right)
         {
             _smooth_coeff = 0;
             this.left = _left_bk = left;
@@ -45,8 +45,8 @@ namespace PixelFarm.PathReconstruction
                 }
                 else
                 {
-                    Vector2 newToRight = (_right_bk - _mid_bk) * _smooth_coeff;
-                    Vector2 newToLeft = (_left_bk - _mid_bk) * _smooth_coeff;
+                    Vector2d newToRight = (_right_bk - _mid_bk) * _smooth_coeff;
+                    Vector2d newToLeft = (_left_bk - _mid_bk) * _smooth_coeff;
 
                     left = _mid_bk + newToLeft;
                     right = _mid_bk + newToRight;
@@ -55,7 +55,7 @@ namespace PixelFarm.PathReconstruction
         }
         public void Offset(double dx, double dy)
         {
-            Vector2 diff = new Vector2(dx, dy);
+            Vector2d diff = new Vector2d(dx, dy);
             left += diff;
             mid += diff;
             right += diff;
@@ -65,17 +65,17 @@ namespace PixelFarm.PathReconstruction
             _right_bk += diff;
         }
 
-        static double Len(Vector2 v0, Vector2 v1)
+        static double Len(Vector2d v0, Vector2d v1)
         {
             return System.Math.Sqrt(
                   ((v1.Y - v0.Y) * (v1.Y - v0.Y)) +
                   ((v1.X - v0.X) * (v1.X - v0.x)));
         }
 
-        public static BezierControllerArmPair ReconstructControllerArms(Vector2 left, Vector2 middle, Vector2 right)
+        public static BezierControllerArmPair ReconstructControllerArms(Vector2d left, Vector2d middle, Vector2d right)
         {
-            Vector2 a_left = (left + middle) / 2;
-            Vector2 a_right = (right + middle) / 2;
+            Vector2d a_left = (left + middle) / 2;
+            Vector2d a_right = (right + middle) / 2;
 
 
             double len_1 = Len(left, middle);
@@ -90,13 +90,13 @@ namespace PixelFarm.PathReconstruction
 
             double d1_ratio = (len_1 / (len_1 + len_2));
 
-            Vector2 b = new Vector2(
+            Vector2d b = new Vector2d(
                 a_left.x + (d1_ratio * (a_right.x - a_left.x)),
                 a_left.y + (d1_ratio * (a_right.y - a_left.y)));
 
             var controllerPair = new BezierControllerArmPair(a_left, b, a_right);
 
-            Vector2 diff = b - middle;
+            Vector2d diff = b - middle;
             controllerPair.Offset(-diff.x, -diff.y);
 
             return controllerPair;
@@ -112,7 +112,7 @@ namespace PixelFarm.PathReconstruction
     public class BezireControllerArmBuilder
     {
         //TODO: optmize this later... 
-        FixedLengthQueue<Vector2> _reusableQueue = new FixedLengthQueue<Vector2>(3);
+        FixedLengthQueue<Vector2d> _reusableQueue = new FixedLengthQueue<Vector2d>(3);
 
         class FixedLengthQueue<T>
         {
@@ -236,15 +236,15 @@ namespace PixelFarm.PathReconstruction
                 switch (inputVxs.GetVertex(i, out double x, out double y))
                 {
                     case VertexCmd.MoveTo:
-                        _reusableQueue.Enqueue(new Vector2(lastest_moveToX = x, latest_moveToY = y));
+                        _reusableQueue.Enqueue(new Vector2d(lastest_moveToX = x, latest_moveToY = y));
                         break;
                     case VertexCmd.C3:
                     case VertexCmd.C4:
                     case VertexCmd.LineTo:
-                        _reusableQueue.Enqueue(new Vector2(x, y));
+                        _reusableQueue.Enqueue(new Vector2d(x, y));
                         break;
                     case VertexCmd.Close:
-                        _reusableQueue.Enqueue(new Vector2(lastest_moveToX, latest_moveToY));
+                        _reusableQueue.Enqueue(new Vector2d(lastest_moveToX, latest_moveToY));
 
                         if (_reusableQueue.Count == 3)
                         {
@@ -259,7 +259,7 @@ namespace PixelFarm.PathReconstruction
                         {
                             //close the 1st point
                             inputVxs.GetVertex(1, out x, out y);
-                            _reusableQueue.Enqueue(new Vector2(x, y));
+                            _reusableQueue.Enqueue(new Vector2d(x, y));
 
                             BezierControllerArmPair arm = CreateArmPair();
                             if (arm != null)

@@ -22,12 +22,14 @@ SOFTWARE.
 
 using System;
 using System.Runtime.InteropServices;
+using Vector2f = System.Numerics.Vector2;
+
 namespace PixelFarm.VectorMath
 {
-    /// <summary>Represents a 2D vector using two double-precision floating-point numbers.</summary>
-    //[Serializable]
+
+    ///// <summary>Represents a 2D vector using two double-precision floating-point numbers.</summary> 
     [StructLayout(LayoutKind.Sequential)]
-    public struct Vector2 : IEquatable<Vector2>
+    public struct Vector2d : IEquatable<Vector2d>
     {
 
         /// <summary>The X coordinate of this instance.</summary>
@@ -37,44 +39,44 @@ namespace PixelFarm.VectorMath
         /// <summary>
         /// Defines a unit-length Vector2d that points towards the X-axis.
         /// </summary>
-        public static readonly Vector2 UnitX = new Vector2(1, 0);
+        public static readonly Vector2d UnitX = new Vector2d(1, 0);
         /// <summary>
         /// Defines a unit-length Vector2d that points towards the Y-axis.
         /// </summary>
-        public static readonly Vector2 UnitY = new Vector2(0, 1);
+        public static readonly Vector2d UnitY = new Vector2d(0, 1);
         /// <summary>
         /// Defines a zero-length Vector2d.
         /// </summary>
-        public static readonly Vector2 Zero = new Vector2(0, 0);
+        public static readonly Vector2d Zero = new Vector2d(0, 0);
         /// <summary>
         /// Defines an instance with all components set to 1.
         /// </summary>
-        public static readonly Vector2 One = new Vector2(1, 1);
+        public static readonly Vector2d One = new Vector2d(1, 1);
         /// <summary>
         /// Defines the size of the Vector2d struct in bytes.
         /// </summary>
-        public static readonly int SizeInBytes = Marshal.SizeOf(new Vector2());
+        public static readonly int SizeInBytes = Marshal.SizeOf(new Vector2d());
 
 
         /// <summary>Constructs left vector with the given coordinates.</summary>
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
-        public Vector2(double x, double y)
+        public Vector2d(double x, double y)
         {
             this.x = x;
             this.y = y;
         }
 
-        public Vector2(Vector3 vector)
+        public Vector2d(Vector3 vector)
         {
             this.x = vector.x;
             this.y = vector.y;
         }
-        public Vector2 NewLength(double newLength)
+        public Vector2d NewLength(double newLength)
         {
             //radian
             double atan = Math.Atan2(y, x);
-            return new Vector2(Math.Cos(atan) * newLength,
+            return new Vector2d(Math.Cos(atan) * newLength,
                         Math.Sin(atan) * newLength);
         }
 
@@ -144,14 +146,14 @@ namespace PixelFarm.VectorMath
         }
 
 
-        public Vector2 RotateInDegree(double deg)
+        public Vector2d RotateInDegree(double deg)
         {
 
             double rad = deg * (System.Math.PI / 180.0f); //convert from degree to rad 
             double sin = System.Math.Sin(rad);
             double cos = System.Math.Cos(rad);
 
-            return new Vector2(
+            return new Vector2d(
                 x * cos - y * sin,
                 x * sin + y * cos);
         }
@@ -170,18 +172,18 @@ namespace PixelFarm.VectorMath
         /// <summary>
         /// Gets the perpendicular vector on the right side of this vector.
         /// </summary>
-        public Vector2 GetPerpendicularRight()
+        public Vector2d GetPerpendicularRight()
         {
-            return new Vector2(y, -x);
+            return new Vector2d(y, -x);
         }
         /// <summary>
         /// Gets the perpendicular vector on the right side of this vector.
         /// </summary>
-        public Vector2 PerpendicularRight
+        public Vector2d PerpendicularRight
         {
             get
             {
-                return new Vector2(Y, -X);
+                return new Vector2d(Y, -X);
             }
         }
 
@@ -189,9 +191,9 @@ namespace PixelFarm.VectorMath
         /// <summary>
         /// Gets the perpendicular vector on the left side of this vector.
         /// </summary>
-        public Vector2 GetPerpendicularLeft()
+        public Vector2d GetPerpendicularLeft()
         {
-            return new Vector2(-y, x);
+            return new Vector2d(-y, x);
         }
 
 
@@ -200,9 +202,9 @@ namespace PixelFarm.VectorMath
         /// Returns a normalized Vector of this.
         /// </summary>
         /// <returns></returns>
-        public Vector2 GetNormal()
+        public Vector2d GetNormal()
         {
-            Vector2 temp = this;
+            Vector2d temp = this;
             temp.Normalize();
             return temp;
         }
@@ -227,7 +229,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">Left operand.</param>
         /// <param name="b">Right operand.</param>
         /// <returns>Result of operation.</returns>
-        public static Vector2 Add(Vector2 a, Vector2 b)
+        public static Vector2d Add(Vector2d a, Vector2d b)
         {
             Add(ref a, ref b, out a);
             return a;
@@ -239,9 +241,9 @@ namespace PixelFarm.VectorMath
         /// <param name="a">Left operand.</param>
         /// <param name="b">Right operand.</param>
         /// <param name="result">Result of operation.</param>
-        public static void Add(ref Vector2 a, ref Vector2 b, out Vector2 result)
+        public static void Add(ref Vector2d a, ref Vector2d b, out Vector2d result)
         {
-            result = new Vector2(a.x + b.x, a.y + b.y);
+            result = new Vector2d(a.x + b.x, a.y + b.y);
         }
 
 
@@ -252,7 +254,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <returns>Result of subtraction</returns>
-        public static Vector2 Subtract(Vector2 a, Vector2 b)
+        public static Vector2d Subtract(Vector2d a, Vector2d b)
         {
             Subtract(ref a, ref b, out a);
             return a;
@@ -264,9 +266,9 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <param name="result">Result of subtraction</param>
-        public static void Subtract(ref Vector2 a, ref Vector2 b, out Vector2 result)
+        public static void Subtract(ref Vector2d a, ref Vector2d b, out Vector2d result)
         {
-            result = new Vector2(a.x - b.x, a.y - b.y);
+            result = new Vector2d(a.x - b.x, a.y - b.y);
         }
 
 
@@ -277,7 +279,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector2 Multiply(Vector2 vector, double scale)
+        public static Vector2d Multiply(Vector2d vector, double scale)
         {
             Multiply(ref vector, scale, out vector);
             return vector;
@@ -289,9 +291,9 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Multiply(ref Vector2 vector, double scale, out Vector2 result)
+        public static void Multiply(ref Vector2d vector, double scale, out Vector2d result)
         {
-            result = new Vector2(vector.x * scale, vector.y * scale);
+            result = new Vector2d(vector.x * scale, vector.y * scale);
         }
 
         /// <summary>
@@ -300,7 +302,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector2 Multiply(Vector2 vector, Vector2 scale)
+        public static Vector2d Multiply(Vector2d vector, Vector2d scale)
         {
             Multiply(ref vector, ref scale, out vector);
             return vector;
@@ -312,9 +314,9 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Multiply(ref Vector2 vector, ref Vector2 scale, out Vector2 result)
+        public static void Multiply(ref Vector2d vector, ref Vector2d scale, out Vector2d result)
         {
-            result = new Vector2(vector.x * scale.x, vector.y * scale.y);
+            result = new Vector2d(vector.x * scale.x, vector.y * scale.y);
         }
 
 
@@ -325,7 +327,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector2 Divide(Vector2 vector, double scale)
+        public static Vector2d Divide(Vector2d vector, double scale)
         {
             Divide(ref vector, scale, out vector);
             return vector;
@@ -337,7 +339,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Divide(ref Vector2 vector, double scale, out Vector2 result)
+        public static void Divide(ref Vector2d vector, double scale, out Vector2d result)
         {
             Multiply(ref vector, 1 / scale, out result);
         }
@@ -348,7 +350,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector2 Divide(Vector2 vector, Vector2 scale)
+        public static Vector2d Divide(Vector2d vector, Vector2d scale)
         {
             Divide(ref vector, ref scale, out vector);
             return vector;
@@ -360,9 +362,9 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Divide(ref Vector2 vector, ref Vector2 scale, out Vector2 result)
+        public static void Divide(ref Vector2d vector, ref Vector2d scale, out Vector2d result)
         {
-            result = new Vector2(vector.x / scale.x, vector.y / scale.y);
+            result = new Vector2d(vector.x / scale.x, vector.y / scale.y);
         }
 
 
@@ -373,7 +375,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <returns>The component-wise minimum</returns>
-        public static Vector2 Min(Vector2 a, Vector2 b)
+        public static Vector2d Min(Vector2d a, Vector2d b)
         {
             a.x = a.x < b.x ? a.x : b.x;
             a.y = a.y < b.y ? a.y : b.y;
@@ -386,7 +388,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <param name="result">The component-wise minimum</param>
-        public static void Min(ref Vector2 a, ref Vector2 b, out Vector2 result)
+        public static void Min(ref Vector2d a, ref Vector2d b, out Vector2d result)
         {
             result.x = a.x < b.x ? a.x : b.x;
             result.y = a.y < b.y ? a.y : b.y;
@@ -400,7 +402,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <returns>The component-wise maximum</returns>
-        public static Vector2 Max(Vector2 a, Vector2 b)
+        public static Vector2d Max(Vector2d a, Vector2d b)
         {
             a.x = a.x > b.x ? a.x : b.x;
             a.y = a.y > b.y ? a.y : b.y;
@@ -413,7 +415,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <param name="result">The component-wise maximum</param>
-        public static void Max(ref Vector2 a, ref Vector2 b, out Vector2 result)
+        public static void Max(ref Vector2d a, ref Vector2d b, out Vector2d result)
         {
             result.x = a.x > b.x ? a.x : b.x;
             result.y = a.y > b.y ? a.y : b.y;
@@ -428,7 +430,7 @@ namespace PixelFarm.VectorMath
         /// <param name="min">Minimum vector</param>
         /// <param name="max">Maximum vector</param>
         /// <returns>The clamped vector</returns>
-        public static Vector2 Clamp(Vector2 vec, Vector2 min, Vector2 max)
+        public static Vector2d Clamp(Vector2d vec, Vector2d min, Vector2d max)
         {
             vec.x = vec.x < min.x ? min.x : vec.x > max.x ? max.x : vec.x;
             vec.y = vec.y < min.y ? min.y : vec.y > max.y ? max.y : vec.y;
@@ -442,7 +444,7 @@ namespace PixelFarm.VectorMath
         /// <param name="min">Minimum vector</param>
         /// <param name="max">Maximum vector</param>
         /// <param name="result">The clamped vector</param>
-        public static void Clamp(ref Vector2 vec, ref Vector2 min, ref Vector2 max, out Vector2 result)
+        public static void Clamp(ref Vector2d vec, ref Vector2d min, ref Vector2d max, out Vector2d result)
         {
             result.x = vec.x < min.x ? min.x : vec.x > max.x ? max.x : vec.x;
             result.y = vec.y < min.y ? min.y : vec.y > max.y ? max.y : vec.y;
@@ -455,7 +457,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="vec">The input vector</param>
         /// <returns>The normalized vector</returns>
-        public static Vector2 Normalize(Vector2 vec)
+        public static Vector2d Normalize(Vector2d vec)
         {
             double scale = 1.0 / vec.Length;
             vec.x *= scale;
@@ -468,7 +470,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="vec">The input vector</param>
         /// <param name="result">The normalized vector</param>
-        public static void Normalize(ref Vector2 vec, out Vector2 result)
+        public static void Normalize(ref Vector2d vec, out Vector2d result)
         {
             double scale = 1.0 / vec.Length;
             result.x = vec.x * scale;
@@ -483,7 +485,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The dot product of the two inputs</returns>
-        public static double Dot(Vector2 left, Vector2 right)
+        public static double Dot(Vector2d left, Vector2d right)
         {
             return left.x * right.x + left.y * right.y;
         }
@@ -494,7 +496,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <param name="result">The dot product of the two inputs</param>
-        public static void Dot(ref Vector2 left, ref Vector2 right, out double result)
+        public static void Dot(ref Vector2d left, ref Vector2d right, out double result)
         {
             result = left.x * right.x + left.y * right.y;
         }
@@ -507,7 +509,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The cross product of the two inputs</returns>
-        public static double Cross(Vector2 left, Vector2 right)
+        public static double Cross(Vector2d left, Vector2d right)
         {
             return left.x * right.y - left.y * right.x;
         }
@@ -537,7 +539,7 @@ namespace PixelFarm.VectorMath
         /// <param name="b">Second input vector</param>
         /// <param name="blend">The blend factor. a when blend=0, b when blend=1.</param>
         /// <returns>a when blend=0, b when blend=1, and a linear combination otherwise</returns>
-        public static Vector2 Lerp(Vector2 a, Vector2 b, double blend)
+        public static Vector2d Lerp(Vector2d a, Vector2d b, double blend)
         {
             a.x = blend * (b.x - a.x) + a.x;
             a.y = blend * (b.y - a.y) + a.y;
@@ -551,7 +553,7 @@ namespace PixelFarm.VectorMath
         /// <param name="b">Second input vector</param>
         /// <param name="blend">The blend factor. a when blend=0, b when blend=1.</param>
         /// <param name="result">a when blend=0, b when blend=1, and a linear combination otherwise</param>
-        public static void Lerp(ref Vector2 a, ref Vector2 b, double blend, out Vector2 result)
+        public static void Lerp(ref Vector2d a, ref Vector2d b, double blend, out Vector2d result)
         {
             result.x = blend * (b.x - a.x) + a.x;
             result.y = blend * (b.y - a.y) + a.y;
@@ -568,7 +570,7 @@ namespace PixelFarm.VectorMath
         /// <param name="u">First Barycentric Coordinate</param>
         /// <param name="v">Second Barycentric Coordinate</param>
         /// <returns>a when u=v=0, b when u=1,v=0, c when u=0,v=1, and a linear combination of a,b,c otherwise</returns>
-        public static Vector2 BaryCentric(Vector2 a, Vector2 b, Vector2 c, double u, double v)
+        public static Vector2d BaryCentric(Vector2d a, Vector2d b, Vector2d c, double u, double v)
         {
             return a + u * (b - a) + v * (c - a);
         }
@@ -580,10 +582,10 @@ namespace PixelFarm.VectorMath
         /// <param name="u">First Barycentric Coordinate.</param>
         /// <param name="v">Second Barycentric Coordinate.</param>
         /// <param name="result">Output Vector. a when u=v=0, b when u=1,v=0, c when u=0,v=1, and a linear combination of a,b,c otherwise</param>
-        public static void BaryCentric(ref Vector2 a, ref Vector2 b, ref Vector2 c, double u, double v, out Vector2 result)
+        public static void BaryCentric(ref Vector2d a, ref Vector2d b, ref Vector2d c, double u, double v, out Vector2d result)
         {
             result = a; // copy
-            Vector2 temp = b; // copy
+            Vector2d temp = b; // copy
             Subtract(ref temp, ref a, out temp);
             Multiply(ref temp, u, out temp);
             Add(ref result, ref temp, out result);
@@ -601,9 +603,9 @@ namespace PixelFarm.VectorMath
         /// <param name="vec">The vector to transform.</param>
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <returns>The result of the operation.</returns>
-        public static Vector2 Transform(Vector2 vec, Quaternion quat)
+        public static Vector2d Transform(Vector2d vec, Quaternion quat)
         {
-            Vector2 result;
+            Vector2d result;
             Transform(ref vec, ref quat, out result);
             return result;
         }
@@ -614,13 +616,13 @@ namespace PixelFarm.VectorMath
         /// <param name="vec">The vector to transform.</param>
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <param name="result">The result of the operation.</param>
-        public static void Transform(ref Vector2 vec, ref Quaternion quat, out Vector2 result)
+        public static void Transform(ref Vector2d vec, ref Quaternion quat, out Vector2d result)
         {
             Quaternion v = new Quaternion(vec.x, vec.y, 0, 0), i, t;
             Quaternion.Invert(ref quat, out i);
             Quaternion.Multiply(ref quat, ref v, out t);
             Quaternion.Multiply(ref t, ref i, out v);
-            result = new Vector2(v.X, v.Y);
+            result = new Vector2d(v.X, v.Y);
         }
 
 
@@ -631,7 +633,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <returns>The component-wise minimum</returns>
-        public static Vector2 ComponentMin(Vector2 a, Vector2 b)
+        public static Vector2d ComponentMin(Vector2d a, Vector2d b)
         {
             a.x = a.x < b.x ? a.x : b.x;
             a.y = a.y < b.y ? a.y : b.y;
@@ -644,7 +646,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <param name="result">The component-wise minimum</param>
-        public static void ComponentMin(ref Vector2 a, ref Vector2 b, out Vector2 result)
+        public static void ComponentMin(ref Vector2d a, ref Vector2d b, out Vector2d result)
         {
             result.x = a.x < b.x ? a.x : b.x;
             result.y = a.y < b.y ? a.y : b.y;
@@ -658,7 +660,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <returns>The component-wise maximum</returns>
-        public static Vector2 ComponentMax(Vector2 a, Vector2 b)
+        public static Vector2d ComponentMax(Vector2d a, Vector2d b)
         {
             a.x = a.x > b.x ? a.x : b.x;
             a.y = a.y > b.y ? a.y : b.y;
@@ -671,7 +673,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <param name="result">The component-wise maximum</param>
-        public static void ComponentMax(ref Vector2 a, ref Vector2 b, out Vector2 result)
+        public static void ComponentMax(ref Vector2d a, ref Vector2d b, out Vector2d result)
         {
             result.x = a.x > b.x ? a.x : b.x;
             result.y = a.y > b.y ? a.y : b.y;
@@ -686,7 +688,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">The left instance.</param>
         /// <param name="right">The right instance.</param>
         /// <returns>The result of the operation.</returns>
-        public static Vector2 operator +(Vector2 left, Vector2 right)
+        public static Vector2d operator +(Vector2d left, Vector2d right)
         {
             left.x += right.x;
             left.y += right.y;
@@ -699,7 +701,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">The left instance.</param>
         /// <param name="right">The right instance.</param>
         /// <returns>The result of the operation.</returns>
-        public static Vector2 operator -(Vector2 left, Vector2 right)
+        public static Vector2d operator -(Vector2d left, Vector2d right)
         {
             left.x -= right.x;
             left.y -= right.y;
@@ -711,7 +713,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="vec">The instance.</param>
         /// <returns>The result of the operation.</returns>
-        public static Vector2 operator -(Vector2 vec)
+        public static Vector2d operator -(Vector2d vec)
         {
             vec.x = -vec.x;
             vec.y = -vec.y;
@@ -724,7 +726,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vec">The instance.</param>
         /// <param name="f">The scalar.</param>
         /// <returns>The result of the operation.</returns>
-        public static Vector2 operator *(Vector2 vec, double f)
+        public static Vector2d operator *(Vector2d vec, double f)
         {
             vec.x *= f;
             vec.y *= f;
@@ -737,7 +739,7 @@ namespace PixelFarm.VectorMath
         /// <param name="f">The scalar.</param>
         /// <param name="vec">The instance.</param>
         /// <returns>The result of the operation.</returns>
-        public static Vector2 operator *(double f, Vector2 vec)
+        public static Vector2d operator *(double f, Vector2d vec)
         {
             vec.x *= f;
             vec.y *= f;
@@ -750,7 +752,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vec">The instance.</param>
         /// <param name="f">The scalar.</param>
         /// <returns>The result of the operation.</returns>
-        public static Vector2 operator /(Vector2 vec, double f)
+        public static Vector2d operator /(Vector2d vec, double f)
         {
             double mult = 1.0 / f;
             vec.x *= mult;
@@ -764,7 +766,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vec">The scalar.</param>
         /// <param name="f">The instance.</param>
         /// <returns>The result of the operation.</returns>
-        public static Vector2 operator /(double f, Vector2 vec)
+        public static Vector2d operator /(double f, Vector2d vec)
         {
             vec.x = f / vec.x;
             vec.y = f / vec.y;
@@ -777,7 +779,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">The left instance.</param>
         /// <param name="right">The right instance.</param>
         /// <returns>True, if both instances are equal; false otherwise.</returns>
-        public static bool operator ==(Vector2 left, Vector2 right)
+        public static bool operator ==(Vector2d left, Vector2d right)
         {
             return left.Equals(right);
         }
@@ -788,7 +790,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">The left instance.</param>
         /// <param name="right">The right instance.</param>
         /// <returns>True, if the instances are not equal; false otherwise.</returns>
-        public static bool operator !=(Vector2 left, Vector2 right)
+        public static bool operator !=(Vector2d left, Vector2d right)
         {
             return !left.Equals(right);
         }
@@ -825,9 +827,9 @@ namespace PixelFarm.VectorMath
         /// <returns>True if the instances are equal; false otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (!(obj is Vector2))
+            if (!(obj is Vector2d))
                 return false;
-            return this.Equals((Vector2)obj);
+            return this.Equals((Vector2d)obj);
         }
 
 
@@ -837,7 +839,7 @@ namespace PixelFarm.VectorMath
         /// <summary>Indicates whether the current vector is equal to another vector.</summary>
         /// <param name="other">A vector to compare with this vector.</param>
         /// <returns>true if the current vector is equal to the vector parameter; otherwise, false.</returns>
-        public bool Equals(Vector2 other)
+        public bool Equals(Vector2d other)
         {
             return
                 x == other.x &&
@@ -847,7 +849,7 @@ namespace PixelFarm.VectorMath
         /// <summary>Indicates whether the current vector is equal to another vector.</summary>
         /// <param name="other">A vector to compare with this vector.</param>
         /// <returns>true if the current vector is equal to the vector parameter; otherwise, false.</returns>
-        public bool Equals(Vector2 other, double errorRange)
+        public bool Equals(Vector2d other, double errorRange)
         {
             if ((x < other.x + errorRange && x > other.x - errorRange) &&
                 (y < other.y + errorRange && y > other.y - errorRange))
@@ -871,9 +873,12 @@ namespace PixelFarm.VectorMath
     }
 
 
+
+
+
     public static class Vector2Ext
     {
-        public static Vector2 Rotate(this Vector2 v, int degree)
+        public static Vector2d Rotate(this Vector2d v, int degree)
         {
             double radian = degree * Math.PI / 180.0;
             double sin = Math.Sin(radian);
@@ -881,13 +886,13 @@ namespace PixelFarm.VectorMath
             double nx = v.X * cos - v.Y * sin;
             double ny = v.X * sin + v.Y * cos;
 
-            return new Vector2((float)nx, (float)ny);
+            return new Vector2d((float)nx, (float)ny);
         }
-        public static Vector2 NewLength(this Vector2 v, double newLength)
+        public static Vector2d NewLength(this Vector2d v, double newLength)
         {
             //radian
             double atan = Math.Atan2(v.Y, v.X);
-            return new Vector2(
+            return new Vector2d(
                       (float)(Math.Cos(atan) * newLength),
                       (float)(Math.Sin(atan) * newLength));
         }
@@ -912,130 +917,128 @@ namespace PixelFarm.VectorMath
         }
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct Vector2f
-    {
-        static Vector2f zeroVector = new Vector2f(0f, 0f);
-        static Vector2f unitVector = new Vector2f(1f, 1f);
-        static Vector2f unitXVector = new Vector2f(1f, 0f);
-        static Vector2f unitYVector = new Vector2f(0f, 1f);
-        public float X;
-        public float Y;
-        public static readonly Vector2f Zero = new Vector2f(0, 0);
-        public Vector2f(float x, float y)
-        {
-            this.X = x;
-            this.Y = y;
-        }
-        public static Vector2f operator +(Vector2f v1, Vector2f v2)
-        {
-            return new Vector2f(v1.X + v2.X, v1.Y + v2.Y);
-        }
-        public static Vector2f operator +(Vector2f v1, float n)
-        {
-            return new Vector2f(v1.X + n, v1.Y + n);
-        }
+    //    [StructLayout(LayoutKind.Sequential)]
+    //    public struct Vector2f
+    //    {
+    //        static Vector2f zeroVector = new Vector2f(0f, 0f);
+    //        static Vector2f unitVector = new Vector2f(1f, 1f);
+    //        static Vector2f unitXVector = new Vector2f(1f, 0f);
+    //        static Vector2f unitYVector = new Vector2f(0f, 1f);
+    //        public float X;
+    //        public float Y;
+    //        public static readonly Vector2f Zero = new Vector2f(0, 0);
+    //        public Vector2f(float x, float y)
+    //        {
+    //            this.X = x;
+    //            this.Y = y;
+    //        }
+    //        public static Vector2f operator +(Vector2f v1, Vector2f v2)
+    //        {
+    //            return new Vector2f(v1.X + v2.X, v1.Y + v2.Y);
+    //        }
+    //        public static Vector2f operator +(Vector2f v1, float n)
+    //        {
+    //            return new Vector2f(v1.X + n, v1.Y + n);
+    //        }
 
-        public static Vector2f operator -(Vector2f v1, Vector2f v2)
-        {
-            return new Vector2f(v1.X - v2.X, v1.Y - v2.Y);
-        }
-        public static Vector2f operator /(Vector2f v1, float n)
-        {
-            return new Vector2f(v1.X / n, v1.Y / n);
-        }
-        public static Vector2f operator *(Vector2f v1, float n)
-        {
-            return new Vector2f(v1.X * n, v1.Y * n);
-        }
-        public static Vector2f operator *(float n, Vector2f v1)
-        {
-            return new Vector2f(v1.X * n, v1.Y * n);
-        }
-        public static bool operator ==(Vector2f v1, Vector2f v2)
-        {
-            return (v1.X == v2.X) && (v1.Y == v2.Y);
-        }
-        public static bool operator !=(Vector2f v1, Vector2f v2)
-        {
-            return (v1.X != v2.X) || (v1.Y != v2.Y);
-        }
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-        public static Vector2f Min(Vector2f value1, Vector2f value2)
-        {
-            return new Vector2f(
-                (value1.X < value2.X) ? value1.X : value2.X,
-                (value1.Y < value2.Y) ? value1.Y : value2.Y
-                );
-        }
-        public static Vector2f Max(Vector2f value1, Vector2f value2)
-        {
-            return new Vector2f(
-                (value1.X > value2.X) ? value1.X : value2.X,
-                (value1.Y > value2.Y) ? value1.Y : value2.Y
-                );
-        }
-        public override bool Equals(object obj)
-        {
-            if (obj is Vector2f)
-            {
-                Vector2f v2 = (Vector2f)obj;
-                return this == v2;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        public static Vector2f Normalize(Vector2f value)
-        {
-            double factor = 1.0f / (double)Math.Sqrt((value.X * value.X) + (value.Y * value.Y));
-            return new Vector2f((float)(value.X * factor), (float)(value.Y * factor));
-            //value.X *= val;
-            //value.Y *= val;
-            //return value;
-        }
-
-
-        public static Vector2f One
-        {
-            get { return unitVector; }
-        }
-
-        public static Vector2f UnitX
-        {
-            get { return unitXVector; }
-        }
-
-        public static Vector2f UnitY
-        {
-            get { return unitYVector; }
-        }
-        public static double Dot(Vector2f value1, Vector2f value2)
-        {
-            return (value1.X * value2.X) + (value1.Y * value2.Y);
-        }
-        public double Length()
-        {
-            return Math.Sqrt((X * X) + (Y * Y));
-        }
-
-        public double LengthSquared()
-        {
-            return (X * X) + (Y * Y);
-        }
-#if DEBUG
-        public override string ToString()
-        {
-            return "(" + X + "," + Y + ")";
-        }
-#endif
+    //        public static Vector2f operator -(Vector2f v1, Vector2f v2)
+    //        {
+    //            return new Vector2f(v1.X - v2.X, v1.Y - v2.Y);
+    //        }
+    //        public static Vector2f operator /(Vector2f v1, float n)
+    //        {
+    //            return new Vector2f(v1.X / n, v1.Y / n);
+    //        }
+    //        public static Vector2f operator *(Vector2f v1, float n)
+    //        {
+    //            return new Vector2f(v1.X * n, v1.Y * n);
+    //        }
+    //        public static Vector2f operator *(float n, Vector2f v1)
+    //        {
+    //            return new Vector2f(v1.X * n, v1.Y * n);
+    //        }
+    //        public static bool operator ==(Vector2f v1, Vector2f v2)
+    //        {
+    //            return (v1.X == v2.X) && (v1.Y == v2.Y);
+    //        }
+    //        public static bool operator !=(Vector2f v1, Vector2f v2)
+    //        {
+    //            return (v1.X != v2.X) || (v1.Y != v2.Y);
+    //        }
+    //        public override int GetHashCode()
+    //        {
+    //            return base.GetHashCode();
+    //        }
+    //        public static Vector2f Min(Vector2f value1, Vector2f value2)
+    //        {
+    //            return new Vector2f(
+    //                (value1.X < value2.X) ? value1.X : value2.X,
+    //                (value1.Y < value2.Y) ? value1.Y : value2.Y
+    //                );
+    //        }
+    //        public static Vector2f Max(Vector2f value1, Vector2f value2)
+    //        {
+    //            return new Vector2f(
+    //                (value1.X > value2.X) ? value1.X : value2.X,
+    //                (value1.Y > value2.Y) ? value1.Y : value2.Y
+    //                );
+    //        }
+    //        public override bool Equals(object obj)
+    //        {
+    //            if (obj is Vector2f)
+    //            {
+    //                Vector2f v2 = (Vector2f)obj;
+    //                return this == v2;
+    //            }
+    //            else
+    //            {
+    //                return false;
+    //            }
+    //        }
+    //        public static Vector2f Normalize(Vector2f value)
+    //        {
+    //            double factor = 1.0f / (double)Math.Sqrt((value.X * value.X) + (value.Y * value.Y));
+    //            return new Vector2f((float)(value.X * factor), (float)(value.Y * factor));
+    //            //value.X *= val;
+    //            //value.Y *= val;
+    //            //return value;
+    //        }
 
 
-    }
+    //        public static Vector2f One
+    //        {
+    //            get { return unitVector; }
+    //        }
+
+    //        public static Vector2f UnitX
+    //        {
+    //            get { return unitXVector; }
+    //        }
+
+    //        public static Vector2f UnitY
+    //        {
+    //            get { return unitYVector; }
+    //        }
+    //        public static double Dot(Vector2f value1, Vector2f value2)
+    //        {
+    //            return (value1.X * value2.X) + (value1.Y * value2.Y);
+    //        }
+    //        public double Length()
+    //        {
+    //            return Math.Sqrt((X * X) + (Y * Y));
+    //        }
+
+    //        public double LengthSquared()
+    //        {
+    //            return (X * X) + (Y * Y);
+    //        }
+    //#if DEBUG
+    //        public override string ToString()
+    //        {
+    //            return "(" + X + "," + Y + ")";
+    //        }
+    //#endif 
+    //    }
 
     public struct Matrix3x2f
     {

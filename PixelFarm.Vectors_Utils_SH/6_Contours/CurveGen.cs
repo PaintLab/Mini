@@ -6,6 +6,7 @@
  * Contributions by Georg W�chter.
  */
 using PixelFarm.VectorMath;
+using Vector2f = System.Numerics.Vector2;
 namespace PixelFarm.Contours
 {
     static class Vector2fExtensions

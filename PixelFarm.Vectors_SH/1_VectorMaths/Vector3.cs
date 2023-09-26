@@ -66,7 +66,7 @@ namespace PixelFarm.VectorMath
         /// Constructs a new instance from the given Vector2d.
         /// </summary>
         /// <param name="v">The Vector2d to copy components from.</param>
-        public Vector3(Vector2 v, double z = 0)
+        public Vector3(Vector2d v, double z = 0)
         {
             x = v.x;
             y = v.y;
@@ -970,7 +970,7 @@ namespace PixelFarm.VectorMath
         /// Gets or sets an OpenTK.Vector2d with the X and Y components of this instance.
         /// </summary>
         [JsonIgnoreAttribute]
-        public Vector2 Xy { get { return new Vector2(x, y); } set { x = value.x; y = value.y; } }
+        public Vector2d Xy { get { return new Vector2d(x, y); } set { x = value.x; y = value.y; } }
 
 
 

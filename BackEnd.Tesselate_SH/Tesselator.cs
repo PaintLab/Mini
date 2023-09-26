@@ -73,10 +73,12 @@ namespace Tesselate
 
 
         public ref struct CombineParameters
-        {//mutable-struct//
+        {
+            //mutable-struct//
             public int d0, d1, d2, d3;
             public double w0, w1, w2, w3;
         }
+
         public enum TriangleListType
         {
             LineLoop,

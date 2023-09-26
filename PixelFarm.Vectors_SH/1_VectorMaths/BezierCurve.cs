@@ -17,7 +17,7 @@ namespace PixelFarm.VectorMath
     public struct BezierCurve
     {
 
-        List<Vector2> _points;
+        List<Vector2d> _points;
         /// <summary>
         /// The parallel value.
         /// </summary>
@@ -31,17 +31,17 @@ namespace PixelFarm.VectorMath
         /// Gets the points of this curve.
         /// </summary>
         /// <remarks>The first point and the last points represent the anchor points.</remarks>
-        public IList<Vector2> Points => _points;
+        public IList<Vector2d> Points => _points;
 
         /// <summary>
         /// Constructs a new <see cref="BezierCurve"/>.
         /// </summary>
         /// <param name="points">The points.</param>
-        public BezierCurve(IEnumerable<Vector2> points)
+        public BezierCurve(IEnumerable<Vector2d> points)
         {
             if (points == null)
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
-            _points = new List<Vector2>(points);
+            _points = new List<Vector2d>(points);
             this.Parallel = 0.0f;
         }
 
@@ -49,11 +49,11 @@ namespace PixelFarm.VectorMath
         /// Constructs a new <see cref="BezierCurve"/>.
         /// </summary>
         /// <param name="points">The points.</param>
-        public BezierCurve(params Vector2[] points)
+        public BezierCurve(params Vector2d[] points)
         {
             if (points == null)
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
-            _points = new List<Vector2>(points);
+            _points = new List<Vector2d>(points);
             this.Parallel = 0.0f;
         }
 
@@ -62,12 +62,12 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="parallel">The parallel value.</param>
         /// <param name="points">The points.</param>
-        public BezierCurve(float parallel, params Vector2[] points)
+        public BezierCurve(float parallel, params Vector2d[] points)
         {
             if (points == null)
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
             this.Parallel = parallel;
-            _points = new List<Vector2>(points);
+            _points = new List<Vector2d>(points);
         }
 
         /// <summary>
@@ -75,12 +75,12 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="parallel">The parallel value.</param>
         /// <param name="points">The points.</param>
-        public BezierCurve(float parallel, IEnumerable<Vector2> points)
+        public BezierCurve(float parallel, IEnumerable<Vector2d> points)
         {
             if (points == null)
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
             this.Parallel = parallel;
-            _points = new List<Vector2>(points);
+            _points = new List<Vector2d>(points);
         }
 
 
@@ -91,7 +91,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="t">The t value, between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        public Vector2 CalculatePoint(float t)
+        public Vector2d CalculatePoint(float t)
         {
             return BezierCurve.CalculatePoint(_points, t, Parallel);
         }
@@ -116,7 +116,7 @@ namespace PixelFarm.VectorMath
         /// <param name="precision">The precision value.</param>
         /// <returns>The precision gets better as the <paramref name="precision"/>
         /// value gets smaller.</returns>
-        public static float CalculateLength(IList<Vector2> points, float precision)
+        public static float CalculateLength(IList<Vector2d> points, float precision)
         {
             return BezierCurve.CalculateLength(points, precision, 0.0f);
         }
@@ -134,13 +134,13 @@ namespace PixelFarm.VectorMath
         /// parallel curve to the original bezier curve. A value of 0.0f represents
         /// the original curve, 5.0f represents a curve that has always a distance
         /// of 5.0f to the orignal curve.</para></remarks>
-        public static float CalculateLength(IList<Vector2> points, float precision, float parallel)
+        public static float CalculateLength(IList<Vector2d> points, float precision, float parallel)
         {
             double length = 0.0f;
-            Vector2 old = BezierCurve.CalculatePoint(points, 0.0f, parallel);
+            Vector2d old = BezierCurve.CalculatePoint(points, 0.0f, parallel);
             for (float i = precision; i < (1.0f + precision); i += precision)
             {
-                Vector2 n = CalculatePoint(points, i, parallel);
+                Vector2d n = CalculatePoint(points, i, parallel);
                 length += (n - old).Length;
                 old = n;
             }
@@ -154,7 +154,7 @@ namespace PixelFarm.VectorMath
         /// <param name="points">The points.</param>
         /// <param name="t">The t parameter, a value between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        public static Vector2 CalculatePoint(IList<Vector2> points, float t)
+        public static Vector2d CalculatePoint(IList<Vector2d> points, float t)
         {
             return BezierCurve.CalculatePoint(points, t, 0.0f);
         }
@@ -170,13 +170,13 @@ namespace PixelFarm.VectorMath
         /// parallel curve to the original bezier curve. A value of 0.0f represents
         /// the original curve, 5.0f represents a curve that has always a distance
         /// of 5.0f to the orignal curve.</remarks>
-        public static Vector2 CalculatePoint(IList<Vector2> points, float t, float parallel)
+        public static Vector2d CalculatePoint(IList<Vector2d> points, float t, float parallel)
         {
-            Vector2 r = new Vector2();
+            Vector2d r = new Vector2d();
             double c = 1.0d - (double)t;
             float temp;
             int i = 0;
-            foreach (Vector2 pt in points)
+            foreach (Vector2d pt in points)
             {
                 temp = (float)MathHelper.BinomialCoefficient(points.Count - 1, i) * (float)(System.Math.Pow(t, i) *
                         System.Math.Pow(c, (points.Count - 1) - i));
@@ -187,12 +187,12 @@ namespace PixelFarm.VectorMath
 
             if (parallel == 0.0f)
                 return r;
-            Vector2 perpendicular = new Vector2();
+            Vector2d perpendicular = new Vector2d();
             if (t != 0.0f)
                 perpendicular = r - BezierCurve.CalculatePointOfDerivative(points, t);
             else
                 perpendicular = points[1] - points[0];
-            return r + Vector2.Normalize(perpendicular).PerpendicularRight * parallel;
+            return r + Vector2d.Normalize(perpendicular).PerpendicularRight * parallel;
         }
 
         /// <summary>
@@ -201,13 +201,13 @@ namespace PixelFarm.VectorMath
         /// <param name="points">The points.</param>
         /// <param name="t">The t parameter, value between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        private static Vector2 CalculatePointOfDerivative(IList<Vector2> points, float t)
+        private static Vector2d CalculatePointOfDerivative(IList<Vector2d> points, float t)
         {
-            Vector2 r = new Vector2();
+            Vector2d r = new Vector2d();
             double c = 1.0d - (double)t;
             float temp;
             int i = 0;
-            foreach (Vector2 pt in points)
+            foreach (Vector2d pt in points)
             {
                 temp = (float)MathHelper.BinomialCoefficient(points.Count - 2, i) * (float)(System.Math.Pow(t, i) *
                         System.Math.Pow(c, (points.Count - 2) - i));

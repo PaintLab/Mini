@@ -194,7 +194,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public bool EnableHighQuality { get; set; }
         public float Tolerance { get; set; }
-        public void Simplify(List<VectorMath.Vector2> inputPoints, List<VectorMath.Vector2> simplifiedOutput)
+        public void Simplify(List<VectorMath.Vector2d> inputPoints, List<VectorMath.Vector2d> simplifiedOutput)
         {
 
             PixelFarm.CpuBlit.VertexProcessing.SimplificationHelpers.Simplify(
@@ -217,24 +217,24 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public class Vec2dSource : IVector2dProvider
     {
-        List<PixelFarm.VectorMath.Vector2> _vecSource;
+        List<PixelFarm.VectorMath.Vector2d> _vecSource;
         public Vec2dSource()
         {
         }
-        public void SetVectorSource(List<PixelFarm.VectorMath.Vector2> source)
+        public void SetVectorSource(List<PixelFarm.VectorMath.Vector2d> source)
         {
             _vecSource = source;
         }
         int IVector2dProvider.CoordCount => _vecSource.Count;
         void IVector2dProvider.GetCoord(int index, out double x, out double y)
         {
-            PixelFarm.VectorMath.Vector2 vec = _vecSource[index];
+            PixelFarm.VectorMath.Vector2d vec = _vecSource[index];
             x = vec.x;
             y = vec.y;
         }
         void IVector2dProvider.GetCoord(int index, out float x, out float y)
         {
-            PixelFarm.VectorMath.Vector2 vec = _vecSource[index];
+            PixelFarm.VectorMath.Vector2d vec = _vecSource[index];
             x = (float)vec.x;
             y = (float)vec.y;
         }

@@ -26,14 +26,12 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 {
     public static class MyMath
     {
-
-
-        public static bool MinDistanceFirst(Vector2 baseVec, Vector2 compare0, Vector2 compare1)
+        public static bool MinDistanceFirst(Vector2d baseVec, Vector2d compare0, Vector2d compare1)
         {
             return (SquareDistance(baseVec, compare0) < SquareDistance(baseVec, compare1)) ? true : false;
         }
 
-        public static double SquareDistance(Vector2 v0, Vector2 v1)
+        public static double SquareDistance(Vector2d v0, Vector2d v1)
         {
             double xdiff = v1.X - v0.X;
             double ydiff = v1.Y - v0.Y;
@@ -48,7 +46,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <param name="c"></param>
-        static void FindABC(Vector2 p0, Vector2 p1, out double a, out double b, out double c)
+        static void FindABC(Vector2d p0, Vector2d p1, out double a, out double b, out double c)
         {
             //line is in the form
             //Ax + By = C 
@@ -59,8 +57,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             c = a * p0.X + b * p0.Y;
         }
         public static bool FindCutPoint(
-              Vector2 p0, Vector2 p1,
-              Vector2 p2, Vector2 p3, out Vector2 result)
+              Vector2d p0, Vector2d p1,
+              Vector2d p2, Vector2d p3, out Vector2d result)
         {
             //TODO: review here
             //from http://stackoverflow.com/questions/4543506/algorithm-for-intersection-of-2-lines
@@ -88,18 +86,18 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             if (delta == 0)
             {
                 //"Lines are parallel"
-                result = Vector2.Zero;
+                result = Vector2d.Zero;
                 return false; //
                 throw new System.ArgumentException("Lines are parallel");
             }
             double x = (b2 * c1 - b1 * c2) / delta;
             double y = (a1 * c2 - a2 * c1) / delta;
-            result = new Vector2((float)x, (float)y);
+            result = new Vector2d((float)x, (float)y);
             return true; //has cutpoint
         }
 
 
-        static double FindB(Vector2 p0, Vector2 p1)
+        static double FindB(Vector2d p0, Vector2d p1)
         {
 
             double m1 = (p1.Y - p0.Y) / (p1.X - p0.X);
@@ -166,11 +164,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             if (LineJoinKind == LineJoin.Bevel) return;
 
             //--------------------------------------------------------------
-            Vector2 v0v1 = new Vector2(x1 - x0, y1 - y0);
-            Vector2 v1v2 = new Vector2(x2 - x1, y2 - y1);
+            Vector2d v0v1 = new Vector2d(x1 - x0, y1 - y0);
+            Vector2d v1v2 = new Vector2d(x2 - x1, y2 - y1);
 
-            Vector2 delta_v0v1 = v0v1.RotateInDegree(90).NewLength(HalfWidth);
-            Vector2 delta_v1v2 = v1v2.RotateInDegree(90).NewLength(HalfWidth);
+            Vector2d delta_v0v1 = v0v1.RotateInDegree(90).NewLength(HalfWidth);
+            Vector2d delta_v1v2 = v1v2.RotateInDegree(90).NewLength(HalfWidth);
 
 
             double rad_v0v1 = Math.Atan2(v0v1.y, v0v1.x);
@@ -181,13 +179,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             {
 
 
-                Vector2 vec_a = new Vector2(x0 + delta_v0v1.x, y0 + delta_v0v1.y);
-                Vector2 vec_b = new Vector2(x1 + delta_v0v1.x, y1 + delta_v0v1.y);
-                Vector2 vec_c = new Vector2(x1 + delta_v1v2.x, y1 + delta_v1v2.y);
-                Vector2 vec_d = new Vector2(x2 + delta_v1v2.x, y2 + delta_v1v2.y);
+                Vector2d vec_a = new Vector2d(x0 + delta_v0v1.x, y0 + delta_v0v1.y);
+                Vector2d vec_b = new Vector2d(x1 + delta_v0v1.x, y1 + delta_v0v1.y);
+                Vector2d vec_c = new Vector2d(x1 + delta_v1v2.x, y1 + delta_v1v2.y);
+                Vector2d vec_d = new Vector2d(x2 + delta_v1v2.x, y2 + delta_v1v2.y);
 
 
-                Vector2 cutPoint;
+                Vector2d cutPoint;
                 if (MyMath.FindCutPoint(
                        vec_a, vec_b, //a->b
                        vec_c, vec_d, //b->c
@@ -227,13 +225,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                                     if (cal_mitterLen > half_mitterLen)
                                     {
 
-                                        Vector2 mid_bc = (vec_b + vec_c) / 2;
-                                        Vector2 vec_bc = vec_c - vec_b;
-                                        Vector2 limit_delta = vec_bc.RotateInDegree(90).NewLength(half_mitterLen);
-                                        Vector2 mid_bc_n = mid_bc + limit_delta;
+                                        Vector2d mid_bc = (vec_b + vec_c) / 2;
+                                        Vector2d vec_bc = vec_c - vec_b;
+                                        Vector2d limit_delta = vec_bc.RotateInDegree(90).NewLength(half_mitterLen);
+                                        Vector2d mid_bc_n = mid_bc + limit_delta;
 
 
-                                        Vector2 lim_cutPoint;
+                                        Vector2d lim_cutPoint;
                                         if (MyMath.FindCutPoint(
                                                 vec_a, vec_b, //a->b
                                                 mid_bc_n, mid_bc_n + vec_bc, //b->c
@@ -286,13 +284,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 delta_v0v1 = -delta_v0v1; //change vector direction***
                 delta_v1v2 = -delta_v1v2; //change vector direction***
 
-                Vector2 vec_a = new Vector2(x0 + delta_v0v1.x, y0 + delta_v0v1.y);
-                Vector2 vec_b = new Vector2(x1 + delta_v0v1.x, y1 + delta_v0v1.y);
-                Vector2 vec_c = new Vector2(x1 + delta_v1v2.x, y1 + delta_v1v2.y);
-                Vector2 vec_d = new Vector2(x2 + delta_v1v2.x, y2 + delta_v1v2.y);
+                Vector2d vec_a = new Vector2d(x0 + delta_v0v1.x, y0 + delta_v0v1.y);
+                Vector2d vec_b = new Vector2d(x1 + delta_v0v1.x, y1 + delta_v0v1.y);
+                Vector2d vec_c = new Vector2d(x1 + delta_v1v2.x, y1 + delta_v1v2.y);
+                Vector2d vec_d = new Vector2d(x2 + delta_v1v2.x, y2 + delta_v1v2.y);
 
                 //-------------
-                Vector2 cutPoint;
+                Vector2d cutPoint;
                 if (MyMath.FindCutPoint(
                         vec_a, vec_b, //a->b
                         vec_c, vec_d, //b->c
@@ -321,13 +319,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                                     if (cal_mitterLen > half_mitterLen)
                                     {
 
-                                        Vector2 mid_bc = (vec_b + vec_c) / 2;
-                                        Vector2 vec_bc = vec_c - vec_b;
-                                        Vector2 limit_delta = vec_bc.RotateInDegree(-90).NewLength(half_mitterLen);
-                                        Vector2 mid_bc_n = mid_bc + limit_delta;
+                                        Vector2d mid_bc = (vec_b + vec_c) / 2;
+                                        Vector2d vec_bc = vec_c - vec_b;
+                                        Vector2d limit_delta = vec_bc.RotateInDegree(-90).NewLength(half_mitterLen);
+                                        Vector2d mid_bc_n = mid_bc + limit_delta;
 
 
-                                        Vector2 lim_cutPoint;
+                                        Vector2d lim_cutPoint;
                                         if (MyMath.FindCutPoint(
                                                 vec_a, vec_b, //a->b
                                                 mid_bc_n, mid_bc_n + vec_bc, //b->c
@@ -792,7 +790,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //------------------------ 
                         double c_x = (x0 + x1) / 2;
                         double c_y = (y0 + y1) / 2;
-                        Vector2 delta = new Vector2(x0 - c_x, y0 - c_y);
+                        Vector2d delta = new Vector2d(x0 - c_x, y0 - c_y);
                         ArcGenerator.GenerateArcNew(outputVectors,
                                      c_x, c_y, delta, AggMath.deg2rad(180));
                     }
@@ -821,7 +819,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //------------------------ 
                         double c_x = (x0 + x1) / 2;
                         double c_y = (y0 + y1) / 2;
-                        Vector2 delta = new Vector2(x1 - c_x, y1 - c_y);
+                        Vector2d delta = new Vector2d(x1 - c_x, y1 - c_y);
                         ArcGenerator.GenerateArcNew(outputVectors,
                                      c_x, c_y, delta, AggMath.deg2rad(180));
                     }
@@ -837,7 +835,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //
         public static void GenerateArcNew(List<Vector> output, double cx,
             double cy,
-            Vector2 startDelta,
+            Vector2d startDelta,
             double sweepAngleRad)
         {
 
@@ -848,8 +846,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             for (int i = 0; i < nsteps; ++i)
             {
 
-                Vector2 newPerpend = startDelta.RotateInDegree(angle);
-                Vector2 newpos = new Vector2(cx + newPerpend.x, cy + newPerpend.y);
+                Vector2d newPerpend = startDelta.RotateInDegree(angle);
+                Vector2d newpos = new Vector2d(cx + newPerpend.x, cy + newPerpend.y);
                 output.Add(new Vector(newpos.x, newpos.y));
                 angle += eachStep;
             }

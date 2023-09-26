@@ -2,6 +2,7 @@
 using System;
 using Poly2Tri;
 using PixelFarm.VectorMath;
+using Vector2f = System.Numerics.Vector2;
 namespace PixelFarm.Contours
 {
 

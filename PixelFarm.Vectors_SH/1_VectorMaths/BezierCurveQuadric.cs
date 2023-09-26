@@ -5,7 +5,7 @@
  * 
  * Contributions by Georg W�chter.
  */
-
+using Vector2dd = System.Numerics.Vector<double>;
 
 namespace PixelFarm.VectorMath
 {
@@ -19,15 +19,15 @@ namespace PixelFarm.VectorMath
         /// <summary>
         /// Start anchor point.
         /// </summary>
-        public Vector2 StartAnchor;
+        public Vector2d StartAnchor;
         /// <summary>
         /// End anchor point.
         /// </summary>
-        public Vector2 EndAnchor;
+        public Vector2d EndAnchor;
         /// <summary>
         /// Control point, controls the direction of both endings of the curve.
         /// </summary>
-        public Vector2 ControlPoint;
+        public Vector2d ControlPoint;
         /// <summary>
         /// The parallel value.
         /// </summary>
@@ -44,7 +44,7 @@ namespace PixelFarm.VectorMath
         /// <param name="startAnchor">The start anchor.</param>
         /// <param name="endAnchor">The end anchor.</param>
         /// <param name="controlPoint">The control point.</param>
-        public BezierCurveQuadric(Vector2 startAnchor, Vector2 controlPoint, Vector2 endAnchor)
+        public BezierCurveQuadric(Vector2d startAnchor, Vector2d controlPoint, Vector2d endAnchor)
         {
             this.StartAnchor = startAnchor;
             this.EndAnchor = endAnchor;
@@ -59,7 +59,7 @@ namespace PixelFarm.VectorMath
         /// <param name="startAnchor">The start anchor.</param>
         /// <param name="endAnchor">The end anchor.</param>
         /// <param name="controlPoint">The control point.</param>
-        public BezierCurveQuadric(float parallel, Vector2 startAnchor, Vector2 endAnchor, Vector2 controlPoint)
+        public BezierCurveQuadric(float parallel, Vector2d startAnchor, Vector2d endAnchor, Vector2d controlPoint)
         {
             this.Parallel = parallel;
             this.StartAnchor = startAnchor;
@@ -74,20 +74,20 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="t">The t value, between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        public Vector2 CalculatePoint(float t)
+        public Vector2d CalculatePoint(float t)
         {
-            Vector2 r = new Vector2();
+            Vector2d r = new Vector2d();
             float c = 1.0f - t;
             r.X = (c * c * StartAnchor.X) + (2 * t * c * ControlPoint.X) + (t * t * EndAnchor.X);
             r.Y = (c * c * StartAnchor.Y) + (2 * t * c * ControlPoint.Y) + (t * t * EndAnchor.Y);
             if (Parallel == 0.0f)
                 return r;
-            Vector2 perpendicular = new Vector2();
+            Vector2d perpendicular = new Vector2d();
             if (t == 0.0f)
                 perpendicular = ControlPoint - StartAnchor;
             else
                 perpendicular = r - CalculatePointOfDerivative(t);
-            return r + Vector2.Normalize(perpendicular).PerpendicularRight * Parallel;
+            return r + Vector2d.Normalize(perpendicular).PerpendicularRight * Parallel;
         }
 
         /// <summary>
@@ -95,9 +95,9 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="t">The t, value between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        private Vector2 CalculatePointOfDerivative(float t)
+        private Vector2d CalculatePointOfDerivative(float t)
         {
-            Vector2 r = new Vector2();
+            Vector2d r = new Vector2d();
             r.X = (1.0f - t) * StartAnchor.X + t * ControlPoint.X;
             r.Y = (1.0f - t) * StartAnchor.Y + t * ControlPoint.Y;
             return r;
@@ -113,10 +113,10 @@ namespace PixelFarm.VectorMath
         public float CalculateLength(float precision)
         {
             double length = 0.0f;
-            Vector2 old = CalculatePoint(0.0f);
+            Vector2d old = CalculatePoint(0.0f);
             for (float i = precision; i < (1.0f + precision); i += precision)
             {
-                Vector2 n = CalculatePoint(i);
+                Vector2d n = CalculatePoint(i);
                 length += (n - old).Length;
                 old = n;
             }

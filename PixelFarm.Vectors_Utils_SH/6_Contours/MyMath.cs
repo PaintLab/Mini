@@ -1,5 +1,6 @@
 ﻿//MIT, 2017-present, WinterDev
 using PixelFarm.VectorMath;
+using Vector2f = System.Numerics.Vector2;
 namespace PixelFarm.Contours
 {
 

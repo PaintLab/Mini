@@ -37,7 +37,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         ////
         public bool Contains(Q1RectD innerRect) => Contains(innerRect.Left, innerRect.Bottom) && Contains(innerRect.Right, innerRect.Top);
         ////
-        public bool Contains(Vector2 position) => Contains(position.x, position.y);
+        public bool Contains(Vector2d position) => Contains(position.x, position.y);
         ////
 
         public void Offset(double x, double y)

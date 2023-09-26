@@ -48,12 +48,12 @@ namespace Msdfgen
         static void CreateOuterBorder(VertexStore vxs, double x0, double y0, double x1, double y1, double w)
         {
             //create 'outer border box' of a line (x0,y0)=>(x1,y1)
-            PixelFarm.VectorMath.Vector2 vector = new PixelFarm.VectorMath.Vector2(x1 - x0, y1 - y0);
+            PixelFarm.VectorMath.Vector2d vector = new PixelFarm.VectorMath.Vector2d(x1 - x0, y1 - y0);
 
             //for outer border, we need to extend both endpoints with len w
             //this will create overlapped area outside the shape.
 
-            PixelFarm.VectorMath.Vector2 ext_vec = vector.NewLength(w);
+            PixelFarm.VectorMath.Vector2d ext_vec = vector.NewLength(w);
             x0 -= ext_vec.x;
             y0 -= ext_vec.y;
             x1 += ext_vec.x;
@@ -61,7 +61,7 @@ namespace Msdfgen
 
             //rotate 90 degree to create a height vector that point to 'outside' of the 'rectbox' shape.
             //the box height= w
-            PixelFarm.VectorMath.Vector2 h_vec = vector.RotateInDegree(90).NewLength(w);
+            PixelFarm.VectorMath.Vector2d h_vec = vector.RotateInDegree(90).NewLength(w);
             vxs.AddMoveTo(x0, y0);
             vxs.AddLineTo(x0 + h_vec.x, y0 + h_vec.y);
             vxs.AddLineTo(x1 + h_vec.x, y1 + h_vec.y);
@@ -72,12 +72,12 @@ namespace Msdfgen
         {
             //create 'inner border box' of a line a line (x0,y0)=>(x1,y1)
 
-            PixelFarm.VectorMath.Vector2 vector = new PixelFarm.VectorMath.Vector2(x1 - x0, y1 - y0);
+            PixelFarm.VectorMath.Vector2d vector = new PixelFarm.VectorMath.Vector2d(x1 - x0, y1 - y0);
 
             //for inner border, we don't extend both endpoint
             //rotate 270 degree to create a height vector that point 'inside' of the 'rectbox' shape.
             //the box height= w
-            PixelFarm.VectorMath.Vector2 vdiff = vector.RotateInDegree(270).NewLength(w);
+            PixelFarm.VectorMath.Vector2d vdiff = vector.RotateInDegree(270).NewLength(w);
             vxs.AddMoveTo(x0, y0);
             vxs.AddLineTo(x1, y1);
             vxs.AddLineTo(x1 + vdiff.x, y1 + vdiff.y);

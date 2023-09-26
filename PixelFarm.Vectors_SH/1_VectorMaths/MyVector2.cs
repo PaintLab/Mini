@@ -1,28 +1,32 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
+using PointF = System.Numerics.Vector2;
+
 namespace PixelFarm.VectorMath
 {
-    public struct PointF
-    {
-        public float X;
-        public float Y;
-        public PointF(float x, float y)
-        {
-            this.X = x;
-            this.Y = y;
-        }
-        public void Offset(float dx, float dy)
-        {
-            this.X += dx;
-            this.Y += dy;
-        }
-    }
+    //    public struct PointF
+    //    {
+    //        public float X;
+    //        public float Y;
+    //        public PointF(float x, float y)
+    //        {
+    //            this.X = x;
+    //            this.Y = y;
+    //        }
+    //        public void Offset(float dx, float dy)
+    //        {
+    //            this.X += dx;
+    //            this.Y += dy;
+    //        }
+    //    }
+
     public struct Point
     {
         public int x;
         public int y;
         public Point(int x, int y)
         {
+            
             this.x = x;
             this.y = y;
         }
@@ -76,7 +80,8 @@ namespace PixelFarm.VectorMath
 
     public struct Vector
     {
-        readonly double _x, _y;
+        readonly double _x;
+        readonly double _y;
         public Vector(double x, double y)
         {
             _x = x; _y = y;

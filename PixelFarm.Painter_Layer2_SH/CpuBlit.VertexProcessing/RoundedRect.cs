@@ -35,10 +35,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     public class RoundedRect
     {
         Q1RectD _bounds;
-        Vector2 _leftBottomRadius;
-        Vector2 _rightBottomRadius;
-        Vector2 _rightTopRadius;
-        Vector2 _leftTopRadius;
+        Vector2d _leftBottomRadius;
+        Vector2d _rightBottomRadius;
+        Vector2d _rightTopRadius;
+        Vector2d _leftTopRadius;
         Arc _arc = new Arc();
         public RoundedRect()
         {
@@ -88,10 +88,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         public void SetRadius(double leftBottomRadius, double rightBottomRadius, double rightTopRadius, double leftTopRadius)
         {
-            _leftBottomRadius = new Vector2(leftBottomRadius, leftBottomRadius);
-            _rightBottomRadius = new Vector2(rightBottomRadius, rightBottomRadius);
-            _rightTopRadius = new Vector2(rightTopRadius, rightTopRadius);
-            _leftTopRadius = new Vector2(leftTopRadius, leftTopRadius);
+            _leftBottomRadius = new Vector2d(leftBottomRadius, leftBottomRadius);
+            _rightBottomRadius = new Vector2d(rightBottomRadius, rightBottomRadius);
+            _rightTopRadius = new Vector2d(rightTopRadius, rightTopRadius);
+            _leftTopRadius = new Vector2d(leftTopRadius, leftTopRadius);
         }
 
         public void SetRadius(double leftBottomRx, double leftBottomRy,

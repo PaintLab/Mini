@@ -32,7 +32,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             this.command = command;
             x = y = 0;
         }
-        public VertexData(PixelFarm.Drawing.VertexCmd command, Vector2 position)
+        public VertexData(PixelFarm.Drawing.VertexCmd command, Vector2d position)
         {
             this.command = command;
             this.x = position.x;
@@ -45,9 +45,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             this.y = y;
         }
 
-        public Vector2 position
+        public Vector2d position
         {
-            get => new Vector2(this.x, this.y);
+            get => new Vector2d(this.x, this.y);
             set { this.x = value.x; this.y = value.y; }
         }
 

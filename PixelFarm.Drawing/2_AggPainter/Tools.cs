@@ -378,8 +378,8 @@ namespace PixelFarm.CpuBlit
         
 
         public static void FillRectangle(this AggPainterCore pcx,
-            Vector2 leftBottom,
-            Vector2 rightTop, Color fillColor)
+            Vector2d leftBottom,
+            Vector2d rightTop, Color fillColor)
         {
             pcx.FillRectangle(leftBottom.x, leftBottom.y, rightTop.x, rightTop.y, fillColor);
         }
@@ -410,7 +410,7 @@ namespace PixelFarm.CpuBlit
             }
 
         }
-        public static void Circle(this AggPainterCore pcx, Vector2 origin, double radius, Color color)
+        public static void Circle(this AggPainterCore pcx, Vector2d origin, double radius, Color color)
         {
             Circle(pcx, origin.x, origin.y, radius, color);
         }

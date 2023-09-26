@@ -185,7 +185,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double _latest_moveto_X, _latest_moveto_Y;
 
             double _total_accum_len;
-            readonly List<VectorMath.Vector2> _tempPoints = new List<VectorMath.Vector2>();
+            readonly List<VectorMath.Vector2d> _tempPoints = new List<VectorMath.Vector2d>();
 
 
             internal ILineSegmentWalkerOutput _output;
@@ -246,8 +246,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     for (int i = 0; i < j;)
                     {
                         //p0-p1
-                        VectorMath.Vector2 p0 = _tempPoints[i];
-                        VectorMath.Vector2 p1 = _tempPoints[i + 1];
+                        VectorMath.Vector2d p0 = _tempPoints[i];
+                        VectorMath.Vector2d p1 = _tempPoints[i + 1];
                         //-------------------------------
                         //a series of connected line
 
@@ -396,8 +396,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     //there are remaining segment that can be complete at this state
                     //so we just collect it                                        
                     _total_accum_len += remainingLen;
-                    _tempPoints.Add(new VectorMath.Vector2(_latest_X, _latest_Y));
-                    _tempPoints.Add(new VectorMath.Vector2(x, y));
+                    _tempPoints.Add(new VectorMath.Vector2d(_latest_X, _latest_Y));
+                    _tempPoints.Add(new VectorMath.Vector2d(x, y));
                 }
                 _latest_X = x;
                 _latest_Y = y;

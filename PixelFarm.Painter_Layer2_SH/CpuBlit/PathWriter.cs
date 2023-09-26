@@ -97,11 +97,11 @@ namespace PixelFarm.CpuBlit
         /// <summary>
         /// 1st curve control point
         /// </summary>
-        Vector2 _c1;
+        Vector2d _c1;
         /// <summary>
         /// 2nd curve control point 
         /// </summary>
-        Vector2 _c2;
+        Vector2d _c2;
         //
         SvgPathCommand _latestSVGPathCmd;
         int _figureCount = 0;
@@ -122,8 +122,8 @@ namespace PixelFarm.CpuBlit
         {
             _myvxs = null;
             _latest_moveTo_X = _latest_moveTo_Y = _latest_x = _latest_y = 0;
-            _c1 = new Vector2();
-            _c2 = new Vector2();
+            _c1 = new Vector2d();
+            _c2 = new Vector2d();
             _latestSVGPathCmd = SvgPathCommand.MoveTo;
             _figureCount = 0;
         }
@@ -135,8 +135,8 @@ namespace PixelFarm.CpuBlit
             }
 
             _latest_moveTo_X = _latest_moveTo_Y = _latest_x = _latest_y = 0;
-            _c1 = new Vector2();
-            _c2 = new Vector2();
+            _c1 = new Vector2d();
+            _c2 = new Vector2d();
             _latestSVGPathCmd = SvgPathCommand.MoveTo;
             _figureCount = 0;
         }
@@ -285,7 +285,7 @@ namespace PixelFarm.CpuBlit
                     {
                         //curve3,
                         //create new c1 from current c1
-                        Vector2 new_c1 = CreateMirrorPoint(_c1, new Vector2(_latest_x, _latest_y));
+                        Vector2d new_c1 = CreateMirrorPoint(_c1, new Vector2d(_latest_x, _latest_y));
                         Curve3(new_c1.X, new_c1.Y, x2, y2);
                     }
                     break;
@@ -294,7 +294,7 @@ namespace PixelFarm.CpuBlit
                     {
                         //curve4,
                         //create new c1 from current c2
-                        Vector2 new_c1 = CreateMirrorPoint(_c2, new Vector2(_latest_x, _latest_y));
+                        Vector2d new_c1 = CreateMirrorPoint(_c2, new Vector2d(_latest_x, _latest_y));
                         Curve3(new_c1.X, new_c1.Y, x2, y2);
                     }
                     break;
@@ -307,9 +307,9 @@ namespace PixelFarm.CpuBlit
         }
 
         //-------------------------------------------------------------------
-        static Vector2 CreateMirrorPoint(Vector2 mirrorPoint, Vector2 fixedPoint)
+        static Vector2d CreateMirrorPoint(Vector2d mirrorPoint, Vector2d fixedPoint)
         {
-            return new Vector2(
+            return new Vector2d(
                 fixedPoint.X - (mirrorPoint.X - fixedPoint.X),
                 fixedPoint.Y - (mirrorPoint.Y - fixedPoint.Y));
         }
@@ -331,7 +331,7 @@ namespace PixelFarm.CpuBlit
                            double x3, double y3)
         {
             _latestSVGPathCmd = SvgPathCommand.CurveTo;
-            _c2 = new Vector2(x2, y2);
+            _c2 = new Vector2d(x2, y2);
 
             _myvxs.AddC4To(
                 x1, y1,
@@ -345,7 +345,7 @@ namespace PixelFarm.CpuBlit
                               double dx3, double dy3)
         {
             _latestSVGPathCmd = SvgPathCommand.CurveTo;
-            _c2 = new Vector2(_latest_x + dx2, _latest_y + dy2);
+            _c2 = new Vector2d(_latest_x + dx2, _latest_y + dy2);
 
             _myvxs.AddC4To(
                _latest_x + dx1, _latest_y + dy1,
@@ -366,7 +366,7 @@ namespace PixelFarm.CpuBlit
                 case SvgPathCommand.TSmoothQuadraticBezierCurveTo:
                     {
                         //create new c1 from current c1
-                        Vector2 new_c1 = CreateMirrorPoint(_c1, new Vector2(_latest_x, _latest_y));
+                        Vector2d new_c1 = CreateMirrorPoint(_c1, new Vector2d(_latest_x, _latest_y));
                         Curve4(new_c1.X, new_c1.Y, x2, y2, x3, y3);
                     }
                     break;
@@ -374,7 +374,7 @@ namespace PixelFarm.CpuBlit
                 case SvgPathCommand.SmoothCurveTo:
                     {
                         //create new c1 from current c2
-                        Vector2 new_c1 = CreateMirrorPoint(_c2, new Vector2(_latest_x, _latest_y));
+                        Vector2d new_c1 = CreateMirrorPoint(_c2, new Vector2d(_latest_x, _latest_y));
                         Curve4(new_c1.X, new_c1.Y, x2, y2, x3, y3);
                     }
                     break;

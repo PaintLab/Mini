@@ -7,6 +7,8 @@
 using System;
 using PixelFarm.VectorMath;
 using PixelFarm.CpuBlit.PixelProcessing;
+using PointF = System.Numerics.Vector2;
+
 namespace PixelFarm.CpuBlit.Imaging
 {
 
@@ -187,7 +189,7 @@ namespace PixelFarm.CpuBlit.Imaging
                         for (int x = 0; x < rectWidth; ++x)
                         {
                             PointF srcPt = new PointF(x, y);
-                            srcPt.Offset(rectLeft, rectTop);
+                            srcPt += new PointF(rectLeft, rectTop);//offset
                             if (!IsOnPlaneABCD(srcPt))
                             {
                                 continue;
@@ -245,7 +247,11 @@ namespace PixelFarm.CpuBlit.Imaging
                     for (int x = 0; x < rectWidth; ++x)
                     {
                         PointF srcPt = new PointF(x, y);
-                        srcPt.Offset(rectLeft, rectTop);
+
+                        //offset 
+                        srcPt.X += rectLeft;
+                        srcPt.Y += rectTop;
+
                         if (!IsOnPlaneABCD(srcPt))
                         {
                             continue;
@@ -432,7 +438,8 @@ namespace PixelFarm.CpuBlit.Imaging
                     for (int x = 0; x < destRectWidth; ++x)
                     {
                         PointF srcPt = new PointF(x, y);
-                        srcPt.Offset(rectLeft, 0);
+                        srcPt += new PointF(rectLeft, 0); //offset
+                         
                         if (!IsOnPlaneABCD(srcPt))
                         {
                             continue;
