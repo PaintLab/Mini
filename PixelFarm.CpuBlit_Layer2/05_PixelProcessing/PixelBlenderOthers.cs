@@ -114,11 +114,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         internal override unsafe void BlendPixel(int* dstBuffer, int arrayOffset, Color srcColor)
         {
-            unsafe
-            {
-                int* head = dstBuffer + arrayOffset;
-                BlendPixel32Internal(head, srcColor);
-            }
+
+            BlendPixel32Internal(dstBuffer + arrayOffset, srcColor);
+
         }
 
         internal unsafe override void BlendPixels(int* dstBuffer1, int arrayElemOffset, Color[] srcColors, int srcColorOffset, byte[] covers, int coversIndex, bool firstCoverForAll, int count)
@@ -172,7 +170,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     }
                     while (count > 0)
                     {
-                        //Blend32PixelInternal(header2, sourceColors[sourceColorsOffset++].NewFromChangeCoverage(cover));
+
                         //1.
                         BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
                         header2++;//move next
@@ -293,12 +291,12 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     while (count > 0)
                     {
                         //now count is even number
-                        //---------
+                         
                         //1
                         BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
                         header2++;//move next
                         count--;
-                        //---------
+                        
                         //2
                         BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
                         header2++;//move next
@@ -368,12 +366,12 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
             while (count > 0)
             {
-                //-----------
+                
                 //1. 
                 BlendPixel32Internal(ptr, srcColor);
                 ptr++; //move next
                 count--;
-                //-----------
+                
                 //2 
                 BlendPixel32Internal(ptr, srcColor);
                 ptr++; //move next
@@ -387,12 +385,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         }
     }
-
-
-
-
-
-
+     
 
     /// <summary>
     /// apply mask to srcColor before send it to dest bmp
@@ -841,7 +834,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 }
             }
             else
-            { 
+            {
                 do
                 {
                     //cover may diff in each loop
@@ -858,7 +851,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     arrayElemOffset++;
                     srcColorOffset++;
                 }
-                while (--count != 0); 
+                while (--count != 0);
             }
         }
 

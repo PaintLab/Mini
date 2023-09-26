@@ -27,9 +27,7 @@
 //----------------------------------------------------------------------------
 #define USE_BLENDER
 
-using PixelFarm.Drawing;
-using System;
-using CO = PixelFarm.Drawing.Internal.CO;
+using PixelFarm.Drawing; 
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
     public abstract class PixelBlender32
@@ -84,16 +82,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         internal abstract unsafe void CopyPixel(int* dstBuffer, int arrayOffset, Color srcColor);
         internal abstract unsafe void BlendPixel32(int* ptr, Color sc);
         //----------------
-        internal unsafe Color PixelToColorRGBA(int* buffer, int bufferOffset32)
-        {
-            int value = buffer[bufferOffset32];
-            return new Color(
-               (byte)((value >> (CO.A_SHIFT)) & 0xff),
-               (byte)((value >> (CO.R_SHIFT)) & 0xff),
-               (byte)((value >> (CO.G_SHIFT)) & 0xff),
-               (byte)((value >> (CO.B_SHIFT)) & 0xff));
 
-        }
+       
 
     }
 

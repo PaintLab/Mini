@@ -266,7 +266,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 }
             }
             else
-            { 
+            {
                 int* dstBufferPtr = dstBuffer + arrayElemOffset;
                 do
                 {
@@ -283,7 +283,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     dstBufferPtr++;
                     ++srcColorOffset;
                 }
-                while (--count != 0); 
+                while (--count != 0);
             }
         }
 
@@ -313,19 +313,12 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 ptr++; //move next
                 count--;
             }
-
-
         }
 
         internal override unsafe void CopyPixel(int* dstBuffer, int arrayOffset, Color srcColor)
         {
-            //copy single pixel
-            unsafe
-            {
-                int* ptr = dstBuffer + arrayOffset;
-                //TODO: consider use memcpy() impl*** 
-                *ptr = srcColor.ToARGB();
-            }
+            //copy single pixel 
+            *(dstBuffer + arrayOffset) = srcColor.ToARGB();
         }
     }
 
