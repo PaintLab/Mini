@@ -43,7 +43,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\Painter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)_ESS_LINK_WITH_TY\RequestFont.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\TextBaseline.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ForNet20.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TempContext.cs" />
   </ItemGroup>
   <ItemGroup>
