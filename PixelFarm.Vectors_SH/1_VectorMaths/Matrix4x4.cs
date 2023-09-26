@@ -65,23 +65,23 @@ namespace PixelFarm.VectorMath
         /// <summary>
         /// Top row of the matrix
         /// </summary>
-        public Vector4 Row0;
+        public Vector4d Row0;
         /// <summary>
         /// 2nd row of the matrix
         /// </summary>
-        public Vector4 Row1;
+        public Vector4d Row1;
         /// <summary>
         /// 3rd row of the matrix
         /// </summary>
-        public Vector4 Row2;
+        public Vector4d Row2;
         /// <summary>
         /// Bottom row of the matrix
         /// </summary>
-        public Vector4 Row3;
+        public Vector4d Row3;
         /// <summary>
         /// The identity matrix
         /// </summary>
-        public static Matrix4X4 Identity = new Matrix4X4(Vector4.UnitX, Vector4.UnitY, Vector4.UnitZ, Vector4.UnitW);
+        public static Matrix4X4 Identity = new Matrix4X4(Vector4d.UnitX, Vector4d.UnitY, Vector4d.UnitZ, Vector4d.UnitW);
 
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace PixelFarm.VectorMath
         /// <param name="row1">Second row of the matrix</param>
         /// <param name="row2">Third row of the matrix</param>
         /// <param name="row3">Bottom row of the matrix</param>
-        public Matrix4X4(Vector4 row0, Vector4 row1, Vector4 row2, Vector4 row3)
+        public Matrix4X4(Vector4d row0, Vector4d row1, Vector4d row2, Vector4d row3)
         {
             Row0 = row0;
             Row1 = row1;
@@ -124,18 +124,18 @@ namespace PixelFarm.VectorMath
             double m20, double m21, double m22, double m23,
             double m30, double m31, double m32, double m33)
         {
-            Row0 = new Vector4(m00, m01, m02, m03);
-            Row1 = new Vector4(m10, m11, m12, m13);
-            Row2 = new Vector4(m20, m21, m22, m23);
-            Row3 = new Vector4(m30, m31, m32, m33);
+            Row0 = new Vector4d(m00, m01, m02, m03);
+            Row1 = new Vector4d(m10, m11, m12, m13);
+            Row2 = new Vector4d(m20, m21, m22, m23);
+            Row3 = new Vector4d(m30, m31, m32, m33);
         }
 
         public Matrix4X4(double[] double16)
         {
-            Row0 = new Vector4(double16[0], double16[1], double16[2], double16[3]);
-            Row1 = new Vector4(double16[4], double16[5], double16[6], double16[7]);
-            Row2 = new Vector4(double16[8], double16[9], double16[10], double16[11]);
-            Row3 = new Vector4(double16[12], double16[13], double16[14], double16[15]);
+            Row0 = new Vector4d(double16[0], double16[1], double16[2], double16[3]);
+            Row1 = new Vector4d(double16[4], double16[5], double16[6], double16[7]);
+            Row2 = new Vector4d(double16[8], double16[9], double16[10], double16[11]);
+            Row3 = new Vector4d(double16[12], double16[13], double16[14], double16[15]);
         }
 
 
@@ -161,41 +161,41 @@ namespace PixelFarm.VectorMath
         /// <summary>
         /// Get just the position out of the matrix.
         /// </summary>
-        public Vector3 Position
+        public Vector3d Position
         {
-            get { return new Vector3(Row3); }
+            get { return new Vector3d(Row3); }
         }
 
         /// <summary>
         /// The first column of this matrix
         /// </summary>
-        public Vector4 Column0
+        public Vector4d Column0
         {
-            get { return new Vector4(Row0.x, Row1.x, Row2.x, Row3.x); }
+            get { return new Vector4d(Row0.x, Row1.x, Row2.x, Row3.x); }
         }
 
         /// <summary>
         /// The second column of this matrix
         /// </summary>
-        public Vector4 Column1
+        public Vector4d Column1
         {
-            get { return new Vector4(Row0.y, Row1.y, Row2.y, Row3.y); }
+            get { return new Vector4d(Row0.y, Row1.y, Row2.y, Row3.y); }
         }
 
         /// <summary>
         /// The third column of this matrix
         /// </summary>
-        public Vector4 Column2
+        public Vector4d Column2
         {
-            get { return new Vector4(Row0.z, Row1.z, Row2.z, Row3.z); }
+            get { return new Vector4d(Row0.z, Row1.z, Row2.z, Row3.z); }
         }
 
         /// <summary>
         /// The fourth column of this matrix
         /// </summary>
-        public Vector4 Column3
+        public Vector4d Column3
         {
-            get { return new Vector4(Row0.w, Row1.w, Row2.w, Row3.w); }
+            get { return new Vector4d(Row0.w, Row1.w, Row2.w, Row3.w); }
         }
 
         /// <summary>
@@ -390,7 +390,7 @@ namespace PixelFarm.VectorMath
         /// <param name="axis">The axis to rotate about.</param>
         /// <param name="angle">Angle in radians to rotate counter-clockwise (looking in the direction of the given axis).</param>
         /// <param name="result">A matrix instance.</param>
-        public static void CreateFromAxisAngle(Vector3 axis, double angle, out Matrix4X4 result)
+        public static void CreateFromAxisAngle(Vector3d axis, double angle, out Matrix4X4 result)
         {
             double cos = System.Math.Cos(-angle);
             double sin = System.Math.Sin(-angle);
@@ -408,7 +408,7 @@ namespace PixelFarm.VectorMath
         /// <param name="axis">The axis to rotate about.</param>
         /// <param name="angle">Angle in radians to rotate counter-clockwise (looking in the direction of the given axis).</param>
         /// <returns>A matrix instance.</returns>
-        public static Matrix4X4 CreateFromAxisAngle(Vector3 axis, double angle)
+        public static Matrix4X4 CreateFromAxisAngle(Vector3d axis, double angle)
         {
             Matrix4X4 result;
             CreateFromAxisAngle(axis, angle, out result);
@@ -417,7 +417,7 @@ namespace PixelFarm.VectorMath
 
 
 
-        public static Matrix4X4 CreateRotation(Vector3 radians)
+        public static Matrix4X4 CreateRotation(Vector3d radians)
         {
             return Matrix4X4.CreateRotation(Quaternion.FromEulerAngles(radians));
         }
@@ -431,10 +431,10 @@ namespace PixelFarm.VectorMath
         {
             double cos = System.Math.Cos(angle);
             double sin = System.Math.Sin(angle);
-            result.Row0 = Vector4.UnitX;
-            result.Row1 = new Vector4(0, cos, sin, 0);
-            result.Row2 = new Vector4(0, -sin, cos, 0);
-            result.Row3 = Vector4.UnitW;
+            result.Row0 = Vector4d.UnitX;
+            result.Row1 = new Vector4d(0, cos, sin, 0);
+            result.Row2 = new Vector4d(0, -sin, cos, 0);
+            result.Row3 = Vector4d.UnitW;
         }
 
         /// <summary>
@@ -458,10 +458,10 @@ namespace PixelFarm.VectorMath
         {
             double cos = System.Math.Cos(angle);
             double sin = System.Math.Sin(angle);
-            result.Row0 = new Vector4(cos, 0, -sin, 0);
-            result.Row1 = Vector4.UnitY;
-            result.Row2 = new Vector4(sin, 0, cos, 0);
-            result.Row3 = Vector4.UnitW;
+            result.Row0 = new Vector4d(cos, 0, -sin, 0);
+            result.Row1 = Vector4d.UnitY;
+            result.Row2 = new Vector4d(sin, 0, cos, 0);
+            result.Row3 = Vector4d.UnitW;
         }
 
         /// <summary>
@@ -485,10 +485,10 @@ namespace PixelFarm.VectorMath
         {
             double cos = System.Math.Cos(angle);
             double sin = System.Math.Sin(angle);
-            result.Row0 = new Vector4(cos, sin, 0, 0);
-            result.Row1 = new Vector4(-sin, cos, 0, 0);
-            result.Row2 = Vector4.UnitZ;
-            result.Row3 = Vector4.UnitW;
+            result.Row0 = new Vector4d(cos, sin, 0, 0);
+            result.Row1 = new Vector4d(-sin, cos, 0, 0);
+            result.Row2 = Vector4d.UnitZ;
+            result.Row3 = Vector4d.UnitW;
         }
 
         /// <summary>
@@ -509,17 +509,17 @@ namespace PixelFarm.VectorMath
         /// <param name="axis">the axis to rotate about</param>
         /// <param name="angle">angle in radians to rotate counter-clockwise (looking in the direction of the given axis)</param>
         /// <returns>A rotation matrix</returns>
-        public static Matrix4X4 CreateRotation(Vector3 axis, double angle)
+        public static Matrix4X4 CreateRotation(Vector3d axis, double angle)
         {
             double cos = System.Math.Cos(-angle);
             double sin = System.Math.Sin(-angle);
             double t = 1.0 - cos;
             axis.Normalize();
             Matrix4X4 result;
-            result.Row0 = new Vector4(t * axis.x * axis.x + cos, t * axis.x * axis.y - sin * axis.z, t * axis.x * axis.z + sin * axis.y, 0.0);
-            result.Row1 = new Vector4(t * axis.x * axis.y + sin * axis.z, t * axis.y * axis.y + cos, t * axis.y * axis.z - sin * axis.x, 0.0);
-            result.Row2 = new Vector4(t * axis.x * axis.z - sin * axis.y, t * axis.y * axis.z + sin * axis.x, t * axis.z * axis.z + cos, 0.0);
-            result.Row3 = Vector4.UnitW;
+            result.Row0 = new Vector4d(t * axis.x * axis.x + cos, t * axis.x * axis.y - sin * axis.z, t * axis.x * axis.z + sin * axis.y, 0.0);
+            result.Row1 = new Vector4d(t * axis.x * axis.y + sin * axis.z, t * axis.y * axis.y + cos, t * axis.y * axis.z - sin * axis.x, 0.0);
+            result.Row2 = new Vector4d(t * axis.x * axis.z - sin * axis.y, t * axis.y * axis.z + sin * axis.x, t * axis.z * axis.z + cos, 0.0);
+            result.Row3 = Vector4d.UnitW;
             return result;
         }
 
@@ -530,7 +530,7 @@ namespace PixelFarm.VectorMath
         /// <returns>A rotation matrix</returns>
         public static Matrix4X4 CreateRotation(Quaternion q)
         {
-            Vector3 axis;
+            Vector3d axis;
             double angle;
             q.ToAxisAngle(out axis, out angle);
             return CreateRotation(axis, angle);
@@ -542,7 +542,7 @@ namespace PixelFarm.VectorMath
         /// <param name="startingDirection"></param>
         /// <param name="endingDirection"></param>
         /// <returns></returns>
-        public static Matrix4X4 CreateRotation(Vector3 startingDirection, Vector3 endingDirection)
+        public static Matrix4X4 CreateRotation(Vector3d startingDirection, Vector3d endingDirection)
         {
             Quaternion q = new Quaternion(startingDirection, endingDirection);
             return CreateRotation(q);
@@ -560,7 +560,7 @@ namespace PixelFarm.VectorMath
         public static void CreateTranslation(double x, double y, double z, out Matrix4X4 result)
         {
             result = Identity;
-            result.Row3 = new Vector4(x, y, z, 1);
+            result.Row3 = new Vector4d(x, y, z, 1);
         }
 
         /// <summary>
@@ -568,10 +568,10 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="vector">The translation vector.</param>
         /// <param name="result">The resulting Matrix4d instance.</param>
-        public static void CreateTranslation(ref Vector3 vector, out Matrix4X4 result)
+        public static void CreateTranslation(ref Vector3d vector, out Matrix4X4 result)
         {
             result = Identity;
-            result.Row3 = new Vector4(vector.x, vector.y, vector.z, 1);
+            result.Row3 = new Vector4d(vector.x, vector.y, vector.z, 1);
         }
 
         /// <summary>
@@ -593,7 +593,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="vector">The translation vector.</param>
         /// <returns>The resulting Matrix4d instance.</returns>
-        public static Matrix4X4 CreateTranslation(Vector3 vector)
+        public static Matrix4X4 CreateTranslation(Vector3d vector)
         {
             Matrix4X4 result;
             CreateTranslation(vector.x, vector.y, vector.z, out result);
@@ -827,7 +827,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="scale">Scale factors for x,y and z axes</param>
         /// <returns>A scaling matrix</returns>
-        public static Matrix4X4 CreateScale(Vector3 scale)
+        public static Matrix4X4 CreateScale(Vector3d scale)
         {
             return CreateScale(scale.x, scale.y, scale.z);
         }
@@ -842,10 +842,10 @@ namespace PixelFarm.VectorMath
         public static Matrix4X4 CreateScale(double x, double y, double z)
         {
             Matrix4X4 result;
-            result.Row0 = Vector4.UnitX * x;
-            result.Row1 = Vector4.UnitY * y;
-            result.Row2 = Vector4.UnitZ * z;
-            result.Row3 = Vector4.UnitW;
+            result.Row0 = Vector4d.UnitX * x;
+            result.Row1 = Vector4d.UnitY * y;
+            result.Row2 = Vector4d.UnitZ * z;
+            result.Row3 = Vector4d.UnitW;
             return result;
         }
 
@@ -858,17 +858,17 @@ namespace PixelFarm.VectorMath
         /// <param name="target">Target position in world space</param>
         /// <param name="up">Up vector in world space (should not be parallel to the camera direction, that is target - eye)</param>
         /// <returns>A Matrix that transforms world space to camera space</returns>
-        public static Matrix4X4 LookAt(Vector3 eye, Vector3 target, Vector3 up)
+        public static Matrix4X4 LookAt(Vector3d eye, Vector3d target, Vector3d up)
         {
             // There are lots of examples of look at code on the internet that don't do all these normalizes and also find the position
             // through several dot products.  The problem with them is that they have a bit of error in that all the vectors arn't normal and need to be.
-            Vector3 z = Vector3.Normalize(eye - target);
-            Vector3 x = Vector3.Normalize(Vector3.Cross(up, z));
-            Vector3 y = Vector3.Normalize(Vector3.Cross(z, x));
-            Matrix4X4 rot = new Matrix4X4(new Vector4(x.x, y.x, z.x, 0.0),
-                                        new Vector4(x.y, y.y, z.y, 0.0),
-                                        new Vector4(x.z, y.z, z.z, 0.0),
-                                        Vector4.UnitW);
+            Vector3d z = Vector3d.Normalize(eye - target);
+            Vector3d x = Vector3d.Normalize(Vector3d.Cross(up, z));
+            Vector3d y = Vector3d.Normalize(Vector3d.Cross(z, x));
+            Matrix4X4 rot = new Matrix4X4(new Vector4d(x.x, y.x, z.x, 0.0),
+                                        new Vector4d(x.y, y.y, z.y, 0.0),
+                                        new Vector4d(x.z, y.z, z.z, 0.0),
+                                        Vector4d.UnitW);
             Matrix4X4 trans = Matrix4X4.CreateTranslation(-eye);
             return trans * rot;
         }
@@ -888,7 +888,7 @@ namespace PixelFarm.VectorMath
         /// <returns>A Matrix4 that transforms world space to camera space</returns>
         public static Matrix4X4 LookAt(double eyeX, double eyeY, double eyeZ, double targetX, double targetY, double targetZ, double upX, double upY, double upZ)
         {
-            return LookAt(new Vector3(eyeX, eyeY, eyeZ), new Vector3(targetX, targetY, targetZ), new Vector3(upX, upY, upZ));
+            return LookAt(new Vector3d(eyeX, eyeY, eyeZ), new Vector3d(targetX, targetY, targetZ), new Vector3d(upX, upY, upZ));
         }
 
         /// <summary>
@@ -906,10 +906,10 @@ namespace PixelFarm.VectorMath
             double invRL = 1.0 / (right - left);
             double invTB = 1.0 / (top - bottom);
             double invFN = 1.0 / (far - near);
-            return new Matrix4X4(new Vector4(2.0 * near * invRL, 0.0, 0.0, 0.0),
-                               new Vector4(0.0, 2.0 * near * invTB, 0.0, 0.0),
-                               new Vector4((right + left) * invRL, (top + bottom) * invTB, -(far + near) * invFN, -1.0),
-                               new Vector4(0.0, 0.0, -2.0 * far * near * invFN, 0.0));
+            return new Matrix4X4(new Vector4d(2.0 * near * invRL, 0.0, 0.0, 0.0),
+                               new Vector4d(0.0, 2.0 * near * invTB, 0.0, 0.0),
+                               new Vector4d((right + left) * invRL, (top + bottom) * invTB, -(far + near) * invFN, -1.0),
+                               new Vector4d(0.0, 0.0, -2.0 * far * near * invFN, 0.0));
         }
 
         /// <summary>
@@ -1072,10 +1072,10 @@ namespace PixelFarm.VectorMath
                 }
             }
 
-            mat.Row0 = new Vector4(inverse[0, 0], inverse[0, 1], inverse[0, 2], inverse[0, 3]);
-            mat.Row1 = new Vector4(inverse[1, 0], inverse[1, 1], inverse[1, 2], inverse[1, 3]);
-            mat.Row2 = new Vector4(inverse[2, 0], inverse[2, 1], inverse[2, 2], inverse[2, 3]);
-            mat.Row3 = new Vector4(inverse[3, 0], inverse[3, 1], inverse[3, 2], inverse[3, 3]);
+            mat.Row0 = new Vector4d(inverse[0, 0], inverse[0, 1], inverse[0, 2], inverse[0, 3]);
+            mat.Row1 = new Vector4d(inverse[1, 0], inverse[1, 1], inverse[1, 2], inverse[1, 3]);
+            mat.Row2 = new Vector4d(inverse[2, 0], inverse[2, 1], inverse[2, 2], inverse[2, 3]);
+            mat.Row3 = new Vector4d(inverse[3, 0], inverse[3, 1], inverse[3, 2], inverse[3, 3]);
             return mat;
         }
 

@@ -47,16 +47,16 @@ namespace PixelFarm.VectorMath
     public class Ray
     {
         public static double sameSurfaceOffset = .00001;
-        public Vector3 origin;
-        public Vector3 direction;
+        public Vector3d origin;
+        public Vector3d direction;
         public double minDistanceToConsider;
         public double maxDistanceToConsider;
-        public Vector3 oneOverDirection;
+        public Vector3d oneOverDirection;
         public bool isShadowRay;
         public IntersectionType intersectionType;
         public enum Sign { Negative = 1, Positive = 0 };
         public Sign[] sign = new Sign[3];
-        public Ray(Vector3 origin, Vector3 direction, double minDistanceToConsider = 0, double maxDistanceToConsider = double.PositiveInfinity, IntersectionType intersectionType = IntersectionType.FrontFace)
+        public Ray(Vector3d origin, Vector3d direction, double minDistanceToConsider = 0, double maxDistanceToConsider = double.PositiveInfinity, IntersectionType intersectionType = IntersectionType.FrontFace)
         {
             this.origin = origin;
             this.direction = direction;

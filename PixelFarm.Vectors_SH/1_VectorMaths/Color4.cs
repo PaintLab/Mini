@@ -980,7 +980,7 @@ namespace PixelFarm.VectorMath
         /// The X element is Hue (H), the Y element is Saturation (S), the Z element is Lightness (L), and the W element is Alpha (which is copied to the output's Alpha value).
         /// Each has a range of 0.0 to 1.0.
         /// </param>
-        public static Color4 FromHsl(Vector4 hsl)
+        public static Color4 FromHsl(Vector4d hsl)
         {
             var hue = hsl.x * 360.0f;
             var saturation = hsl.y;
@@ -1048,7 +1048,7 @@ namespace PixelFarm.VectorMath
         /// Each has a range of 0.0 to 1.0.
         /// </returns>
         /// <param name="rgb">Color value to convert.</param>
-        public static Vector4 ToHsl(Color4 rgb)
+        public static Vector4d ToHsl(Color4 rgb)
         {
             var M = Math.Max(rgb.R, Math.Max(rgb.G, rgb.B));
             var m = Math.Min(rgb.R, Math.Min(rgb.G, rgb.B));
@@ -1082,7 +1082,7 @@ namespace PixelFarm.VectorMath
                 saturation = C / (1.0f - Math.Abs(2.0f * lightness - 1.0f));
             }
 
-            return new Vector4(hue, saturation, lightness, rgb.A);
+            return new Vector4d(hue, saturation, lightness, rgb.A);
         }
 
         /// <summary>
@@ -1096,7 +1096,7 @@ namespace PixelFarm.VectorMath
         /// The X element is Hue (H), the Y element is Saturation (S), the Z element is Value (V), and the W element is Alpha (which is copied to the output's Alpha value).
         /// Each has a range of 0.0 to 1.0.
         /// </param>
-        public static Color4 FromHsv(Vector4 hsv)
+        public static Color4 FromHsv(Vector4d hsv)
         {
             var hue = hsv.x * 360.0f;
             var saturation = hsv.y;
@@ -1164,7 +1164,7 @@ namespace PixelFarm.VectorMath
         /// Each has a range of 0.0 to 1.0.
         /// </returns>
         /// <param name="rgb">Color value to convert.</param>
-        public static Vector4 ToHsv(Color4 rgb)
+        public static Vector4d ToHsv(Color4 rgb)
         {
             var M = Math.Max(rgb.R, Math.Max(rgb.G, rgb.B));
             var m = Math.Min(rgb.R, Math.Min(rgb.G, rgb.B));
@@ -1195,7 +1195,7 @@ namespace PixelFarm.VectorMath
                 saturation = C / M;
             }
 
-            return new Vector4(hue, saturation, M, rgb.A);
+            return new Vector4d(hue, saturation, M, rgb.A);
         }
 
         /// <summary>
@@ -1209,7 +1209,7 @@ namespace PixelFarm.VectorMath
         /// Each has a range of 0.0 to 1.0.
         /// </param>
         /// <remarks>Uses the CIE XYZ colorspace.</remarks>
-        public static Color4 FromXyz(Vector4 xyz)
+        public static Color4 FromXyz(Vector4d xyz)
         {
             var r = 0.41847f * xyz.x + -0.15866f * xyz.y + -0.082835f * xyz.z;
             var g = -0.091169f * xyz.x + 0.25243f * xyz.y + 0.015708f * xyz.z;
@@ -1226,12 +1226,12 @@ namespace PixelFarm.VectorMath
         /// </returns>
         /// <param name="rgb">Color value to convert.</param>
         /// <remarks>Uses the CIE XYZ colorspace.</remarks>
-        public static Vector4 ToXyz(Color4 rgb)
+        public static Vector4d ToXyz(Color4 rgb)
         {
             var x = (0.49f * rgb.R + 0.31f * rgb.G + 0.20f * rgb.B) / 0.17697f;
             var y = (0.17697f * rgb.R + 0.81240f * rgb.G + 0.01063f * rgb.B) / 0.17697f;
             var z = (0.00f * rgb.R + 0.01f * rgb.G + 0.99f * rgb.B) / 0.17697f;
-            return new Vector4(x, y, z, rgb.A);
+            return new Vector4d(x, y, z, rgb.A);
         }
 
         /// <summary>
@@ -1245,7 +1245,7 @@ namespace PixelFarm.VectorMath
         /// The X element contains Luma (Y, 0.0 to 1.0), the Y element contains Blue-difference chroma (U, -0.5 to 0.5), the Z element contains the Red-difference chroma (V, -0.5 to 0.5), and the W element contains the Alpha (which is copied to the output's Alpha value).
         /// </param>
         /// <remarks>Converts using ITU-R BT.601/CCIR 601 W(r) = 0.299 W(b) = 0.114 U(max) = 0.436 V(max) = 0.615.</remarks>
-        public static Color4 FromYcbcr(Vector4 ycbcr)
+        public static Color4 FromYcbcr(Vector4d ycbcr)
         {
             var r = 1.0f * ycbcr.x + 0.0f * ycbcr.y + 1.402f * ycbcr.z;
             var g = 1.0f * ycbcr.x + -0.344136f * ycbcr.y + -0.714136f * ycbcr.z;
@@ -1263,12 +1263,12 @@ namespace PixelFarm.VectorMath
         /// </returns>
         /// <param name="rgb">Color value to convert.</param>
         /// <remarks>Converts using ITU-R BT.601/CCIR 601 W(r) = 0.299 W(b) = 0.114 U(max) = 0.436 V(max) = 0.615.</remarks>
-        public static Vector4 ToYcbcr(Color4 rgb)
+        public static Vector4d ToYcbcr(Color4 rgb)
         {
             var y = 0.299f * rgb.R + 0.587f * rgb.G + 0.114f * rgb.B;
             var u = -0.168736f * rgb.R + -0.331264f * rgb.G + 0.5f * rgb.B;
             var v = 0.5f * rgb.R + -0.418688f * rgb.G + -0.081312f * rgb.B;
-            return new Vector4(y, u, v, rgb.A);
+            return new Vector4d(y, u, v, rgb.A);
         }
 
         /// <summary>
@@ -1282,7 +1282,7 @@ namespace PixelFarm.VectorMath
         /// The X element is Hue (H), the Y element is Chroma (C), the Z element is luminance (Y), and the W element is Alpha (which is copied to the output's Alpha value).
         /// Each has a range of 0.0 to 1.0.
         /// </param>
-        public static Color4 FromHcy(Vector4 hcy)
+        public static Color4 FromHcy(Vector4d hcy)
         {
             var hue = hcy.x * 360.0f;
             var C = hcy.y;
@@ -1348,7 +1348,7 @@ namespace PixelFarm.VectorMath
         /// Each has a range of 0.0 to 1.0.
         /// </returns>
         /// <param name="rgb">Color value to convert.</param>
-        public static Vector4 ToHcy(Color4 rgb)
+        public static Vector4d ToHcy(Color4 rgb)
         {
             var M = Math.Max(rgb.R, Math.Max(rgb.G, rgb.B));
             var m = Math.Min(rgb.R, Math.Min(rgb.G, rgb.B));
@@ -1372,7 +1372,7 @@ namespace PixelFarm.VectorMath
 
             var luminance = 0.30f * rgb.R + 0.59f * rgb.G + 0.11f * rgb.B;
 
-            return new Vector4(hue, C, luminance, rgb.A);
+            return new Vector4d(hue, C, luminance, rgb.A);
         }
 
         /// <summary>

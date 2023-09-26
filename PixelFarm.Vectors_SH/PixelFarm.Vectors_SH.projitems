@@ -17,12 +17,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Color4.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\MathHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Matrix4x4.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\MyVector2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Point.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Quaternion.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Ray.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Vector2.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Vector3.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Vector4.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Vector2d.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Vector3d.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)1_VectorMaths\Vector4d.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)2_Geometry\Arc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)2_Geometry\BezireCurve.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)2_Geometry\BSpline.cs" />

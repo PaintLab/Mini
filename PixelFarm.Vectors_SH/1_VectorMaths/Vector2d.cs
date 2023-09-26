@@ -67,7 +67,7 @@ namespace PixelFarm.VectorMath
             this.y = y;
         }
 
-        public Vector2d(Vector3 vector)
+        public Vector2d(Vector3d vector)
         {
             this.x = vector.x;
             this.y = vector.y;
@@ -874,12 +874,9 @@ namespace PixelFarm.VectorMath
         }
 
     }
+     
 
-
-
-
-
-    public static class Vector2Ext
+    public static class Vector2dExt
     {
         public static Vector2d Rotate(this Vector2d v, int degree)
         {

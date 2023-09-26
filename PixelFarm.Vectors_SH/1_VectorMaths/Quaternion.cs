@@ -32,7 +32,7 @@ namespace PixelFarm.VectorMath
     public struct Quaternion : IEquatable<Quaternion>
     {
 
-        Vector3 xyz;
+        Vector3d xyz;
         double w;
 
 
@@ -41,7 +41,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="v">The vector part</param>
         /// <param name="w">The w part</param>
-        public Quaternion(Vector3 v, double w)
+        public Quaternion(Vector3d v, double w)
         {
             this.xyz = v;
             this.w = w;
@@ -55,7 +55,7 @@ namespace PixelFarm.VectorMath
         /// <param name="z">The z component</param>
         /// <param name="w">The w component</param>
         public Quaternion(double x, double y, double z, double w)
-            : this(new Vector3(x, y, z), w)
+            : this(new Vector3d(x, y, z), w)
         { }
 
         /// <summary>
@@ -63,10 +63,10 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="startingDirection"></param>
         /// <param name="endingDirection"></param>
-        public Quaternion(Vector3 startingDirection, Vector3 endingDirection)
+        public Quaternion(Vector3d startingDirection, Vector3d endingDirection)
         {
-            this.xyz = Vector3.Cross(startingDirection, endingDirection);
-            this.w = Math.Sqrt(Math.Pow(startingDirection.Length, 2) * Math.Pow(endingDirection.Length, 2)) + Vector3.Dot(startingDirection, endingDirection);
+            this.xyz = Vector3d.Cross(startingDirection, endingDirection);
+            this.w = Math.Sqrt(Math.Pow(startingDirection.Length, 2) * Math.Pow(endingDirection.Length, 2)) + Vector3d.Dot(startingDirection, endingDirection);
             Normalize();
         }
 
@@ -76,7 +76,7 @@ namespace PixelFarm.VectorMath
         /// <summary>
         /// Gets or sets an OpenTK.Vector3d with the X, Y and Z components of this instance.
         /// </summary>
-        public Vector3 Xyz { get { return xyz; } set { xyz = value; } }
+        public Vector3d Xyz { get { return xyz; } set { xyz = value; } }
 
         /// <summary>
         /// Gets or sets the X component of this instance.
@@ -106,9 +106,9 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="axis">The resultant axis</param>
         /// <param name="angle">The resultant angle</param>
-        public void ToAxisAngle(out Vector3 axis, out double angle)
+        public void ToAxisAngle(out Vector3d axis, out double angle)
         {
-            Vector4 result = ToAxisAngle();
+            Vector4d result = ToAxisAngle();
             axis = result.Xyz;
             angle = result.w;
         }
@@ -117,12 +117,12 @@ namespace PixelFarm.VectorMath
         /// Convert this instance to an axis-angle representation.
         /// </summary>
         /// <returns>A Vector4 that is the axis-angle representation of this quaternion.</returns>
-        public Vector4 ToAxisAngle()
+        public Vector4d ToAxisAngle()
         {
             Quaternion q = this;
             if (q.W > 1.0f)
                 q.Normalize();
-            Vector4 result = new Vector4();
+            Vector4d result = new Vector4d();
             result.w = 2.0f * (float)System.Math.Acos(q.W); // angle
             float den = (float)System.Math.Sqrt(1.0 - q.W * q.W);
             if (den > 0.0001f)
@@ -133,7 +133,7 @@ namespace PixelFarm.VectorMath
             {
                 // This occurs when the angle is zero. 
                 // Not a problem: just set an arbitrary normalized axis.
-                result.Xyz = Vector3.UnitX;
+                result.Xyz = Vector3d.UnitX;
             }
 
             return result;
@@ -304,8 +304,8 @@ namespace PixelFarm.VectorMath
         public static void Multiply(ref Quaternion left, ref Quaternion right, out Quaternion result)
         {
             result = new Quaternion(
-                right.W * left.Xyz + left.W * right.Xyz + Vector3.Cross(left.Xyz, right.Xyz),
-                left.W * right.W - Vector3.Dot(left.Xyz, right.Xyz));
+                right.W * left.Xyz + left.W * right.Xyz + Vector3d.Cross(left.Xyz, right.Xyz),
+                left.W * right.W - Vector3d.Dot(left.Xyz, right.Xyz));
         }
 
         /// <summary>
@@ -412,11 +412,11 @@ namespace PixelFarm.VectorMath
 
 
 
-        public static Quaternion FromEulerAngles(Vector3 rotation)
+        public static Quaternion FromEulerAngles(Vector3d rotation)
         {
-            Quaternion xRotation = FromAxisAngle(Vector3.UnitX, rotation.x);
-            Quaternion yRotation = FromAxisAngle(Vector3.UnitY, rotation.y);
-            Quaternion zRotation = FromAxisAngle(Vector3.UnitZ, rotation.z);
+            Quaternion xRotation = FromAxisAngle(Vector3d.UnitX, rotation.x);
+            Quaternion yRotation = FromAxisAngle(Vector3d.UnitY, rotation.y);
+            Quaternion zRotation = FromAxisAngle(Vector3d.UnitZ, rotation.z);
             //return xRotation * yRotation * zRotation;
             return zRotation * yRotation * xRotation;
         }
@@ -429,7 +429,7 @@ namespace PixelFarm.VectorMath
         /// <param name="axis">The axis to rotate about</param>
         /// <param name="angle">The rotation angle in radians</param>
         /// <returns></returns>
-        public static Quaternion FromAxisAngle(Vector3 axis, double angle)
+        public static Quaternion FromAxisAngle(Vector3d axis, double angle)
         {
             if (axis.LengthSquared == 0.0f)
             {
@@ -470,7 +470,7 @@ namespace PixelFarm.VectorMath
             }
 
 
-            double cosHalfAngle = q1.W * q2.W + Vector3.Dot(q1.Xyz, q2.Xyz);
+            double cosHalfAngle = q1.W * q2.W + Vector3d.Dot(q1.Xyz, q2.Xyz);
             if (cosHalfAngle >= 1.0f || cosHalfAngle <= -1.0f)
             {
                 // angle = 0.0f, so just return one input.

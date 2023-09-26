@@ -32,9 +32,9 @@ namespace PixelFarm.VectorMath
 {
     public class AxisAlignedBoundingBox
     {
-        public Vector3 minXYZ;
-        public Vector3 maxXYZ;
-        public AxisAlignedBoundingBox(Vector3 minXYZ, Vector3 maxXYZ)
+        public Vector3d minXYZ;
+        public Vector3d maxXYZ;
+        public AxisAlignedBoundingBox(Vector3d minXYZ, Vector3d maxXYZ)
         {
             if (maxXYZ.x < minXYZ.x || maxXYZ.y < minXYZ.y || maxXYZ.z < minXYZ.z)
             {
@@ -45,7 +45,7 @@ namespace PixelFarm.VectorMath
             this.maxXYZ = maxXYZ;
         }
 
-        public Vector3 Size => maxXYZ - minXYZ;
+        public Vector3d Size => maxXYZ - minXYZ;
 
         public double XSize => maxXYZ.x - minXYZ.x;
 
@@ -55,18 +55,18 @@ namespace PixelFarm.VectorMath
 
         public AxisAlignedBoundingBox NewTransformed(Matrix4X4 transform)
         {
-            Vector3[] boundsVerts = new Vector3[8];
-            boundsVerts[0] = new Vector3(this[0][0], this[0][1], this[0][2]);
-            boundsVerts[1] = new Vector3(this[0][0], this[0][1], this[1][2]);
-            boundsVerts[2] = new Vector3(this[0][0], this[1][1], this[0][2]);
-            boundsVerts[3] = new Vector3(this[0][0], this[1][1], this[1][2]);
-            boundsVerts[4] = new Vector3(this[1][0], this[0][1], this[0][2]);
-            boundsVerts[5] = new Vector3(this[1][0], this[0][1], this[1][2]);
-            boundsVerts[6] = new Vector3(this[1][0], this[1][1], this[0][2]);
-            boundsVerts[7] = new Vector3(this[1][0], this[1][1], this[1][2]);
-            Vector3.Transform(boundsVerts, transform);
-            Vector3 newMin = new Vector3(double.MaxValue, double.MaxValue, double.MaxValue);
-            Vector3 newMax = new Vector3(double.MinValue, double.MinValue, double.MinValue);
+            Vector3d[] boundsVerts = new Vector3d[8];
+            boundsVerts[0] = new Vector3d(this[0][0], this[0][1], this[0][2]);
+            boundsVerts[1] = new Vector3d(this[0][0], this[0][1], this[1][2]);
+            boundsVerts[2] = new Vector3d(this[0][0], this[1][1], this[0][2]);
+            boundsVerts[3] = new Vector3d(this[0][0], this[1][1], this[1][2]);
+            boundsVerts[4] = new Vector3d(this[1][0], this[0][1], this[0][2]);
+            boundsVerts[5] = new Vector3d(this[1][0], this[0][1], this[1][2]);
+            boundsVerts[6] = new Vector3d(this[1][0], this[1][1], this[0][2]);
+            boundsVerts[7] = new Vector3d(this[1][0], this[1][1], this[1][2]);
+            Vector3d.Transform(boundsVerts, transform);
+            Vector3d newMin = new Vector3d(double.MaxValue, double.MaxValue, double.MaxValue);
+            Vector3d newMax = new Vector3d(double.MinValue, double.MinValue, double.MinValue);
             for (int i = 0; i < 8; i++)
             {
                 newMin.x = Math.Min(newMin.x, boundsVerts[i].x);
@@ -80,7 +80,7 @@ namespace PixelFarm.VectorMath
             return new AxisAlignedBoundingBox(newMin, newMax);
         }
 
-        public Vector3 Center => (minXYZ + maxXYZ) / 2;
+        public Vector3d Center => (minXYZ + maxXYZ) / 2;
 
         /// <summary>
         /// This is the computation cost of doing an intersection with the given type.
@@ -89,7 +89,7 @@ namespace PixelFarm.VectorMath
         /// <returns></returns>
         public static double GetIntersectCost() => 132;   // it would be great to try and measure this more accurately.  This is a guess from looking at the intersect function.
 
-        public Vector3 GetCenter() => (minXYZ + maxXYZ) * .5;
+        public Vector3d GetCenter() => (minXYZ + maxXYZ) * .5;
 
         public double GetCenterX() => (minXYZ.x + maxXYZ.x) * .5;
 
@@ -117,7 +117,7 @@ namespace PixelFarm.VectorMath
             return _surfaceAreaCache;
         }
 
-        public Vector3 this[int index]
+        public Vector3d this[int index]
         {
             get
             {
@@ -138,11 +138,11 @@ namespace PixelFarm.VectorMath
 
         public static AxisAlignedBoundingBox operator +(AxisAlignedBoundingBox A, AxisAlignedBoundingBox B)
         {
-            Vector3 calcMinXYZ = new Vector3();
+            Vector3d calcMinXYZ = new Vector3d();
             calcMinXYZ.x = Math.Min(A.minXYZ.x, B.minXYZ.x);
             calcMinXYZ.y = Math.Min(A.minXYZ.y, B.minXYZ.y);
             calcMinXYZ.z = Math.Min(A.minXYZ.z, B.minXYZ.z);
-            Vector3 calcMaxXYZ = new Vector3();
+            Vector3d calcMaxXYZ = new Vector3d();
             calcMaxXYZ.x = Math.Max(A.maxXYZ.x, B.maxXYZ.x);
             calcMaxXYZ.y = Math.Max(A.maxXYZ.y, B.maxXYZ.y);
             calcMaxXYZ.z = Math.Max(A.maxXYZ.z, B.maxXYZ.z);
@@ -152,11 +152,11 @@ namespace PixelFarm.VectorMath
 
         public static AxisAlignedBoundingBox Union(AxisAlignedBoundingBox boundsA, AxisAlignedBoundingBox boundsB)
         {
-            Vector3 minXYZ = Vector3.Zero;
+            Vector3d minXYZ = Vector3d.Zero;
             minXYZ.x = Math.Min(boundsA.minXYZ.x, boundsB.minXYZ.x);
             minXYZ.y = Math.Min(boundsA.minXYZ.y, boundsB.minXYZ.y);
             minXYZ.z = Math.Min(boundsA.minXYZ.z, boundsB.minXYZ.z);
-            Vector3 maxXYZ = Vector3.Zero;
+            Vector3d maxXYZ = Vector3d.Zero;
             maxXYZ.x = Math.Max(boundsA.maxXYZ.x, boundsB.maxXYZ.x);
             maxXYZ.y = Math.Max(boundsA.maxXYZ.y, boundsB.maxXYZ.y);
             maxXYZ.z = Math.Max(boundsA.maxXYZ.z, boundsB.maxXYZ.z);
@@ -165,31 +165,31 @@ namespace PixelFarm.VectorMath
 
         public static AxisAlignedBoundingBox Intersection(AxisAlignedBoundingBox boundsA, AxisAlignedBoundingBox boundsB)
         {
-            Vector3 minXYZ = Vector3.Zero;
+            Vector3d minXYZ = Vector3d.Zero;
             minXYZ.x = Math.Max(boundsA.minXYZ.x, boundsB.minXYZ.x);
             minXYZ.y = Math.Max(boundsA.minXYZ.y, boundsB.minXYZ.y);
             minXYZ.z = Math.Max(boundsA.minXYZ.z, boundsB.minXYZ.z);
-            Vector3 maxXYZ = Vector3.Zero;
+            Vector3d maxXYZ = Vector3d.Zero;
             maxXYZ.x = Math.Max(minXYZ.x, Math.Min(boundsA.maxXYZ.x, boundsB.maxXYZ.x));
             maxXYZ.y = Math.Max(minXYZ.y, Math.Min(boundsA.maxXYZ.y, boundsB.maxXYZ.y));
             maxXYZ.z = Math.Max(minXYZ.z, Math.Min(boundsA.maxXYZ.z, boundsB.maxXYZ.z));
             return new AxisAlignedBoundingBox(minXYZ, maxXYZ);
         }
 
-        public static AxisAlignedBoundingBox Union(AxisAlignedBoundingBox bounds, Vector3 vertex)
+        public static AxisAlignedBoundingBox Union(AxisAlignedBoundingBox bounds, Vector3d vertex)
         {
-            Vector3 minXYZ = Vector3.Zero;
+            Vector3d minXYZ = Vector3d.Zero;
             minXYZ.x = Math.Min(bounds.minXYZ.x, vertex.x);
             minXYZ.y = Math.Min(bounds.minXYZ.y, vertex.y);
             minXYZ.z = Math.Min(bounds.minXYZ.z, vertex.z);
-            Vector3 maxXYZ = Vector3.Zero;
+            Vector3d maxXYZ = Vector3d.Zero;
             maxXYZ.x = Math.Max(bounds.maxXYZ.x, vertex.x);
             maxXYZ.y = Math.Max(bounds.maxXYZ.y, vertex.y);
             maxXYZ.z = Math.Max(bounds.maxXYZ.z, vertex.z);
             return new AxisAlignedBoundingBox(minXYZ, maxXYZ);
         }
 
-        public void Clamp(ref Vector3 positionToClamp)
+        public void Clamp(ref Vector3d positionToClamp)
         {
             if (positionToClamp.x < minXYZ.x)
             {

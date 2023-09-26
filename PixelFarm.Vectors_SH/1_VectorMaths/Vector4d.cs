@@ -27,7 +27,7 @@ namespace PixelFarm.VectorMath
     /// <summary>Represents a 4D vector using four double-precision floating-point numbers.</summary>
     //[Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct Vector4 : IEquatable<Vector4>
+    public struct Vector4d : IEquatable<Vector4d>
     {
 
         /// <summary>
@@ -49,31 +49,31 @@ namespace PixelFarm.VectorMath
         /// <summary>
         /// Defines a unit-length Vector4d that points towards the X-axis.
         /// </summary>
-        public static Vector4 UnitX = new Vector4(1, 0, 0, 0);
+        public static Vector4d UnitX = new Vector4d(1, 0, 0, 0);
         /// <summary>
         /// Defines a unit-length Vector4d that points towards the Y-axis.
         /// </summary>
-        public static Vector4 UnitY = new Vector4(0, 1, 0, 0);
+        public static Vector4d UnitY = new Vector4d(0, 1, 0, 0);
         /// <summary>
         /// Defines a unit-length Vector4d that points towards the Z-axis.
         /// </summary>
-        public static Vector4 UnitZ = new Vector4(0, 0, 1, 0);
+        public static Vector4d UnitZ = new Vector4d(0, 0, 1, 0);
         /// <summary>
         /// Defines a unit-length Vector4d that points towards the W-axis.
         /// </summary>
-        public static Vector4 UnitW = new Vector4(0, 0, 0, 1);
+        public static Vector4d UnitW = new Vector4d(0, 0, 0, 1);
         /// <summary>
         /// Defines a zero-length Vector4d.
         /// </summary>
-        public static Vector4 Zero = new Vector4(0, 0, 0, 0);
+        public static Vector4d Zero = new Vector4d(0, 0, 0, 0);
         /// <summary>
         /// Defines an instance with all components set to 1.
         /// </summary>
-        public static readonly Vector4 One = new Vector4(1, 1, 1, 1);
+        public static readonly Vector4d One = new Vector4d(1, 1, 1, 1);
         /// <summary>
         /// Defines the size of the Vector4d struct in bytes.
         /// </summary>
-        public static readonly int SizeInBytes = Marshal.SizeOf(new Vector4());
+        public static readonly int SizeInBytes = Marshal.SizeOf(new Vector4d());
 
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace PixelFarm.VectorMath
         /// <param name="y">The y component of the Vector4d.</param>
         /// <param name="z">The z component of the Vector4d.</param>
         /// <param name="w">The w component of the Vector4d.</param>
-        public Vector4(double x, double y, double z, double w)
+        public Vector4d(double x, double y, double z, double w)
         {
             this.x = x;
             this.y = y;
@@ -95,7 +95,7 @@ namespace PixelFarm.VectorMath
         /// Constructs a new Vector4d from the given Vector2d.
         /// </summary>
         /// <param name="v">The Vector2d to copy components from.</param>
-        public Vector4(Vector2d v)
+        public Vector4d(Vector2d v)
         {
             x = v.x;
             y = v.y;
@@ -107,7 +107,7 @@ namespace PixelFarm.VectorMath
         /// Constructs a new Vector4d from the given Vector3d.
         /// </summary>
         /// <param name="v">The Vector3d to copy components from.</param>
-        public Vector4(Vector3 v)
+        public Vector4d(Vector3d v)
         {
             x = v.x;
             y = v.y;
@@ -120,7 +120,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="v">The Vector3d to copy components from.</param>
         /// <param name="w">The w component of the new Vector4.</param>
-        public Vector4(Vector3 v, double w)
+        public Vector4d(Vector3d v, double w)
         {
             x = v.x;
             y = v.y;
@@ -132,7 +132,7 @@ namespace PixelFarm.VectorMath
         /// Constructs a new Vector4d from the given Vector4d.
         /// </summary>
         /// <param name="v">The Vector4d to copy components from.</param>
-        public Vector4(Vector4 v)
+        public Vector4d(Vector4d v)
         {
             x = v.x;
             y = v.y;
@@ -244,7 +244,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">Left operand.</param>
         /// <param name="b">Right operand.</param>
         /// <returns>Result of operation.</returns>
-        public static Vector4 Add(Vector4 a, Vector4 b)
+        public static Vector4d Add(Vector4d a, Vector4d b)
         {
             Add(ref a, ref b, out a);
             return a;
@@ -256,9 +256,9 @@ namespace PixelFarm.VectorMath
         /// <param name="a">Left operand.</param>
         /// <param name="b">Right operand.</param>
         /// <param name="result">Result of operation.</param>
-        public static void Add(ref Vector4 a, ref Vector4 b, out Vector4 result)
+        public static void Add(ref Vector4d a, ref Vector4d b, out Vector4d result)
         {
-            result = new Vector4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
+            result = new Vector4d(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
         }
 
 
@@ -269,7 +269,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <returns>Result of subtraction</returns>
-        public static Vector4 Subtract(Vector4 a, Vector4 b)
+        public static Vector4d Subtract(Vector4d a, Vector4d b)
         {
             Subtract(ref a, ref b, out a);
             return a;
@@ -281,9 +281,9 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <param name="result">Result of subtraction</param>
-        public static void Subtract(ref Vector4 a, ref Vector4 b, out Vector4 result)
+        public static void Subtract(ref Vector4d a, ref Vector4d b, out Vector4d result)
         {
-            result = new Vector4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+            result = new Vector4d(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
         }
 
 
@@ -294,7 +294,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector4 Multiply(Vector4 vector, double scale)
+        public static Vector4d Multiply(Vector4d vector, double scale)
         {
             Multiply(ref vector, scale, out vector);
             return vector;
@@ -306,9 +306,9 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Multiply(ref Vector4 vector, double scale, out Vector4 result)
+        public static void Multiply(ref Vector4d vector, double scale, out Vector4d result)
         {
-            result = new Vector4(vector.x * scale, vector.y * scale, vector.z * scale, vector.w * scale);
+            result = new Vector4d(vector.x * scale, vector.y * scale, vector.z * scale, vector.w * scale);
         }
 
         /// <summary>
@@ -317,7 +317,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector4 Multiply(Vector4 vector, Vector4 scale)
+        public static Vector4d Multiply(Vector4d vector, Vector4d scale)
         {
             Multiply(ref vector, ref scale, out vector);
             return vector;
@@ -329,9 +329,9 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Multiply(ref Vector4 vector, ref Vector4 scale, out Vector4 result)
+        public static void Multiply(ref Vector4d vector, ref Vector4d scale, out Vector4d result)
         {
-            result = new Vector4(vector.x * scale.x, vector.y * scale.y, vector.z * scale.z, vector.w * scale.w);
+            result = new Vector4d(vector.x * scale.x, vector.y * scale.y, vector.z * scale.z, vector.w * scale.w);
         }
 
 
@@ -342,7 +342,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector4 Divide(Vector4 vector, double scale)
+        public static Vector4d Divide(Vector4d vector, double scale)
         {
             Divide(ref vector, scale, out vector);
             return vector;
@@ -354,7 +354,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Divide(ref Vector4 vector, double scale, out Vector4 result)
+        public static void Divide(ref Vector4d vector, double scale, out Vector4d result)
         {
             Multiply(ref vector, 1 / scale, out result);
         }
@@ -365,7 +365,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector4 Divide(Vector4 vector, Vector4 scale)
+        public static Vector4d Divide(Vector4d vector, Vector4d scale)
         {
             Divide(ref vector, ref scale, out vector);
             return vector;
@@ -377,9 +377,9 @@ namespace PixelFarm.VectorMath
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Divide(ref Vector4 vector, ref Vector4 scale, out Vector4 result)
+        public static void Divide(ref Vector4d vector, ref Vector4d scale, out Vector4d result)
         {
-            result = new Vector4(vector.x / scale.x, vector.y / scale.y, vector.z / scale.z, vector.w / scale.w);
+            result = new Vector4d(vector.x / scale.x, vector.y / scale.y, vector.z / scale.z, vector.w / scale.w);
         }
 
 
@@ -390,7 +390,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <returns>The component-wise minimum</returns>
-        public static Vector4 Min(Vector4 a, Vector4 b)
+        public static Vector4d Min(Vector4d a, Vector4d b)
         {
             a.x = a.x < b.x ? a.x : b.x;
             a.y = a.y < b.y ? a.y : b.y;
@@ -405,7 +405,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <param name="result">The component-wise minimum</param>
-        public static void Min(ref Vector4 a, ref Vector4 b, out Vector4 result)
+        public static void Min(ref Vector4d a, ref Vector4d b, out Vector4d result)
         {
             result.x = a.x < b.x ? a.x : b.x;
             result.y = a.y < b.y ? a.y : b.y;
@@ -421,7 +421,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <returns>The component-wise maximum</returns>
-        public static Vector4 Max(Vector4 a, Vector4 b)
+        public static Vector4d Max(Vector4d a, Vector4d b)
         {
             a.x = a.x > b.x ? a.x : b.x;
             a.y = a.y > b.y ? a.y : b.y;
@@ -436,7 +436,7 @@ namespace PixelFarm.VectorMath
         /// <param name="a">First operand</param>
         /// <param name="b">Second operand</param>
         /// <param name="result">The component-wise maximum</param>
-        public static void Max(ref Vector4 a, ref Vector4 b, out Vector4 result)
+        public static void Max(ref Vector4d a, ref Vector4d b, out Vector4d result)
         {
             result.x = a.x > b.x ? a.x : b.x;
             result.y = a.y > b.y ? a.y : b.y;
@@ -453,7 +453,7 @@ namespace PixelFarm.VectorMath
         /// <param name="min">Minimum vector</param>
         /// <param name="max">Maximum vector</param>
         /// <returns>The clamped vector</returns>
-        public static Vector4 Clamp(Vector4 vec, Vector4 min, Vector4 max)
+        public static Vector4d Clamp(Vector4d vec, Vector4d min, Vector4d max)
         {
             vec.x = vec.x < min.x ? min.x : vec.x > max.x ? max.x : vec.x;
             vec.y = vec.y < min.y ? min.y : vec.y > max.y ? max.y : vec.y;
@@ -469,7 +469,7 @@ namespace PixelFarm.VectorMath
         /// <param name="min">Minimum vector</param>
         /// <param name="max">Maximum vector</param>
         /// <param name="result">The clamped vector</param>
-        public static void Clamp(ref Vector4 vec, ref Vector4 min, ref Vector4 max, out Vector4 result)
+        public static void Clamp(ref Vector4d vec, ref Vector4d min, ref Vector4d max, out Vector4d result)
         {
             result.x = vec.x < min.x ? min.x : vec.x > max.x ? max.x : vec.x;
             result.y = vec.y < min.y ? min.y : vec.y > max.y ? max.y : vec.y;
@@ -484,7 +484,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="vec">The input vector</param>
         /// <returns>The normalized vector</returns>
-        public static Vector4 Normalize(Vector4 vec)
+        public static Vector4d Normalize(Vector4d vec)
         {
             double scale = 1.0 / vec.Length;
             vec.x *= scale;
@@ -499,7 +499,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="vec">The input vector</param>
         /// <param name="result">The normalized vector</param>
-        public static void Normalize(ref Vector4 vec, out Vector4 result)
+        public static void Normalize(ref Vector4d vec, out Vector4d result)
         {
             double scale = 1.0 / vec.Length;
             result.x = vec.x * scale;
@@ -516,7 +516,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The dot product of the two inputs</returns>
-        public static double Dot(Vector4 left, Vector4 right)
+        public static double Dot(Vector4d left, Vector4d right)
         {
             return left.x * right.x + left.y * right.y + left.z * right.z + left.w * right.w;
         }
@@ -527,7 +527,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <param name="result">The dot product of the two inputs</param>
-        public static void Dot(ref Vector4 left, ref Vector4 right, out double result)
+        public static void Dot(ref Vector4d left, ref Vector4d right, out double result)
         {
             result = left.x * right.x + left.y * right.y + left.z * right.z + left.w * right.w;
         }
@@ -541,7 +541,7 @@ namespace PixelFarm.VectorMath
         /// <param name="b">Second input vector</param>
         /// <param name="blend">The blend factor. a when blend=0, b when blend=1.</param>
         /// <returns>a when blend=0, b when blend=1, and a linear combination otherwise</returns>
-        public static Vector4 Lerp(Vector4 a, Vector4 b, double blend)
+        public static Vector4d Lerp(Vector4d a, Vector4d b, double blend)
         {
             a.x = blend * (b.x - a.x) + a.x;
             a.y = blend * (b.y - a.y) + a.y;
@@ -557,7 +557,7 @@ namespace PixelFarm.VectorMath
         /// <param name="b">Second input vector</param>
         /// <param name="blend">The blend factor. a when blend=0, b when blend=1.</param>
         /// <param name="result">a when blend=0, b when blend=1, and a linear combination otherwise</param>
-        public static void Lerp(ref Vector4 a, ref Vector4 b, double blend, out Vector4 result)
+        public static void Lerp(ref Vector4d a, ref Vector4d b, double blend, out Vector4d result)
         {
             result.x = blend * (b.x - a.x) + a.x;
             result.y = blend * (b.y - a.y) + a.y;
@@ -576,7 +576,7 @@ namespace PixelFarm.VectorMath
         /// <param name="u">First Barycentric Coordinate</param>
         /// <param name="v">Second Barycentric Coordinate</param>
         /// <returns>a when u=v=0, b when u=1,v=0, c when u=0,v=1, and a linear combination of a,b,c otherwise</returns>
-        public static Vector4 BaryCentric(Vector4 a, Vector4 b, Vector4 c, double u, double v)
+        public static Vector4d BaryCentric(Vector4d a, Vector4d b, Vector4d c, double u, double v)
         {
             return a + u * (b - a) + v * (c - a);
         }
@@ -588,10 +588,10 @@ namespace PixelFarm.VectorMath
         /// <param name="u">First Barycentric Coordinate.</param>
         /// <param name="v">Second Barycentric Coordinate.</param>
         /// <param name="result">Output Vector. a when u=v=0, b when u=1,v=0, c when u=0,v=1, and a linear combination of a,b,c otherwise</param>
-        public static void BaryCentric(ref Vector4 a, ref Vector4 b, ref Vector4 c, double u, double v, out Vector4 result)
+        public static void BaryCentric(ref Vector4d a, ref Vector4d b, ref Vector4d c, double u, double v, out Vector4d result)
         {
             result = a; // copy
-            Vector4 temp = b; // copy
+            Vector4d temp = b; // copy
             Subtract(ref temp, ref a, out temp);
             Multiply(ref temp, u, out temp);
             Add(ref result, ref temp, out result);
@@ -607,9 +607,9 @@ namespace PixelFarm.VectorMath
         /// <param name="vec">The vector to transform</param>
         /// <param name="mat">The desired transformation</param>
         /// <returns>The transformed vector</returns>
-        public static Vector4 Transform(Vector4 vec, Matrix4X4 mat)
+        public static Vector4d Transform(Vector4d vec, Matrix4X4 mat)
         {
-            Vector4 result;
+            Vector4d result;
             Transform(ref vec, ref mat, out result);
             return result;
         }
@@ -618,9 +618,9 @@ namespace PixelFarm.VectorMath
         /// <param name="vec">The vector to transform</param>
         /// <param name="mat">The desired transformation</param>
         /// <param name="result">The transformed vector</param>
-        public static void Transform(ref Vector4 vec, ref Matrix4X4 mat, out Vector4 result)
+        public static void Transform(ref Vector4d vec, ref Matrix4X4 mat, out Vector4d result)
         {
-            result = new Vector4(
+            result = new Vector4d(
                 vec.x * mat.Row0.x + vec.y * mat.Row1.x + vec.z * mat.Row2.x + vec.w * mat.Row3.x,
                 vec.x * mat.Row0.y + vec.y * mat.Row1.y + vec.z * mat.Row2.y + vec.w * mat.Row3.y,
                 vec.x * mat.Row0.z + vec.y * mat.Row1.z + vec.z * mat.Row2.z + vec.w * mat.Row3.z,
@@ -633,9 +633,9 @@ namespace PixelFarm.VectorMath
         /// <param name="vec">The vector to transform.</param>
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <returns>The result of the operation.</returns>
-        public static Vector4 Transform(Vector4 vec, Quaternion quat)
+        public static Vector4d Transform(Vector4d vec, Quaternion quat)
         {
-            Vector4 result;
+            Vector4d result;
             Transform(ref vec, ref quat, out result);
             return result;
         }
@@ -646,13 +646,13 @@ namespace PixelFarm.VectorMath
         /// <param name="vec">The vector to transform.</param>
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <param name="result">The result of the operation.</param>
-        public static void Transform(ref Vector4 vec, ref Quaternion quat, out Vector4 result)
+        public static void Transform(ref Vector4d vec, ref Quaternion quat, out Vector4d result)
         {
             Quaternion v = new Quaternion(vec.x, vec.y, vec.z, vec.w), i, t;
             Quaternion.Invert(ref quat, out i);
             Quaternion.Multiply(ref quat, ref v, out t);
             Quaternion.Multiply(ref t, ref i, out v);
-            result = new Vector4(v.X, v.Y, v.Z, v.W);
+            result = new Vector4d(v.X, v.Y, v.Z, v.W);
         }
 
 
@@ -666,7 +666,7 @@ namespace PixelFarm.VectorMath
         /// <summary>
         /// Gets or sets an OpenTK.Vector3d with the X, Y and Z components of this instance.
         /// </summary>
-        public Vector3 Xyz { get { return new Vector3(x, y, z); } set { x = value.x; y = value.y; z = value.z; } }
+        public Vector3d Xyz { get { return new Vector3d(x, y, z); } set { x = value.x; y = value.y; z = value.z; } }
 
 
 
@@ -676,7 +676,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">The first instance.</param>
         /// <param name="right">The second instance.</param>
         /// <returns>The result of the calculation.</returns>
-        public static Vector4 operator +(Vector4 left, Vector4 right)
+        public static Vector4d operator +(Vector4d left, Vector4d right)
         {
             left.x += right.x;
             left.y += right.y;
@@ -691,7 +691,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">The first instance.</param>
         /// <param name="right">The second instance.</param>
         /// <returns>The result of the calculation.</returns>
-        public static Vector4 operator -(Vector4 left, Vector4 right)
+        public static Vector4d operator -(Vector4d left, Vector4d right)
         {
             left.x -= right.x;
             left.y -= right.y;
@@ -705,7 +705,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         /// <param name="vec">The instance.</param>
         /// <returns>The result of the calculation.</returns>
-        public static Vector4 operator -(Vector4 vec)
+        public static Vector4d operator -(Vector4d vec)
         {
             vec.x = -vec.x;
             vec.y = -vec.y;
@@ -720,7 +720,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vec">The instance.</param>
         /// <param name="scale">The scalar.</param>
         /// <returns>The result of the calculation.</returns>
-        public static Vector4 operator *(Vector4 vec, double scale)
+        public static Vector4d operator *(Vector4d vec, double scale)
         {
             vec.x *= scale;
             vec.y *= scale;
@@ -735,7 +735,7 @@ namespace PixelFarm.VectorMath
         /// <param name="scale">The scalar.</param>
         /// <param name="vec">The instance.</param>
         /// <returns>The result of the calculation.</returns>
-        public static Vector4 operator *(double scale, Vector4 vec)
+        public static Vector4d operator *(double scale, Vector4d vec)
         {
             vec.x *= scale;
             vec.y *= scale;
@@ -750,7 +750,7 @@ namespace PixelFarm.VectorMath
         /// <param name="vec">The instance.</param>
         /// <param name="scale">The scalar.</param>
         /// <returns>The result of the calculation.</returns>
-        public static Vector4 operator /(Vector4 vec, double scale)
+        public static Vector4d operator /(Vector4d vec, double scale)
         {
             double mult = 1 / scale;
             vec.x *= mult;
@@ -766,7 +766,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">The first instance.</param>
         /// <param name="right">The second instance.</param>
         /// <returns>True, if left equals right; false otherwise.</returns>
-        public static bool operator ==(Vector4 left, Vector4 right)
+        public static bool operator ==(Vector4d left, Vector4d right)
         {
             return left.Equals(right);
         }
@@ -777,7 +777,7 @@ namespace PixelFarm.VectorMath
         /// <param name="left">The first instance.</param>
         /// <param name="right">The second instance.</param>
         /// <returns>True, if left does not equa lright; false otherwise.</returns>
-        public static bool operator !=(Vector4 left, Vector4 right)
+        public static bool operator !=(Vector4d left, Vector4d right)
         {
             return !left.Equals(right);
         }
@@ -824,9 +824,9 @@ namespace PixelFarm.VectorMath
         /// <returns>True if the instances are equal; false otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (!(obj is Vector4))
+            if (!(obj is Vector4d))
                 return false;
-            return this.Equals((Vector4)obj);
+            return this.Equals((Vector4d)obj);
         }
 
 
@@ -836,7 +836,7 @@ namespace PixelFarm.VectorMath
         /// <summary>Indicates whether the current vector is equal to another vector.</summary>
         /// <param name="other">A vector to compare with this vector.</param>
         /// <returns>true if the current vector is equal to the vector parameter; otherwise, false.</returns>
-        public bool Equals(Vector4 other)
+        public bool Equals(Vector4d other)
         {
             return
                 x == other.x &&
