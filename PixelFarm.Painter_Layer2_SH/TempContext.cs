@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace PixelFarm
 {
-    public readonly ref struct TempContext<T>
+    public readonly struct TempContext<T> : IDisposable
     {
         internal readonly T _tool;
         internal TempContext(out T tool)

@@ -17,7 +17,7 @@ namespace PixelFarm.VectorMath
     public struct BezierCurve
     {
 
-        List<Vector2d> _points;
+        readonly List<Vector2d> _points;
         /// <summary>
         /// The parallel value.
         /// </summary>
@@ -31,7 +31,7 @@ namespace PixelFarm.VectorMath
         /// Gets the points of this curve.
         /// </summary>
         /// <remarks>The first point and the last points represent the anchor points.</remarks>
-        public IList<Vector2d> Points => _points;
+        public readonly IList<Vector2d> Points => _points;
 
         /// <summary>
         /// Constructs a new <see cref="BezierCurve"/>.

@@ -195,7 +195,7 @@ namespace PixelFarm.CpuBlit
             _pixelBuffer = externalNativeInt32Ptr;
 
 #if DEBUG
-            dbugMemBitmapMonitor.dbugRegisterMemBitmap(this, width + "x" + height + ": " + DateTime.Now.ToString("u"));
+           // dbugMemBitmapMonitor.dbugRegisterMemBitmap(this, width + "x" + height + ": " + DateTime.Now.ToString("u"));
 #endif
         }
 

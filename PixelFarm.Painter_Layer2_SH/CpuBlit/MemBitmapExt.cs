@@ -59,7 +59,7 @@ namespace PixelFarm.CpuBlit
             unsafe
             {
 
-                byte* srcBuffer = (byte*)memBmp.GetRawUInt8BufferHead();
+                byte* srcBuffer = memBmp.GetRawUInt8BufferHead();
                 int srcIndex = 0;
                 int srcStride = memBmp.Stride;
 

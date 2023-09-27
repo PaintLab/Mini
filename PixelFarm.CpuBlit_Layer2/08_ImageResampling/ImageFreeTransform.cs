@@ -50,7 +50,7 @@ namespace PixelFarm.CpuBlit.Imaging
         }
 
         //left bottom?
-        public Point ImageLocation => new Point(_destBounds.Left, _destBounds.Bottom);
+        public PointF ImageLocation => new PointF(_destBounds.Left, _destBounds.Bottom);
 
         public InterpolationMode Interpolation { get; set; }
         //

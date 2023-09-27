@@ -943,7 +943,6 @@ namespace PaintLab.Svg
         {
 
             VgDocBuilder docBuilder = new VgDocBuilder();
-
             SvgParser svgParser = new SvgParser(docBuilder);
 
             //TODO: don't access file system here, 

@@ -5,28 +5,28 @@ using PointF = System.Numerics.Vector2;
 namespace PixelFarm.VectorMath
 {
 
-    public struct Point
-    {
-        public int x;
-        public int y;
-        public Point(int x, int y)
-        {
+//    public struct Point
+//    {
+//        public int x;
+//        public int y;
+//        public Point(int x, int y)
+//        {
 
-            this.x = x;
-            this.y = y;
-        }
-        public void Offset(int dx, int dy)
-        {
-            this.x += dx;
-            this.y += dy;
-        }
-#if DEBUG
-        public override string ToString()
-        {
-            return "(" + x + "," + y + ")";
-        }
-#endif
-    }
+//            this.x = x;
+//            this.y = y;
+//        }
+//        public void Offset(int dx, int dy)
+//        {
+//            this.x += dx;
+//            this.y += dy;
+//        }
+//#if DEBUG
+//        public override string ToString()
+//        {
+//            return "(" + x + "," + y + ")";
+//        }
+//#endif
+//    }
 
     public static class MyVectorHelper
     {
