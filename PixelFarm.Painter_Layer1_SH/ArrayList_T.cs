@@ -238,6 +238,6 @@ namespace PixelFarm.CpuBlit
         public int Length => _currentSize;
 
         //
-        public ArrayListSegment<T> CreateSpan(int beginAt, int len) => new ArrayListSegment<T>(this, beginAt, len);
+        public ArrayListSegment<T> CreateSubSegment(int beginAt, int len) => new ArrayListSegment<T>(this, beginAt, len);
     }
 }

@@ -107,7 +107,8 @@ namespace PixelFarm.CpuBlit.Rasterization
 
         int[] _gammaLut;//current gamma lut
         bool _useDefaultGammaLut;
-        readonly int[] _orgGammaLut = new int[AA_SCALE]; //original(built-in) gamma table
+
+        readonly int[] _orgGammaLut = new int[AA_SCALE];
 
 
         FillingRule _filling_rule;
@@ -153,9 +154,25 @@ namespace PixelFarm.CpuBlit.Rasterization
             _mul_start_x = 0;
             _mul_start_y = 0;
             _status = Status.Initial;
+
+            //--------
+
             for (int i = AA_SCALE - 1; i >= 0; --i)
             {
+                //1. org no gamma function (GammaNone)
+                //x=> x
                 _orgGammaLut[i] = i;
+                
+
+                //2.threshold
+                //if (i >= 256 / 2)
+                //{
+                //    _orgGammaLut[i] = 255;
+                //}
+                //else
+                //{
+                //    _orgGammaLut[i] = 0;
+                //}
             }
             _gammaLut = _orgGammaLut;
             _useDefaultGammaLut = true;
@@ -197,7 +214,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         static int upscale(double v) => AggMathRound.iround(v * poly_subpix.SCALE);
         static int upscale(int v) => v << poly_subpix.SHIFT;
         //
-      
+
         public FillingRule ScanlineFillingRule
         {
             get => _filling_rule;
@@ -228,7 +245,6 @@ namespace PixelFarm.CpuBlit.Rasterization
             {
                 _useDefaultGammaLut = true;
                 _gammaLut = _orgGammaLut;
-
             }
         }
         //------------------------------------------------------------------------
