@@ -197,7 +197,7 @@ namespace PixelFarm.CpuBlit
                         break;
                     case Drawing.SmoothingMode.HighSpeed:
                     default:
-                        this.RenderQuality = RenderQuality.Fast;
+                        this.RenderQuality = RenderQuality.Low;
                         _pcx.UseSubPixelLcdEffect = false;
                         break;
                 }

@@ -10,7 +10,7 @@ namespace PixelFarm.Drawing
     public enum RenderQuality
     {
         HighQuality,
-        Fast,
+        Low,
     }
     public enum SmoothingMode
     {

@@ -1041,14 +1041,14 @@ namespace PaintLab.Svg
                                             {
                                                 //only X,and Y
                                                 RenderQuality prevQ = p.RenderQuality;
-                                                p.RenderQuality = RenderQuality.Fast;
+                                                p.RenderQuality = RenderQuality.Low;
                                                 p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
                                                 p.RenderQuality = prevQ;
                                             }
                                             else if (_imgW == img.Width && _imgH == img.Height)
                                             {
                                                 RenderQuality prevQ = p.RenderQuality;
-                                                p.RenderQuality = RenderQuality.Fast;
+                                                p.RenderQuality = RenderQuality.Low;
                                                 p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
                                                 p.RenderQuality = prevQ;
                                             }
@@ -1056,7 +1056,7 @@ namespace PaintLab.Svg
                                             {
 
                                                 RenderQuality prevQ = p.RenderQuality;
-                                                p.RenderQuality = RenderQuality.Fast;
+                                                p.RenderQuality = RenderQuality.Low;
                                                 p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
 
                                                 p.RenderQuality = prevQ;
