@@ -60,9 +60,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         internal unsafe abstract void BlendPixels(
            int* dstBuffer, int arrayElemOffset,
            Color[] sourceColors, int sourceColorsOffset,
-           byte[] covers, int coversIndex, bool firstCoverForAll, int count);
-
-
+           byte[] covers, int coversIndex, bool firstCoverForAll, int count); 
 
         /// <summary>
         /// copy multiple pixels
@@ -80,11 +78,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="arrayOffset"></param>
         /// <param name="srcColor"></param>
         internal abstract unsafe void CopyPixel(int* dstBuffer, int arrayOffset, Color srcColor);
-        internal abstract unsafe void BlendPixel32(int* ptr, Color sc);
-        //----------------
-
-       
-
+        internal abstract unsafe void BlendPixel32(int* ptr, Color sc);       
     }
 
 }
