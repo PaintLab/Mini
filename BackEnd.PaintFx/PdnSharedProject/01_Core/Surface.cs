@@ -57,6 +57,7 @@ namespace PaintFx
             return null;
         }
     }
+
     /// <summary>
     /// This is our Surface type. We allocate our own blocks of memory for this,
     /// and provide ways to create a GDI+ Bitmap object that aliases our surface.
@@ -90,7 +91,7 @@ namespace PaintFx
         /// <remarks>
         /// This property will never throw an ObjectDisposedException.
         /// </remarks>
-        public int Width { get; private set; }
+        public int Width { get; }
 
         /// <summary>
         /// Gets the height, in pixels, of this Surface.
@@ -98,7 +99,7 @@ namespace PaintFx
         /// <remarks>
         /// This property will never throw an ObjectDisposedException.
         /// </remarks>
-        public int Height { get; private set; }
+        public int Height { get; }
 
         /// <summary>
         /// Gets the stride, in bytes, for this Surface.
@@ -109,7 +110,7 @@ namespace PaintFx
         /// Stride will always be equal to <b>or greater than</b> Width * ColorBgra.SizeOf.
         /// This property will never throw an ObjectDisposedException.
         /// </remarks>
-        public int Stride { get; private set; }
+        public int Stride { get; }
 
 
         /// <summary>
