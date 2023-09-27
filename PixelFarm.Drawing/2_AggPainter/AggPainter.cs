@@ -4,6 +4,7 @@ using System;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.PixelProcessing;
+using PixelFarm.CpuBlit.Rasterization;
 
 namespace PixelFarm.CpuBlit
 {
@@ -20,6 +21,15 @@ namespace PixelFarm.CpuBlit
         TargetBuffer _targetBuffer;
         float _fillOpacity = 1;
         bool _hasFillOpacity = false;
+
+
+        static readonly PrebuiltGammaTable s_gammaNone;
+        static readonly PrebuiltGammaTable s_gammaThreshold50;
+        static AggPainter()
+        {
+            s_gammaNone = new PrebuiltGammaTable(new GammaNone());
+            s_gammaThreshold50 = new PrebuiltGammaTable(new GammaThreshold(0.5f));
+        }
 
         public AggPainter(AggPainterCore pcx)
         {
@@ -41,23 +51,29 @@ namespace PixelFarm.CpuBlit
             TargetBufferName = TargetBufferName.Default;
             _stroke = new Stroke(1);//default
             _useDefaultBrush = true;
-            _defaultPixelBlender = this.DestBitmapBlender.OutputPixelBlender;            
+            _defaultPixelBlender = this.DestBitmapBlender.OutputPixelBlender;
         }
 
         public override RenderSurface CreateNewRenderSurface(int w, int h)
         {
             return new MemBitmapRenderSurface(new MemBitmap(w, h), true);
         }
-        public AggPainterCore Core => _pcx;
-        public MemBitmap CurrentDestBitmap => _pcx.DestBitmap;
 
+        public MemBitmap CurrentDestBitmap => _pcx.DestBitmap;
+        public AggPainterCore Core => _pcx;
+
+        public void SetGamma(PrebuiltGammaTable gamma) => _pcx.SetGamma(gamma);
+        public void SetCustomPixelBlender(CustomPixelBlender pxblender) => _pcx.SetCustomPixelBlender(pxblender);
+
+        public void AttachDstBitmap(MemBitmap bmp) => _pcx.AttachDstBitmap(bmp);
         public void Reset()
         {
             //TODO: ...
             //reset to init state
             //
+            _pcx.DetachDstBitmap();
             FillingRule = FillingRule.NonZero;
-            
+
         }
         public override FillingRule FillingRule
         {
@@ -138,7 +154,27 @@ namespace PixelFarm.CpuBlit
         public void Clear(Color color, int left, int top, int width, int height) => _pcx.Clear(color, left, top, width, height);
 
 
-        public override RenderQuality RenderQuality { get; set; }
+        RenderQuality _renderQuality; //default = High
+        public override RenderQuality RenderQuality
+        {
+            get => _renderQuality;
+            set
+            {
+                if (_renderQuality != value)
+                {
+                    //change
+                    _renderQuality = value;
+                    if (value == RenderQuality.HighQuality)
+                    {
+                        _pcx.SetGamma(s_gammaNone);
+                    }
+                    else
+                    {
+                        _pcx.SetGamma(s_gammaThreshold50);
+                    }
+                }
+            }
+        }
 
         public override RenderSurfaceOriginKind Orientation
         {
@@ -192,7 +228,7 @@ namespace PixelFarm.CpuBlit
         {
             throw new NotImplementedException();
         }
-       
+
         public static AggPainter Create(MemBitmap bmp, PixelProcessing.PixelBlender32 blender = null)
         {
             //helper func

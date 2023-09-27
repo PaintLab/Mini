@@ -37,22 +37,21 @@ namespace PixelFarm.CpuBlit
         private Tools() { }
 
         public static TempContext<AggPainter> BorrowAggPainter(MemBitmap bmp, out AggPainter painter)
-        {
-
+        {  
             if (!Temp<AggPainter>.IsInit())
             {
                 Temp<AggPainter>.SetNewHandler(
                     () => new AggPainter(new AggPainterCore()),
                     p =>
                     {
-                        p.Core.DetachDstBitmap();
+                        
                         p.Reset();
                     }
                     );
             }
 
             var tmpPainter = Temp<AggPainter>.Borrow(out painter);
-            painter.Core.AttachDstBitmap(bmp);
+            painter.AttachDstBitmap(bmp);
             return tmpPainter;
         }
         public static TempContext<ShapeBuilder> BorrowShapeBuilder(out ShapeBuilder shapeBuilder)
@@ -361,63 +360,61 @@ namespace PixelFarm.CpuBlit
 
     }
 
-    public static class AggPainterCoreExtensions
-    {
+    //public static class AggPainterCoreExtensions
+    //{
 
-        public static void Rectangle(this AggPainterCore pcx, double left, double bottom, double right, double top, Color color, double strokeWidth = 1)
-        {
-            using (Tools.BorrowStroke(out var stroke))
-            using (Tools.BorrowRect(out var rect))
-            using (Tools.BorrowVxs(out var v1, out var v2))
-            {
-                stroke.Width = strokeWidth;
-                rect.SetRect(left + .5, bottom + .5, right - .5, top - .5);
-                pcx.Render(stroke.MakeVxs(rect.MakeVxs(v1), v2), color);
-            }
-        }
-        
+    //    //public static void Rectangle(this AggPainterCore pcx, double left, double bottom, double right, double top, Color color, double strokeWidth = 1)
+    //    //{
+    //    //    using (Tools.BorrowStroke(out var stroke))
+    //    //    using (Tools.BorrowRect(out var rect))
+    //    //    using (Tools.BorrowVxs(out var v1, out var v2))
+    //    //    {
+    //    //        stroke.Width = strokeWidth;
+    //    //        rect.SetRect(left + .5, bottom + .5, right - .5, top - .5);
+    //    //        pcx.Render(stroke.MakeVxs(rect.MakeVxs(v1), v2), color);
+    //    //    }
+    //    //} 
+    //    //public static void FillRectangle(this AggPainterCore pcx,
+    //    //    Vector2d leftBottom,
+    //    //    Vector2d rightTop, Color fillColor)
+    //    //{
+    //    //    pcx.FillRectangle(leftBottom.x, leftBottom.y, rightTop.x, rightTop.y, fillColor);
+    //    //}
 
-        public static void FillRectangle(this AggPainterCore pcx,
-            Vector2d leftBottom,
-            Vector2d rightTop, Color fillColor)
-        {
-            pcx.FillRectangle(leftBottom.x, leftBottom.y, rightTop.x, rightTop.y, fillColor);
-        }
+    //    //public static void FillRectangle(this AggPainterCore pcx, double left,
+    //    //    double bottom, double right, double top, Color fillColor)
+    //    //{
+    //    //    if (right < left || top < bottom)
+    //    //    {
+    //    //        throw new ArgumentException();
+    //    //    }
 
-        public static void FillRectangle(this AggPainterCore pcx, double left,
-            double bottom, double right, double top, Color fillColor)
-        {
-            if (right < left || top < bottom)
-            {
-                throw new ArgumentException();
-            }
+    //    //    using (Tools.BorrowRect(out var rect))
+    //    //    using (Tools.BorrowVxs(out var v1))
+    //    //    {
+    //    //        rect.SetRect(left, bottom, right, top);
+    //    //        pcx.Render(rect.MakeVxs(v1), fillColor);
+    //    //    }
 
-            using (Tools.BorrowRect(out var rect))
-            using (Tools.BorrowVxs(out var v1))
-            {
-                rect.SetRect(left, bottom, right, top);
-                pcx.Render(rect.MakeVxs(v1), fillColor);
-            }
+    //    //}
+    //    //public static void Circle(this AggPainterCore pcx, double x, double y, double radius, Color color)
+    //    //{
+    //    //    using (Tools.BorrowEllipse(out var ellipse))
+    //    //    using (Tools.BorrowVxs(out var v1))
+    //    //    {
+    //    //        ellipse.Set(x, y, radius, radius);
+    //    //        pcx.Render(ellipse.MakeVxs(v1), color);
+    //    //    }
 
-        }
-        public static void Circle(this AggPainterCore pcx, double x, double y, double radius, Color color)
-        {
-            using (Tools.BorrowEllipse(out var ellipse))
-            using (Tools.BorrowVxs(out var v1))
-            {
-                ellipse.Set(x, y, radius, radius);
-                pcx.Render(ellipse.MakeVxs(v1), color);
-            }
-
-        }
-        public static void Circle(this AggPainterCore pcx, Vector2d origin, double radius, Color color)
-        {
-            Circle(pcx, origin.x, origin.y, radius, color);
-        }
+    //    //}
+    //    //public static void Circle(this AggPainterCore pcx, Vector2d origin, double radius, Color color)
+    //    //{
+    //    //    Circle(pcx, origin.x, origin.y, radius, color);
+    //    //}
 
 
 
-    }
+    //}
 
 }
 

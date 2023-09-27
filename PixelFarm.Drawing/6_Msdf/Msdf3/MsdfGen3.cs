@@ -360,7 +360,7 @@ namespace Msdfgen
             {
                  
                 _msdfEdgePxBlender.ClearOverlapList();//reset
-                painter.Core.SetCustomPixelBlender(_msdfEdgePxBlender);
+                painter.SetCustomPixelBlender(_msdfEdgePxBlender);
 
                 //1. clear all bg to black 
                 painter.Clear(PixelFarm.Drawing.Color.Black);
@@ -373,11 +373,11 @@ namespace Msdfgen
                 //---------
                 //2. force fill the shape (this include hole(s) inside shape to)
                 //( we set threshold to 50 and do force fill)
-                painter.Core.SetGamma(_prebuiltThresholdGamma_50);
+                painter.SetGamma(_prebuiltThresholdGamma_50);
                 _msdfEdgePxBlender.FillMode = MsdfEdgePixelBlender.BlenderFillMode.Force;
                 painter.Fill(sh.CurrentSharedVxs, EdgeBmpLut.EncodeToColor(0, AreaKind.AreaInsideCoverage50));
 
-                painter.Core.SetGamma(_prebuiltThresholdGamma_50);//restore
+                painter.SetGamma(_prebuiltThresholdGamma_50);//restore
 #if DEBUG
                 //debug for output
                 //painter.Fill(v7, Color.Red);
@@ -399,7 +399,7 @@ namespace Msdfgen
 
                     //-----------
                     //AA-borders of the contour
-                    painter.Core.SetGamma(_prebuiltThresholdGamma_OverlappedBorder); //this creates overlapped area 
+                    painter.SetGamma(_prebuiltThresholdGamma_OverlappedBorder); //this creates overlapped area 
 
                     for (; n < next_corner_startAt; ++n)
                     {
@@ -437,8 +437,8 @@ namespace Msdfgen
 
 
 
-                painter.Core.SetCustomPixelBlender(null);
-                painter.Core.SetGamma(null);
+                painter.SetCustomPixelBlender(null);
+                painter.SetGamma(null);
 
                 //
                 List<CornerList> overlappedList = MakeUniqueList(_msdfEdgePxBlender._overlapList);

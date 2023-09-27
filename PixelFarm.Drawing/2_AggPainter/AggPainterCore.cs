@@ -71,7 +71,7 @@ namespace PixelFarm.CpuBlit
         {
             _sclineRas.SetGammaLut(prebuiltGammaTable);
         }
-
+        
         public void AttachDstBitmap(MemBitmap dstBmp)
         {
             _destBmp = dstBmp;
@@ -178,9 +178,9 @@ namespace PixelFarm.CpuBlit
         {
             //reset rasterizer before render each vertextSnap 
             //-----------------------------
-           
+
             _sclineRas.Reset();
-             
+
 
             ICoordTransformer transform = this.CurrentTransformMatrix;
             if (!transform.IsIdentity)
