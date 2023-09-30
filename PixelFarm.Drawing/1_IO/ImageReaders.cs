@@ -119,7 +119,13 @@ namespace PixelFarm.Platforms
       int stride, int width, int height,
       string filename);
 
-    public delegate PixelFarm.Drawing.Image ReadImageDataFromMemStream(MemoryStream ms, string hint);
+    public class ImageHint
+    {
+        public string Extension { get; set; }
+        public int ReqWidth { get; set; }
+        public int ReqHeight { get; set; }
+    }
+    public delegate PixelFarm.Drawing.Image ReadImageDataFromMemStream(MemoryStream ms, ImageHint hint);
 
     public class ImageIOSetupParameters
     {
@@ -130,7 +136,7 @@ namespace PixelFarm.Platforms
     public static class ImageIOPortal
     {
         static ReadImageDataFromMemStream s_readImgDataFromMemStream;
-        public static PixelFarm.Drawing.Image ReadImageDataFromMemStream(MemoryStream ms, string kind)
+        public static PixelFarm.Drawing.Image ReadImageDataFromMemStream(MemoryStream ms, ImageHint kind)
         {
             return s_readImgDataFromMemStream(ms, kind);
         }
