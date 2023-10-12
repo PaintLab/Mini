@@ -173,29 +173,30 @@ namespace Msdfgen
     }
 
     //multi-channel signed distance field generator
-    struct EdgePoint
+    ref struct EdgePoint
     {
         public SignedDistance minDistance;
         public EdgeSegment nearEdge;
         public double nearParam;
+        public EdgePoint()
+        {
+            minDistance = SignedDistance.INFINITE;
+        }
         public double CalculateContourColor(Vector2 p)
         {
-            if (nearEdge != null)
-            {
-                nearEdge.distanceToPseudoDistance(ref minDistance, p, nearParam);
-            }
+            nearEdge?.distanceToPseudoDistance(ref minDistance, p, nearParam);
             return minDistance.distance;
         }
     }
+
     struct MultiDistance
     {
         public double r, g, b;
         public double med;
     }
+
     public static class MsdfGenerator
     {
-
-
         static float median(float a, float b, float c)
         {
             return Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), c));
@@ -305,10 +306,9 @@ namespace Msdfgen
                 int row = shape.InverseYAxis ? h - y - 1 : y;
                 for (int x = 0; x < w; ++x)
                 {
+
                     Vector2 p = (new Vector2(x + .5, y + .5) / scale) - translate;
-                    EdgePoint sr = new EdgePoint { minDistance = SignedDistance.INFINITE },
-                        sg = new EdgePoint { minDistance = SignedDistance.INFINITE },
-                        sb = new EdgePoint { minDistance = SignedDistance.INFINITE };
+                    EdgePoint sr = new(), sg = new(), sb = new();
                     double d = Math.Abs(SignedDistance.INFINITE.distance);
                     double negDist = -Math.Abs(SignedDistance.INFINITE.distance);
                     double posDist = Math.Abs(SignedDistance.INFINITE.distance);
@@ -320,9 +320,7 @@ namespace Msdfgen
                         Contour contour = contours[n];
                         List<EdgeSegment> edges = contour.edges;
                         int edgeCount = edges.Count;
-                        EdgePoint r = new EdgePoint { minDistance = SignedDistance.INFINITE },
-                        g = new EdgePoint { minDistance = SignedDistance.INFINITE },
-                        b = new EdgePoint { minDistance = SignedDistance.INFINITE };
+                        EdgePoint r = new(), g = new(), b = new();
                         for (int ee = 0; ee < edgeCount; ++ee)
                         {
                             EdgeSegment edge = edges[ee];
@@ -428,6 +426,7 @@ namespace Msdfgen
             }
 
         }
+
         public static void generateMSDF_legacy(FloatRGBBmp output, Shape shape, double range, Vector2 scale, Vector2 translate,
             double edgeThreshold)
         {
@@ -442,9 +441,7 @@ namespace Msdfgen
                 for (int x = 0; x < w; ++x)
                 {
                     Vector2 p = (new Vector2(x + .5, y + .5) / scale) - translate;
-                    EdgePoint r = new EdgePoint { minDistance = SignedDistance.INFINITE },
-                        g = new EdgePoint { minDistance = SignedDistance.INFINITE },
-                        b = new EdgePoint { minDistance = SignedDistance.INFINITE };
+                    EdgePoint r = new(), g = new(), b = new();
                     //r.nearEdge = g.nearEdge = b.nearEdge = null;
                     //r.nearParam = g.nearParam = b.nearParam = 0;
                     List<Contour> contours = shape.contours;

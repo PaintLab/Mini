@@ -10,17 +10,16 @@ namespace Msdfgen
     public struct EqResult
     {
         public double x0, x1, x2;
-        public double this[int index]
+        public readonly double this[int index]
         {
             get
             {
-
-                switch (index)
+                return index switch
                 {
-                    case 0: return x0;
-                    case 1: return x1;
-                    case 2: return x2;
-                    default: throw new NotSupportedException();
+                    0 => x0,
+                    1 => x1,
+                    2 => x2,
+                    _ => throw new NotSupportedException(),
                 };
             }
         }

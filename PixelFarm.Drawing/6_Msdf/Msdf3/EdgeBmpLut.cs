@@ -8,7 +8,7 @@ namespace Msdfgen
 {
     class CornerList
     {
-        List<ushort> _list = new List<ushort>();
+        readonly List<ushort> _list = new List<ushort>();
 
         int _latestCorner = -1;//hint, reduce duplicated corner in this list (but not make this unique)
 #if DEBUG
@@ -68,42 +68,34 @@ namespace Msdfgen
 
         public enum BlenderFillMode
         {
-            Force,
-            InnerAreaX,
-            InnerArea50,
             OuterBorder,
-            InnerBorder,
+            MakeInnerArea,
         }
 
-
-        //const int WHITE = (255 << 24) | (255 << 16) | (255 << 8) | 255;
         const int BLACK = (255 << 24);
-        const int GREEN = (255 << 24) | (255 << 8);
-        const int RED = (255 << 24) | (255 << 16);
-
 
         readonly struct OverlapPart
         {
             readonly int _edgeA;
             readonly int _edgeB;
-            //readonly AreaKind _areaKindA;
-            //readonly AreaKind _areaKindB;
-            public OverlapPart(int edgeA, AreaKind areaKindA, int edgeB, AreaKind areaKindB)
+            public OverlapPart(int edgeA, int edgeB)
             {
+#if DEBUG
+                if (edgeA == edgeB)
+                {
+                    throw new NotSupportedException();
+                }
+#endif
                 if (edgeB < edgeA)
                 {
                     //swap
                     _edgeA = edgeB;
                     _edgeB = edgeA;
-                    //_areaKindA = areaKindB;
-                    //_areaKindB = areaKindA;
                 }
                 else
                 {
                     _edgeA = edgeA;
                     _edgeB = edgeB;
-                    //_areaKindA = areaKindA;
-                    //_areaKindB = areaKindB;
                 }
 
             }
@@ -112,14 +104,13 @@ namespace Msdfgen
             {
                 return _edgeA + "," + _edgeB;
             }
-
 #endif
         }
 
         Dictionary<OverlapPart, ushort> _overlapParts = new Dictionary<OverlapPart, ushort>();
         internal List<CornerList> _overlapList = new List<CornerList>();
 
-        int _areaInside100;
+        //int _areaInside100;
 
 
         public MsdfEdgePixelBlender()
@@ -134,14 +125,11 @@ namespace Msdfgen
             _overlapParts.Clear();
             _overlapList.Clear();
         }
-        public void SetCurrentInsideAreaCoverage(Color areaInside100)
-        {
-            _areaInside100 = (int)areaInside100.ToABGR();
-        }
+
         public ushort RegisterOverlapOuter(ushort corner1, ushort corner2, AreaKind areaKind)
         {
 
-            OverlapPart overlapPart = new OverlapPart(corner1, areaKind, corner2, areaKind);
+            OverlapPart overlapPart = new OverlapPart(corner1, corner2);
             if (!_overlapParts.TryGetValue(overlapPart, out ushort found))
             {
                 if (_overlapList.Count > ushort.MaxValue)
@@ -172,48 +160,49 @@ namespace Msdfgen
 
         unsafe void CustomBlendPixel32(int* dstPtr, Color srcColor)
         {
-
-            if (FillMode == BlenderFillMode.Force)
-            {
-                *dstPtr = srcColor.ToARGB();
-                return;
-            }
-            //-------------------------------------------------------------
-            int srcColorABGR = (int)srcColor.ToABGR();
             int existingColor = *dstPtr;
-            //int existing_R = (existingColor >> CO.R_SHIFT) & 0xFF;
             int existing_G = (existingColor >> PixelFarm.Drawing.Internal.CO.G_SHIFT) & 0xFF;
-            //int existing_B = (existingColor >> CO.B_SHIFT) & 0xFF;
-
-
-            if (FillMode == BlenderFillMode.InnerAreaX)
+            if (FillMode == BlenderFillMode.MakeInnerArea)
             {
-                if (existing_G == EdgeBmpLut.BORDER_OUTSIDE || existing_G == EdgeBmpLut.BORDER_OVERLAP_OUTSIDE)
+                if (existingColor == BLACK)
                 {
                     *dstPtr = srcColor.ToARGB();
+                    return;
                 }
-                return;
-            }
+                else if (existing_G == EdgeBmpLut.BORDER_OVERLAP_OUTSIDE)
+                {
+                    //convert to border overlap inside
+                    byte a = (byte)((existingColor >> PixelFarm.Drawing.Internal.CO.A_SHIFT) & 0xff);
+                    byte b = (byte)((existingColor >> PixelFarm.Drawing.Internal.CO.B_SHIFT) & 0xff);
+                    byte r = (byte)((existingColor >> PixelFarm.Drawing.Internal.CO.R_SHIFT) & 0xff);
+                    *dstPtr = a << PixelFarm.Drawing.Internal.CO.A_SHIFT | (b << PixelFarm.Drawing.Internal.CO.B_SHIFT) |
+                              (EdgeBmpLut.BORDER_OVERLAP_INSIDE << PixelFarm.Drawing.Internal.CO.G_SHIFT) | (r << PixelFarm.Drawing.Internal.CO.R_SHIFT);
+                    return;
 
+                }
+                else if (existing_G == EdgeBmpLut.BORDER_OUTSIDE)
+                {
+
+                    byte a = (byte)((existingColor >> PixelFarm.Drawing.Internal.CO.A_SHIFT) & 0xff);
+                    byte b = (byte)((existingColor >> PixelFarm.Drawing.Internal.CO.B_SHIFT) & 0xff);
+                    byte r = (byte)((existingColor >> PixelFarm.Drawing.Internal.CO.R_SHIFT) & 0xff);
+                    *dstPtr = a << PixelFarm.Drawing.Internal.CO.A_SHIFT | (b << PixelFarm.Drawing.Internal.CO.B_SHIFT) |
+                              (EdgeBmpLut.BORDER_INSIDE << PixelFarm.Drawing.Internal.CO.G_SHIFT) | (r << PixelFarm.Drawing.Internal.CO.R_SHIFT);
+                    return;
+                }
+                else
+                {
+
+                }
+            }
+            int srcColorABGR = (int)srcColor.ToABGR();
             if (existingColor == BLACK)
-            {
-                *dstPtr = srcColor.ToARGB();
-                return;
-            }
-
-
-            if (existingColor == _areaInside100)
             {
                 *dstPtr = srcColor.ToARGB();
                 return;
             }
             if (srcColorABGR == existingColor)
             {
-                return;
-            }
-            if (FillMode == BlenderFillMode.InnerArea50)
-            {
-                *dstPtr = srcColor.ToARGB();
                 return;
             }
 
@@ -224,6 +213,10 @@ namespace Msdfgen
             ushort existingEdgeNo = EdgeBmpLut.DecodeEdgeFromColor(existingColor, out AreaKind existingAreaKind);
             ushort newEdgeNo = EdgeBmpLut.DecodeEdgeFromColor(srcColor, out AreaKind newEdgeAreaKind);
 
+            if (existingEdgeNo == newEdgeNo)
+            {
+                return;
+            }
 
             if (newEdgeAreaKind == AreaKind.OverlapInside || newEdgeAreaKind == AreaKind.OverlapOutside)
             {
@@ -249,45 +242,8 @@ namespace Msdfgen
                 }
                 else
                 {
-
-                    OverlapPart overlapPart;
-                    AreaKind areaKind;
-                    if (existingAreaKind == AreaKind.BorderInside || existingAreaKind == AreaKind.AreaInsideCoverage100)
-                    {
-                        if (newEdgeAreaKind == AreaKind.BorderInside)
-                        {
-                            areaKind = AreaKind.OverlapInside;
-                            overlapPart = new OverlapPart(
-                                existingEdgeNo, (existing_G == EdgeBmpLut.BORDER_INSIDE) ? AreaKind.OverlapInside : AreaKind.OverlapOutside,
-                                newEdgeNo, (srcColor.G == EdgeBmpLut.BORDER_INSIDE) ? AreaKind.OverlapInside : AreaKind.OverlapOutside);
-                        }
-                        else
-                        {
-                            areaKind = AreaKind.OverlapInside;
-                            overlapPart = new OverlapPart(
-                               existingEdgeNo, (existing_G == EdgeBmpLut.BORDER_INSIDE) ? AreaKind.OverlapInside : AreaKind.OverlapOutside,
-                               newEdgeNo, (existing_G == EdgeBmpLut.BORDER_INSIDE) ? AreaKind.OverlapInside : AreaKind.OverlapOutside);
-                        }
-                    }
-                    else
-                    {
-                        //existing is outside
-                        if (newEdgeAreaKind == AreaKind.BorderInside)
-                        {
-                            areaKind = AreaKind.OverlapInside;
-                            overlapPart = new OverlapPart(
-                                existingEdgeNo, (existing_G == EdgeBmpLut.BORDER_INSIDE) ? AreaKind.OverlapInside : AreaKind.OverlapOutside,
-                                newEdgeNo, (existing_G == EdgeBmpLut.BORDER_INSIDE) ? AreaKind.OverlapInside : AreaKind.OverlapOutside);
-                        }
-                        else
-                        {
-                            areaKind = AreaKind.OverlapOutside;
-                            overlapPart = new OverlapPart(
-                               existingEdgeNo, (existing_G == EdgeBmpLut.BORDER_INSIDE) ? AreaKind.OverlapInside : AreaKind.OverlapOutside,
-                               newEdgeNo, (srcColor.G == EdgeBmpLut.BORDER_INSIDE) ? AreaKind.OverlapInside : AreaKind.OverlapOutside);
-                        }
-                    }
-
+                    OverlapPart overlapPart = new OverlapPart(existingEdgeNo, newEdgeNo);
+                    AreaKind areaKind = (existingAreaKind == AreaKind.BorderInside) ? AreaKind.OverlapInside : AreaKind.OverlapOutside;
 
                     if (!_overlapParts.TryGetValue(overlapPart, out ushort found))
                     {
@@ -322,8 +278,6 @@ namespace Msdfgen
                 }
             }
         }
-
-
     }
 
 
@@ -336,9 +290,14 @@ namespace Msdfgen
         int _w;
         int _h;
         int[] _buffer;
-        List<ContourCorner> _corners;
-        List<EdgeSegment> _flattenEdges;
+        readonly List<ContourCorner> _corners;
+#if DEBUG
+        readonly List<EdgeSegment> _flattenEdges;
+#endif
         List<EdgeSegment[]> _overlappedEdgeList;
+
+        public float ContourOuterBorderW;
+        public float ContourInnerBorderW;
         internal EdgeBmpLut(List<ContourCorner> corners, List<EdgeSegment> flattenEdges, List<int> segOfNextContours, List<int> cornerOfNextContours)
         {
             //move first to last 
@@ -366,6 +325,9 @@ namespace Msdfgen
             EdgeOfNextContours = segOfNextContours;
             CornerOfNextContours = cornerOfNextContours;
         }
+        public List<int> EdgeOfNextContours { get; }
+        public List<int> CornerOfNextContours { get; }
+
         internal void SetOverlappedList(List<CornerList> overlappedList)
         {
             int m = overlappedList.Count;
@@ -373,27 +335,23 @@ namespace Msdfgen
             for (int i = 0; i < m; ++i)
             {
 #if DEBUG
-                if (i == 124 || i == 389)
-                {
+                //if (i == 124 || i == 389)
+                //{
 
-                }
+                //}
 #endif
                 CornerList cornerList = overlappedList[i];
                 int count = cornerList.Count;
-                EdgeSegment[] corners = new EdgeSegment[count];//overlapping corner region
+                EdgeSegment[] edgeSegments = new EdgeSegment[count];//overlapping corner region
                 for (int a = 0; a < count; ++a)
                 {
-                    //ushort x = cornerList[a];
-                    corners[a] = _corners[cornerList[a]].CenterSegment;
+                    edgeSegments[a] = _corners[cornerList[a]].CenterSegment;
                 }
-                _overlappedEdgeList.Add(corners);
+
+                _overlappedEdgeList.Add(edgeSegments);
             }
         }
 
-        public List<int> EdgeOfNextContours { get; private set; }
-        public List<int> CornerOfNextContours { get; private set; }
-
-        //
         public void SetBmpBuffer(int w, int h, int[] buffer)
         {
             _w = w;
@@ -404,8 +362,6 @@ namespace Msdfgen
 
         public int GetPixel(int x, int y) => _buffer[y * _w + x];
 
-        //const int WHITE = (255 << 24) | (255 << 16) | (255 << 8) | 255;
-
         public EdgeStructure GetEdgeStructure(int x, int y)
         {
             //decode 
@@ -413,15 +369,11 @@ namespace Msdfgen
             int pix_G = (pixel >> 8) & 0xFF;
             if (pixel == 0 || pix_G == 0)
             {
-                return EdgeStructure.Empty;
+                return new EdgeStructure(); //empty
             }
-            else if (pix_G == AREA_INSIDE_COVERAGE100)
+            else if (pix_G == AREA_INSIDE_COVERAGE50)
             {
-                return EdgeStructure.Empty;
-            }
-            else if (pix_G == AREA_INSIDE_COVERAGE50 || pix_G == AREA_INSIDE_COVERAGEX)
-            {
-                return EdgeStructure.Empty;
+                return new EdgeStructure();
             }
             else
             {
@@ -441,11 +393,10 @@ namespace Msdfgen
 
 
         internal const int AREA_INSIDE_COVERAGE50 = 15;
-        internal const int AREA_INSIDE_COVERAGE100 = 20;
-        internal const int AREA_INSIDE_COVERAGEX = 30;
 
         internal const int BORDER_INSIDE = 40;
         internal const int BORDER_OUTSIDE = 50;
+
         internal const int BORDER_OVERLAP_INSIDE = 70;
         internal const int BORDER_OVERLAP_OUTSIDE = 75;
 
@@ -453,9 +404,8 @@ namespace Msdfgen
         {
             switch ((int)c.G)
             {
-                case AREA_INSIDE_COVERAGEX: areaKind = AreaKind.AreaInsideCoverageX; break;
+
                 case AREA_INSIDE_COVERAGE50: areaKind = AreaKind.AreaInsideCoverage50; break;
-                case AREA_INSIDE_COVERAGE100: areaKind = AreaKind.AreaInsideCoverage100; break;
                 case BORDER_INSIDE: areaKind = AreaKind.BorderInside; break;
 
                 case BORDER_OUTSIDE: areaKind = AreaKind.BorderOutside; break;
@@ -480,9 +430,8 @@ namespace Msdfgen
 
             switch (inputG)
             {
-                case AREA_INSIDE_COVERAGEX: areaKind = AreaKind.AreaInsideCoverageX; break;
+
                 case AREA_INSIDE_COVERAGE50: areaKind = AreaKind.AreaInsideCoverage50; break;
-                case AREA_INSIDE_COVERAGE100: areaKind = AreaKind.AreaInsideCoverage100; break;
                 case BORDER_INSIDE: areaKind = AreaKind.BorderInside; break;
 
                 case BORDER_OUTSIDE: areaKind = AreaKind.BorderOutside; break;
@@ -499,16 +448,11 @@ namespace Msdfgen
             switch (areaKind)
             {
                 default: throw new NotSupportedException();
-                case AreaKind.AreaInsideCoverageX:
-                    {
-                        int r = cornerNo >> 8;
-                        int b = cornerNo & 0xFF;
-                        return new PixelFarm.Drawing.Color((byte)r, AREA_INSIDE_COVERAGEX, (byte)b);
-                    }
                 case AreaKind.BorderInside:
                     {
                         int r = cornerNo >> 8;
                         int b = cornerNo & 0xFF;
+
                         return new PixelFarm.Drawing.Color((byte)r, BORDER_INSIDE, (byte)b);
                     }
 
@@ -542,13 +486,6 @@ namespace Msdfgen
                         int r = cornerNo >> 8;
                         int b = cornerNo & 0xFF;
                         return new PixelFarm.Drawing.Color((byte)r, AREA_INSIDE_COVERAGE50, (byte)b);
-                    }
-                case AreaKind.AreaInsideCoverage100:
-                    {
-                        //corner=> shape number (id)
-                        int r = cornerNo >> 8;
-                        int b = cornerNo & 0xFF;
-                        return new PixelFarm.Drawing.Color((byte)r, AREA_INSIDE_COVERAGE100, (byte)b);
                     }
             }
         }

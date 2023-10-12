@@ -297,8 +297,6 @@ namespace Msdfgen
             return Vector2.sign(total);
 
         }
-
-
     }
 
     public readonly struct FloatRGB

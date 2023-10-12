@@ -1,6 +1,7 @@
 ﻿//MIT, 2019-present, WinterDev
 
 using System;
+
 namespace Msdfgen
 {
 
@@ -11,13 +12,9 @@ namespace Msdfgen
 
         OverlapInside,
         OverlapOutside,
-
-        AreaInsideCoverageX,
         AreaInsideCoverage50,
-        AreaInsideCoverage100,
-
     }
-    public readonly struct EdgeStructure
+    public readonly ref struct EdgeStructure
     {
         readonly EdgeSegment _edgeSegment;
         readonly EdgeSegment[] _edgeSegments;
@@ -46,16 +43,14 @@ namespace Msdfgen
 
         public AreaKind AreaKind => _areaKind;
         public bool IsEmpty => _isEmpty;
-        public static readonly EdgeStructure Empty = new EdgeStructure();
-
     }
 
-    public class Vec2Info
+    public class PointInfo
     {
         public readonly double x, y;
-        public readonly Vec2PointKind Kind;
+        public readonly PointInfoKind Kind;
         public readonly EdgeSegment owner;
-        public Vec2Info(EdgeSegment owner, Vec2PointKind kind, Vector2 point)
+        public PointInfo(EdgeSegment owner, PointInfoKind kind, Vector2 point)
         {
             this.owner = owner;
             this.x = point.x;
@@ -63,7 +58,8 @@ namespace Msdfgen
             Kind = kind;
         }
     }
-    public enum Vec2PointKind
+
+    public enum PointInfoKind : byte
     {
         Touch1,//on curve point
         C2, //quadratic curve control point (off-curve)
@@ -84,14 +80,14 @@ namespace Msdfgen
         PixelFarm.Drawing.PointD _pCenter;
         PixelFarm.Drawing.PointD _pRight;
 
-        ushort _cornerNo;
+        readonly ushort _cornerNo;
         //-----------
-        Vec2Info _left; //left 
-        Vec2Info _center;
-        Vec2Info _right;
+        readonly PointInfo _left; //left 
+        readonly PointInfo _center;
+        readonly PointInfo _right;
         //-----------
 
-        public ContourCorner(int cornerNo, Vec2Info left, Vec2Info center, Vec2Info right)
+        public ContourCorner(int cornerNo, PointInfo left, PointInfo center, PointInfo right)
         {
 
             if (cornerNo >= ushort.MaxValue) throw new NotSupportedException();
@@ -118,13 +114,12 @@ namespace Msdfgen
 
         public EdgeSegment CenterSegment => _center.owner;
 
-        public Vec2PointKind LeftPointKind => _left.Kind;
-        public Vec2PointKind MiddlePointKind => _center.Kind;
-        public Vec2PointKind RightPointKind => _right.Kind;
+        public PointInfoKind LeftPointKind => _left.Kind;
+        public PointInfoKind MiddlePointKind => _center.Kind;
+        public PointInfoKind RightPointKind => _right.Kind;
 
+        public PixelFarm.Drawing.Color Color => EdgeBmpLut.EncodeToColor(CornerNo, AreaKind.BorderOutside);
 
-        public PixelFarm.Drawing.Color OuterColor => EdgeBmpLut.EncodeToColor(CornerNo, AreaKind.BorderOutside);
-        public PixelFarm.Drawing.Color InnerColor => EdgeBmpLut.EncodeToColor(CornerNo, AreaKind.BorderInside);
 
         public void Offset(double dx, double dy)
         {
@@ -134,9 +129,9 @@ namespace Msdfgen
             _pRight = PixelFarm.Drawing.PointD.OffsetPoint(_pRight, dx, dy);
         }
 
-        public bool MiddlePoint_IsTouchPoint => MiddlePointKind == Vec2PointKind.Touch1 || MiddlePointKind == Vec2PointKind.Touch2;
-        public bool LeftPoint_IsTouchPoint => LeftPointKind == Vec2PointKind.Touch1 || LeftPointKind == Vec2PointKind.Touch2;
-        public bool RightPoint_IsTouchPoint => RightPointKind == Vec2PointKind.Touch1 || RightPointKind == Vec2PointKind.Touch2;
+        public bool MiddlePoint_IsTouchPoint => MiddlePointKind == PointInfoKind.Touch1 || MiddlePointKind == PointInfoKind.Touch2;
+        public bool LeftPoint_IsTouchPoint => LeftPointKind == PointInfoKind.Touch1 || LeftPointKind == PointInfoKind.Touch2;
+        public bool RightPoint_IsTouchPoint => RightPointKind == PointInfoKind.Touch1 || RightPointKind == PointInfoKind.Touch2;
 
 
 #if DEBUG

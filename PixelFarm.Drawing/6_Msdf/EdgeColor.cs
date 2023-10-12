@@ -10,12 +10,12 @@ namespace Msdfgen
     public enum EdgeColor
     {
         BLACK = 0,
-        RED = 1,
-        GREEN = 2,
-        YELLOW = 3,
-        BLUE = 4,
-        MAGENTA = 5,
-        CYAN = 6,
+        RED = 1, //1<<0
+        GREEN = 2, //1<<1
+        YELLOW = 3, // RED| GREEN
+        BLUE = 4,  //1<<2
+        MAGENTA = 5, //RED| BLUE
+        CYAN = 6, //GREEN |BLUE
         WHITE = 7
     }
 }
