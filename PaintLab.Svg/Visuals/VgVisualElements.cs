@@ -217,9 +217,7 @@ namespace PaintLab.Svg
             _visualSpec = visualSpec;
             _vgVisualDoc = vgVisualDoc;
         }
-
-
-        //
+         
         public VgVisualDoc VgVisualDoc => _vgVisualDoc;
 
         public SvgElement DomElem { get; set; }//*** its dom element(optional)
@@ -1000,14 +998,14 @@ namespace PaintLab.Svg
                                             if (_imgW == 0 || _imgH == 0)
                                             {
                                                 //only X,and Y
-                                                RenderQuality prevQ = p.RenderQuality;
+                                                SmoothingMode prev_smooth = p.SmoothingMode;
                                                 //p.RenderQuality = RenderQuality.Fast;
                                                 p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, currentTx);
-                                                p.RenderQuality = prevQ;
+                                                p.SmoothingMode = prev_smooth;
                                             }
                                             else if (_imgW == img.Width && _imgH == img.Height)
                                             {
-                                                RenderQuality prevQ = p.RenderQuality;
+                                                SmoothingMode prev_smooth = p.SmoothingMode;
                                                 //p.RenderQuality = RenderQuality.Fast;
 
 
@@ -1022,15 +1020,16 @@ namespace PaintLab.Svg
                                                 }
 
 
-                                                p.RenderQuality = prevQ;
+                                                p.SmoothingMode = prev_smooth;
                                             }
                                             else
                                             {
 
-                                                RenderQuality prevQ = p.RenderQuality;
+                                                 
+                                                SmoothingMode prev_smooth = p.SmoothingMode;
                                                 //p.RenderQuality = RenderQuality.Fast;
                                                 p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, currentTx);
-                                                p.RenderQuality = prevQ;
+                                                p.SmoothingMode = prev_smooth;
                                             }
 
 
@@ -1040,26 +1039,26 @@ namespace PaintLab.Svg
                                             if (_imgW == 0 || _imgH == 0)
                                             {
                                                 //only X,and Y
-                                                RenderQuality prevQ = p.RenderQuality;
-                                                p.RenderQuality = RenderQuality.Low;
+                                                SmoothingMode prev_smooth = p.SmoothingMode;
+                                                p.SmoothingMode = SmoothingMode.None;
                                                 p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
-                                                p.RenderQuality = prevQ;
+                                                p.SmoothingMode = prev_smooth;
                                             }
                                             else if (_imgW == img.Width && _imgH == img.Height)
                                             {
-                                                RenderQuality prevQ = p.RenderQuality;
-                                                p.RenderQuality = RenderQuality.Low;
+                                                SmoothingMode prev_smooth = p.SmoothingMode;
+                                                p.SmoothingMode = SmoothingMode.None;
                                                 p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
-                                                p.RenderQuality = prevQ;
+                                                p.SmoothingMode = prev_smooth;
                                             }
                                             else
                                             {
 
-                                                RenderQuality prevQ = p.RenderQuality;
-                                                p.RenderQuality = RenderQuality.Low;
+                                                SmoothingMode prev_smooth = p.SmoothingMode;
+                                                p.SmoothingMode = SmoothingMode.None;
                                                 p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY);
 
-                                                p.RenderQuality = prevQ;
+                                                p.SmoothingMode = prev_smooth;
                                             }
                                         }
                                     }

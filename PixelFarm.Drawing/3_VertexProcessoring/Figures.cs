@@ -204,7 +204,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             {
                 //calculate here
                 RectBoundsAccum boundsAccum = new RectBoundsAccum();
-                boundsAccum.Init(); //Must
+
                 for (int i = 0; i < coordXYs.Length;)
                 {
                     boundsAccum.Update(coordXYs[i], coordXYs[i + 1]);
@@ -1031,19 +1031,20 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
     }
 
-    public struct RectBoundsAccum
+    public ref struct RectBoundsAccum
     {
         public double x1;
         public double y1;
         public double x2;
         public double y2;
-        public void Init()
+        public RectBoundsAccum()
         {
             x1 = double.MaxValue;
             y1 = double.MaxValue;
             x2 = double.MinValue;
             y2 = double.MinValue;
         }
+        
         public void Update(double x, double y)
         {
             if (x < x1) x1 = x;
@@ -1052,7 +1053,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             if (y > y2) y2 = y;
         }
 
-        public RectangleF ToRectF()
+        public readonly RectangleF ToRectF()
         {
             return RectangleF.FromLTRB((float)x1, (float)y1, (float)x2, (float)y2);
         }
@@ -1086,7 +1087,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
 
             RectBoundsAccum rectBoundsAccum = new RectBoundsAccum();
-            rectBoundsAccum.Init();
 
             int index = 0;
             VertexCmd cmd;
@@ -1129,8 +1129,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             prevY = prevMoveToY;
 #endif
                             //-----------
-
-
                             Figure newfig = new Figure(_xylist.ToArray(), rectBoundsAccum.ToRectF());
                             newfig.IsClosedFigure = true;
 
@@ -1138,7 +1136,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             //-----------
                             _xylist.Clear(); //clear temp list 
 
-                            rectBoundsAccum.Init();
+                            rectBoundsAccum = new RectBoundsAccum();//use a new one
                         }
                         break;
                     case VertexCmd.NoMore:

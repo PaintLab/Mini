@@ -267,6 +267,15 @@ namespace PixelFarm.CpuBlit
             }
         }
         public VertexStore CurrentSharedVxs => _vxs;
+
+        public ShapeBuilder ReversePathDirection()
+        {
+            VxsTemp.Borrow(out VertexStore v2);
+            _vxs.ReverseClockDirection(v2);
+            VxsTemp.ReleaseVxs(_vxs);
+            _vxs = v2;
+            return this;
+        }
     }
 
     public static class PainterExtensions

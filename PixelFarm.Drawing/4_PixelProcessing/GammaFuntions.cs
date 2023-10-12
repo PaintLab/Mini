@@ -97,4 +97,55 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             return y;
         }
     }
+
+
+    public class GammaSigmoid : IGammaFunction
+    {
+
+        //This method SCurve calculates the y-value for a given x - value using the logistic function.
+        //Adjust the xMidpoint to move the S - curve along the x - axis and change the steepness to adjust how pronounced the curve is.The steeper it is,
+        //the quicker it transitions from the low part of the S to the high part.  
+
+        /// <summary>
+        /// Calculate the y-value for the given x using an S-curve function.
+        /// </summary>
+        /// <param name="x">The x-value. Expected to be between 0 and 255.</param>
+        /// <param name="xMidpoint">The x-value of the midpoint of the curve. Typically between 0 and 255.</param>
+        /// <param name="steepness">The steepness of the curve. Positive values make steeper curves.</param>
+        /// <returns>The y-value of the curve, between 0 and 1.</returns>
+
+
+        double xMidPoint;
+        double steepness;
+        double L;
+        double maxX;
+        public GammaSigmoid(double xMidPoint, double steepness, double L, double maxX)
+        {
+            this.L = L;
+            this.steepness = steepness;
+            this.xMidPoint = xMidPoint;
+            this.maxX = maxX;
+
+        }
+        public float GetGamma(float x)
+        {
+            // Logistic function
+            float value = (float)(L / (1.0 + Math.Exp(-steepness * (x - xMidPoint) / maxX)));
+            if (value > 1.0)
+            {
+                return 1;
+            }
+            else if (value < 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return value;
+            }
+        }
+    }
+
+
+
 }

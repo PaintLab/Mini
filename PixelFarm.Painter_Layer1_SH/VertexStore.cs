@@ -64,6 +64,7 @@ namespace PixelFarm.Drawing
     {
 
     }
+
     public sealed class VertexStore
     {
 
@@ -179,7 +180,7 @@ namespace PixelFarm.Drawing
             _coord_xy[index << 1] = x;
             _coord_xy[(index << 1) + 1] = y;
         }
-        internal void ReplaceCommand(int index, VertexCmd cmd)
+        public void ReplaceCommand(int index, VertexCmd cmd)
         {
             _cmds[index] = (byte)cmd;
         }
@@ -220,15 +221,19 @@ namespace PixelFarm.Drawing
             while (indexToAdd >= _allocated_vertices_count)
             {
 #if DEBUG
-
                 if (nrounds > 0)
                 {
                 }
                 nrounds++;
+
 #endif
 
                 //newsize is LARGER than original  ****
                 int newSize = ((indexToAdd + 257) / 256) * 256; //calculate new size in single round
+                if (newSize > 1024 * 1024 * 3)
+                {
+
+                }
                 //int newSize = m_allocated_vertices + 256; //original
                 //-------------------------------------- 
                 double[] new_xy = new double[newSize << 1];

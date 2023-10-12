@@ -168,7 +168,12 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         GenInsideHalfStrokeForOpenShape(output);
                         return;
                     case StrokeSideForOpenShape.Both:
-                        GenBothside(output);
+                        {
+                            GenBothside(output);
+                            int count = output.Count;
+                            output.ReplaceCommand(0, VertexCmd.MoveTo);
+                            output.ReplaceCommand(count - 1, VertexCmd.Close);
+                        }
                         return;
                 }
             }

@@ -7,11 +7,7 @@ namespace PixelFarm.Drawing
         LcdSubPix,
         Copy,
     }
-    public enum RenderQuality
-    {
-        HighQuality,
-        Low,
-    }
+   
     public enum SmoothingMode
     {
         AntiAlias = 4,

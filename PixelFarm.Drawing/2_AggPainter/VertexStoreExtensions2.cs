@@ -27,24 +27,44 @@ namespace PixelFarm.Drawing
 {
     public static class VertexStoreExtensions2
     {
-        public static void ReverseClockDirection(this VertexStore src, VertexStore outputVxs)
+
+        public static VertexStore ReverseClockDirection(this VertexStore src, VertexStore outputVxs)
         {
-            //temp fix for reverse clock direction
-            Q1RectD bounds = src.GetBoundingRect();
-            double centerX = (bounds.Left + bounds.Width) / 2;
-            double centerY = (bounds.Top + bounds.Height) / 2;
 
-            //Affine aff = Affine.New(AffinePlan.Translate(-centerX, -centerY),
-            //     AffinePlan.Scale(1, -1),//flipY,
-            //     AffinePlan.Translate(centerX, centerY));
-            AffineMat aff = AffineMat.Iden();
-            aff.Translate(-centerX, -centerY);
-            aff.Translate(1, -1);//flipY
-            aff.Translate(centerX, centerY);
-            aff.TransformToVxs(src, outputVxs);
-
+            //temp fix
+            int closeCmdAt = -1;
+            for (int i = src.Count - 1; i >= 0; --i)
+            {
+                var cmd = src.GetVertex(i, out double x, out double y);
+                switch (cmd)
+                {
+                    default: throw new System.Exception();
+                    case VertexCmd.NoMore:
+                        break;
+                    case VertexCmd.Close:
+                        closeCmdAt = outputVxs.Count;
+                        outputVxs.AddMoveTo(x, y);
+                        break;
+                    case VertexCmd.MoveTo:
+                        {
+                            if (closeCmdAt >= 0)
+                            {
+                                //change closeCmdAt
+                                outputVxs.ReplaceVertex(closeCmdAt, x, y);
+                                closeCmdAt = -1;//reset
+                            }
+                        }
+                        outputVxs.AddCloseFigure();
+                        break;
+                    case VertexCmd.LineTo:
+                    case VertexCmd.C3:
+                    case VertexCmd.C4:
+                        outputVxs.AddVertex(x, y, cmd);
+                        break;
+                }
+            }
+            return outputVxs;
         }
-
 
         /// <summary>
         /// copy + translate vertext data from src to outputVxs
@@ -57,10 +77,10 @@ namespace PixelFarm.Drawing
         public static VertexStore TranslateToNewVxs(this VertexStore src, double dx, double dy, VertexStore outputVxs)
         {
             int count = src.Count;
-            VertexCmd cmd;
+
             for (int i = 0; i < count; ++i)
             {
-                cmd = src.GetVertex(i, out double x, out double y);
+                VertexCmd cmd = src.GetVertex(i, out double x, out double y);
                 x += dx;
                 y += dy;
                 outputVxs.AddVertex(x, y, cmd);

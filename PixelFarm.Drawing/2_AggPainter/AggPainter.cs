@@ -25,10 +25,12 @@ namespace PixelFarm.CpuBlit
 
         static readonly PrebuiltGammaTable s_gammaNone;
         static readonly PrebuiltGammaTable s_gammaThreshold50;
+        static readonly PrebuiltGammaTable s_gamma_S_Curve;
         static AggPainter()
         {
             s_gammaNone = new PrebuiltGammaTable(new GammaNone());
             s_gammaThreshold50 = new PrebuiltGammaTable(new GammaThreshold(0.5f));
+            s_gamma_S_Curve = new PrebuiltGammaTable(new GammaSigmoid(1.0 / 2, 10, 1, 1));
         }
 
         public AggPainter(AggPainterCore pcx)
@@ -154,27 +156,28 @@ namespace PixelFarm.CpuBlit
         public void Clear(Color color, int left, int top, int width, int height) => _pcx.Clear(color, left, top, width, height);
 
 
-        RenderQuality _renderQuality; //default = High
-        public override RenderQuality RenderQuality
-        {
-            get => _renderQuality;
-            set
-            {
-                if (_renderQuality != value)
-                {
-                    //change
-                    _renderQuality = value;
-                    if (value == RenderQuality.HighQuality)
-                    {
-                        _pcx.SetGamma(s_gammaNone);
-                    }
-                    else
-                    {
-                        _pcx.SetGamma(s_gammaThreshold50);
-                    }
-                }
-            }
-        }
+        //RenderQuality _renderQuality; //default = High
+        //public override RenderQuality RenderQuality
+        //{
+        //    get => _renderQuality;
+        //    set
+        //    {
+        //        if (_renderQuality != value)
+        //        {
+        //            //change
+        //            _renderQuality = value;
+        //            if (value == RenderQuality.HighQuality)
+        //            {
+        //                _pcx.SetGamma(s_gammaNone);
+        //            }
+        //            else
+        //            {
+        //                //_pcx.SetGamma(s_gammaThreshold50);
+        //                _pcx.SetGamma(s_gamma_S_Curve);
+        //            }
+        //        }
+        //    }
+        //}
 
         public override RenderSurfaceOriginKind Orientation
         {
@@ -192,12 +195,14 @@ namespace PixelFarm.CpuBlit
                     case Drawing.SmoothingMode.AntiAlias:
                         //TODO: review here
                         //anti alias != lcd technique 
-                        this.RenderQuality = RenderQuality.HighQuality;
+                        _pcx.SetGamma(s_gammaNone);
+                        //this.RenderQuality = RenderQuality.HighQuality;
                         //_aggsx.UseSubPixelLcdEffect = true;
                         break;
                     case Drawing.SmoothingMode.HighSpeed:
                     default:
-                        this.RenderQuality = RenderQuality.Low;
+                        _pcx.SetGamma(s_gammaThreshold50);
+                        //_pcx.SetGamma(s_gamma_S_Curve);                         
                         _pcx.UseSubPixelLcdEffect = false;
                         break;
                 }

@@ -9,4 +9,8 @@
 
   <Import Project="..\PaintLab.WebLexer\WebLexer.projitems" Label="Shared" />
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\x_merge_projects\MiniOpenTK\MiniOpenTK.csproj" />
+  </ItemGroup>
+
 </Project>

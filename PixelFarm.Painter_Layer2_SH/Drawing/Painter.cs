@@ -36,7 +36,7 @@ namespace PixelFarm.Drawing
 
         public abstract PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer CoordTransformer { get; set; }
 
-        public abstract RenderQuality RenderQuality { get; set; }
+      
 
         public abstract int Width { get; }
         public abstract int Height { get; }

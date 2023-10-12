@@ -125,20 +125,29 @@ namespace PixelFarm.Platforms
         public int ReqWidth { get; set; }
         public int ReqHeight { get; set; }
     }
-    public delegate PixelFarm.Drawing.Image ReadImageDataFromMemStream(MemoryStream ms, ImageHint hint);
+
+
+
 
     public class ImageIOSetupParameters
     {
         public SaveImageBufferToFileDel SaveToPng;
         public SaveImageBufferToFileDel SaveToJpg;
-        public ReadImageDataFromMemStream ReadFromMemStream;
+        public Func<MemoryStream, ImageHint, PixelFarm.Drawing.Image> ReadFromMemStream;
+        public Func<object, ImageHint, PixelFarm.Drawing.Image> ReadFromNativeImage;
     }
     public static class ImageIOPortal
     {
-        static ReadImageDataFromMemStream s_readImgDataFromMemStream;
-        public static PixelFarm.Drawing.Image ReadImageDataFromMemStream(MemoryStream ms, ImageHint kind)
+        static Func<MemoryStream, ImageHint, PixelFarm.Drawing.Image> s_readImgDataFromMemStream;
+        static Func<object, ImageHint, PixelFarm.Drawing.Image> s_readFromNativeImage;
+
+        public static PixelFarm.Drawing.Image ReadImageDataFromMemStream(MemoryStream ms, ImageHint hint)
         {
-            return s_readImgDataFromMemStream(ms, kind);
+            return s_readImgDataFromMemStream(ms, hint);
+        }
+        public static PixelFarm.Drawing.Image ReadImageFromNativeObject(object nativeImage, ImageHint hint)
+        {
+            return s_readFromNativeImage(nativeImage, hint);
         }
         public static void Setup(ImageIOSetupParameters pars)
         {
@@ -154,6 +163,7 @@ namespace PixelFarm.Platforms
             }
 
             s_readImgDataFromMemStream = pars.ReadFromMemStream;
+            s_readFromNativeImage = pars.ReadFromNativeImage;
         }
 
     }

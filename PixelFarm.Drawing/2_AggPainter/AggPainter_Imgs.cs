@@ -125,13 +125,13 @@ namespace PixelFarm.CpuBlit
                 return;
             }
 
-            bool useSubPix = UseLcdEffectSubPixelRendering; //save, restore later... 
+            bool lcdSubpix = UseLcdEffectSubPixelRendering; //save, restore later... 
                                                             //before render an image we turn off vxs subpixel rendering
             this.UseLcdEffectSubPixelRendering = false;
 
             _pcx.Render(memBmp, aff);
             //restore...
-            this.UseLcdEffectSubPixelRendering = useSubPix;
+            this.UseLcdEffectSubPixelRendering = lcdSubpix;
         }
 
         public override void DrawImage(Image img, double left, double top, ICoordTransformer coordTx)

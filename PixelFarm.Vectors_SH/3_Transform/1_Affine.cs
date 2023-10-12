@@ -92,7 +92,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //----------------------------------------------------------------------
 
 
-    public struct Quad2f
+    public ref struct Quad2f
     {
         public float left_top_x;
         public float left_top_y;
