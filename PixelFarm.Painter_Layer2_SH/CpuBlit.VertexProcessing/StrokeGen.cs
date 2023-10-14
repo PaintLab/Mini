@@ -172,7 +172,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             GenBothside(output);
                             int count = output.Count;
                             output.ReplaceCommand(0, VertexCmd.MoveTo);
-                            output.ReplaceCommand(count - 1, VertexCmd.Close);
+                            output.AddCloseFigure();
+                            //output.ReplaceCommand(count - 1, VertexCmd.Close);
                         }
                         return;
                 }
