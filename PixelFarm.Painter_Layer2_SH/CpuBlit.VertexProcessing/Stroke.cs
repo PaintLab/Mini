@@ -133,7 +133,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             //for stroke,
                             if (strkgen.VertexCount > 0)
                             {
-                                strkgen.Close();
+                                //strkgen.Close();
                                 strkgen.WriteTo(outputVxs);
                                 strkgen.Reset();
                             }
@@ -148,9 +148,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         //---
         EXIT_LOOP:
-            //
-            strkgen.WriteTo(outputVxs);
-            strkgen.Reset();
+            {
+
+                //strkgen.Close();
+                strkgen.WriteTo(outputVxs);
+                strkgen.Reset();
+
+            }
+            //strkgen.WriteTo(outputVxs);
+            //strkgen.Reset();
 
             return outputVxs;
         }

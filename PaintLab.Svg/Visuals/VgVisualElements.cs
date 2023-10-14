@@ -1548,8 +1548,8 @@ namespace PaintLab.Svg
                         float half = maxStrokeWidth / 2f;
                         rectTotal.Left -= half;
                         rectTotal.Right += half;
-                        rectTotal.Top -= half;
-                        rectTotal.Bottom += half;
+                        rectTotal.Top += half;
+                        rectTotal.Bottom -= half;
                     }
 
 

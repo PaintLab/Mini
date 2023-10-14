@@ -139,7 +139,7 @@ namespace PaintLab.Svg
                     vgVisElem = CreateMask(parentNode, (SvgMaskSpec)elem.ElemSpec);
                     break;
                 case WellknownSvgElementName.Svg:
-                    vgVisElem = new VgVisualElement(WellknownSvgElementName.Svg, (SvgVisualSpec)elem.ElemSpec, _vgVisualDoc);
+                    vgVisElem = CreateRootElem((SvgVisualSpec)elem.ElemSpec);
                     break;
                 case WellknownSvgElementName.Rect:
                     vgVisElem = CreateRect(parentNode, (SvgRectSpec)elem.ElemSpec);
@@ -849,6 +849,15 @@ namespace PaintLab.Svg
             parentNode.AddChildElement(vgVisElem);
             return vgVisElem;
         }
+
+        VgVisualElement CreateRootElem(SvgVisualSpec visualSpec)
+        {
+            VgVisualElement vg = new VgVisualElement(WellknownSvgElementName.Svg, visualSpec, _vgVisualDoc);
+
+
+
+            return vg;
+        }
         VgVisualElement CreateRect(VgVisualElement parentNode, SvgRectSpec rectSpec)
         {
 
@@ -920,7 +929,7 @@ namespace PaintLab.Svg
                     curveFlattener.MakeVxs(v2, v3);
                 }
                 else
-                { 
+                {
                     curveFlattener.MakeVxs(v1, v3);
                 }
 
@@ -941,19 +950,19 @@ namespace PaintLab.Svg
     {
         public static VgVisualDoc CreateVgVisualDocFromFile(string filename)
         {
+            return CreateVgVisualDocFromSvg(System.IO.File.ReadAllText(filename));
+        }
+        public static VgVisualDoc CreateVgVisualDocFromSvg(string svgFileContent)
+        {
 
             VgDocBuilder docBuilder = new VgDocBuilder();
             SvgParser svgParser = new SvgParser(docBuilder);
 
-            //TODO: don't access file system here, 
-            //we should ask from 'host' for a file content or stream of filecontent
-            string svgFileContent = System.IO.File.ReadAllText(filename);
             svgParser.ParseSvg(svgFileContent);
             //2. create visual tree from svg document and its spec
             VgVisualDocBuilder vgDocBuilder = new VgVisualDocBuilder();
             return vgDocBuilder.CreateVgVisualDoc(docBuilder.ResultDocument, null);
         }
-
     }
 
 
