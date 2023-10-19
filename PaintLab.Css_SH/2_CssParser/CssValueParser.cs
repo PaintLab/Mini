@@ -121,8 +121,10 @@ namespace LayoutFarm.WebDom.Parser
             TryGetColor(colorValue, 0, colorValue.Length, out CssColor color);
             return color;
         }
-        #region Private methods
-
+        public static bool TryGetColor(string str, out CssColor color)
+        {
+            return TryGetColor(str, 0, str.Length, out color);
+        }
         /// <summary>
         /// Parses a color value in CSS style; e.g. #ff0000, RED, RGB(255,0,0), RGB(100%, 0, 0)
         /// </summary>
@@ -131,7 +133,7 @@ namespace LayoutFarm.WebDom.Parser
         /// <param name="length">substring length</param>
         /// <param name="color">return the parsed color</param>
         /// <returns>true - valid color, false - otherwise</returns>
-        static bool TryGetColor(string str, int idx, int length, out CssColor color)
+        public static bool TryGetColor(string str, int idx, int length, out CssColor color)
         {
 
             //https://www.w3.org/TR/SVGColor12/
@@ -175,6 +177,10 @@ namespace LayoutFarm.WebDom.Parser
             color = Css.CssColor.Black;
             return false;
         }
+
+        #region Private methods
+
+
         /// <summary>
         /// Compare that the substring of <paramref name="str"/> is equal to <paramref name="str"/>
         /// Assume given substring is not empty and all indexes are valid!<br/>
