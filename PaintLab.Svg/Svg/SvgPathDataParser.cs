@@ -1,5 +1,6 @@
 ﻿//Apache2, 2014-present, WinterDev
 
+using PixelFarm.CpuBlit.VertexProcessing;
 using System;
 using System.Collections.Generic;
 namespace PaintLab.Svg
@@ -204,7 +205,10 @@ namespace PaintLab.Svg
                     case 'A':
                     case 'a':
                         {
-                            ParseNumberList(pathDataBuffer, i + 1, out i, _reusable_nums);
+                            //A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+                            //a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
+
+                            ParseSvgArcNumberList(pathDataBuffer, i + 1, out int m, _reusable_nums);
                             int numCount = _reusable_nums.Count;
                             if ((numCount % 7) == 0)
                             {
@@ -219,10 +223,12 @@ namespace PaintLab.Svg
                             }
                             else
                             {
+
+                                _reusable_nums.Clear();
                                 throw new NotSupportedException();
                             }
 
-
+                            i = m;
                             _reusable_nums.Clear();
                         }
                         break;
@@ -429,8 +435,322 @@ namespace PaintLab.Svg
             }
         }
 
+
+        static void ParseSvgArcNumberList(char[] pathDataBuffer, int startIndex, out int latestIndex, List<float> numbers)
+        {
+            //A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+            //a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
+
+
+#if DEBUG
+            //string substr = new string(pathDataBuffer, startIndex, 50);
+#endif
+            latestIndex = startIndex;
+            //parse coordinate
+            int j = pathDataBuffer.Length;
+            int currentState = 0;
+            int startCollectNumber = -1;
+            NumberLexerAccum numLexAccum = new NumberLexerAccum();
+
+            int step_no = 0;
+            for (; latestIndex < j; ++latestIndex)
+            {
+                //lex and parse
+                char c = pathDataBuffer[latestIndex];
+                if (c == ',' || char.IsWhiteSpace(c))
+                {
+                    if (startCollectNumber >= 0)
+                    {
+
+                        //string test = new string(pathDataBuffer, startCollectNumber, 100);
+                        ////collect latest number
+                        //string str = new string(pathDataBuffer, startCollectNumber, latestIndex - startCollectNumber);
+                        //float number;
+                        //float.TryParse(str, out number);
+                        //numbers.Add(number);
+                        numbers.Add(numLexAccum.PopValueAsFloat());
+                        startCollectNumber = -1;
+                        currentState = 0;//reset
+                        step_no++;
+
+                        if (step_no == 7)
+                        {
+                            step_no = 0;//reset
+                        }
+
+                    }
+                    continue;
+                }
+
+                switch (currentState)
+                {
+                    case 0:
+                        {
+                            //--------------------------
+                            if (c == '-')
+                            {
+                                numLexAccum.AddMinusBeforeIntegerPart();
+                                currentState = 1;//negative
+                                startCollectNumber = latestIndex;
+
+                            }
+                            else if (char.IsNumber(c))
+                            {
+                                if (step_no == 2 || step_no == 3 || step_no == 4)
+                                {
+                                    //single value
+                                    numbers.Add(int.Parse(c.ToString()));
+                                    step_no++;
+                                    continue;
+                                }
+
+                                numLexAccum.AddIntegerPart(c);
+                                currentState = 2;//number found
+                                startCollectNumber = latestIndex;
+                            }
+                            else if (c == '.')
+                            {
+                                currentState = 3;
+                                startCollectNumber = latestIndex;
+                            }
+                            else
+                            {
+                                if (startCollectNumber >= 0)
+                                {
+                                    //collect latest number
+                                    //string str = new string(pathDataBuffer, startCollectNumber, latestIndex - startCollectNumber);
+                                    //float number;
+                                    //float.TryParse(str, out number);
+                                    //numbers.Add(number);
+
+                                    numbers.Add(numLexAccum.PopValueAsFloat());
+                                    step_no++;
+                                    startCollectNumber = -1;
+                                    currentState = 0;//reset
+                                }
+                                return;
+                            }
+                        }
+                        break;
+                    case 1:
+                        {
+                            //after negative => we expect first number
+                            if (char.IsNumber(c))
+                            {
+                                //ok collect next
+                                currentState = 2;
+                                numLexAccum.AddIntegerPart(c);
+                            }
+                            else if (c == '.')
+                            {
+                                currentState = 3;
+                                startCollectNumber = latestIndex;
+                            }
+                            else
+                            {
+                                //must found number
+                                if (startCollectNumber >= 0)
+                                {
+                                    //collect latest number
+                                    //string str = new string(pathDataBuffer, startCollectNumber, latestIndex - startCollectNumber);
+                                    //float number;
+                                    //float.TryParse(str, out number);
+                                    //numbers.Add(number);
+
+                                    numbers.Add(numLexAccum.PopValueAsFloat());
+                                    step_no++;
+                                    startCollectNumber = -1;
+                                    currentState = 0;//reset
+                                }
+                                return;
+                            }
+                        }
+                        break;
+                    case 2:
+                        {
+                            //integer-part state
+                            if (char.IsNumber(c))
+                            {
+                                //ok collect next
+                                numLexAccum.AddIntegerPart(c);
+                            }
+                            else if (c == 'e' || c == 'E')
+                            {
+                                currentState = 4;
+                            }
+                            else if (c == '.')
+                            {
+                                //collect next
+                                currentState = 3;
+                            }
+                            else if (c == '-')
+                            {
+                                if (startCollectNumber >= 0)
+                                {
+                                    //collect latest number
+                                    //string str = new string(pathDataBuffer, startCollectNumber, latestIndex - startCollectNumber);
+                                    //float number;
+                                    //float.TryParse(str, out number);
+                                    //numbers.Add(number); 
+                                    numbers.Add(numLexAccum.PopValueAsFloat());
+                                    step_no++;
+                                    currentState = 1;//negative
+                                    startCollectNumber = latestIndex;
+                                }
+                                numLexAccum.AddMinusBeforeIntegerPart();
+
+                            }
+                            else
+                            {
+                                //must found number
+                                if (startCollectNumber >= 0)
+                                {
+                                    //collect latest number
+                                    //string str = new string(pathDataBuffer, startCollectNumber, latestIndex - startCollectNumber);
+                                    //float number;
+                                    //float.TryParse(str, out number);
+                                    //numbers.Add(number); 
+                                    numbers.Add(numLexAccum.PopValueAsFloat());
+                                    step_no++;
+                                    startCollectNumber = -1;
+                                    currentState = 0;//reset
+                                }
+                                return;
+                            }
+                        }
+                        break;
+                    case 3:
+                        {
+                            //after .
+                            if (char.IsNumber(c))
+                            {
+                                //ok collect next
+                                numLexAccum.AddFractionalPart(c);
+                            }
+                            else if (c == 'e' || c == 'E')
+                            {
+                                currentState = 4;
+                            }
+                            else if (c == '-')
+                            {
+
+                                if (startCollectNumber >= 0)
+                                {
+                                    //collect latest number
+                                    //string str = new string(pathDataBuffer, startCollectNumber, latestIndex - startCollectNumber);
+                                    //float number;
+                                    //float.TryParse(str, out number);
+                                    //numbers.Add(number); 
+                                    numbers.Add(numLexAccum.PopValueAsFloat());
+                                    step_no++;
+                                    currentState = 1;//negative
+                                    startCollectNumber = latestIndex;
+                                }
+                                numLexAccum.AddMinusBeforeIntegerPart();
+                            }
+                            else if (c == '.')
+                            {
+                                numbers.Add(numLexAccum.PopValueAsFloat());
+                                step_no++;
+                                startCollectNumber = -1;
+                                currentState = 0;//reset
+                                latestIndex--;
+                                continue;//try again
+                            }
+                            else
+                            {
+                                if (startCollectNumber >= 0)
+                                {
+                                    //collect latest number
+                                    //string str = new string(pathDataBuffer, startCollectNumber, latestIndex - startCollectNumber);
+                                    //float number;
+                                    //float.TryParse(str, out number);
+                                    //numbers.Add(number); 
+                                    numbers.Add(numLexAccum.PopValueAsFloat());
+                                    step_no++;
+                                    startCollectNumber = -1;
+                                    currentState = 0;//reset
+                                }
+
+                                return;
+                            }
+                        }
+                        break;
+                    case 4:
+                        {
+                            //after e 
+                            //must be - or + or number
+                            if (c == '-')
+                            {
+                                numLexAccum.AddMinusAfterEPart();
+                                currentState = 5;
+                            }
+                            else if (c == '+')
+                            {
+                                currentState = 5;
+                            }
+                            else if (char.IsNumber(c))
+                            {
+                                //collect number after 'e' sign
+                                numLexAccum.AddNumberAfterEPart(c);
+                                currentState = 5;
+                            }
+                            else
+                            {
+                                throw new NotSupportedException();
+                            }
+                        }
+                        break;
+                    case 5:
+                        {
+
+                            if (char.IsNumber(c))
+                            {
+                                //ok collect next
+                                //collect more
+                                numLexAccum.AddNumberAfterEPart(c);
+                            }
+                            else
+                            {
+                                if (startCollectNumber >= 0)
+                                {
+                                    //collect latest number
+                                    //string str = new string(pathDataBuffer, startCollectNumber, latestIndex - startCollectNumber);
+                                    //float number;
+                                    //float.TryParse(str, out number);
+                                    //numbers.Add(number);
+
+                                    numbers.Add(numLexAccum.PopValueAsFloat());
+                                    step_no++;
+                                    startCollectNumber = -1;
+                                    currentState = 0;//reset
+                                }
+                                return;
+                            }
+                        }
+                        break;
+                }
+            }
+            //-------------------
+            if (startCollectNumber >= 0)
+            {
+                //collect latest number
+                //string str = new string(pathDataBuffer, startCollectNumber, latestIndex - startCollectNumber);
+                //float number;
+                //float.TryParse(str, out number);
+                //numbers.Add(number);
+
+                numbers.Add(numLexAccum.PopValueAsFloat());
+                step_no++;
+                startCollectNumber = -1;
+                currentState = 0;//reset
+            }
+        }
         static void ParseNumberList(char[] pathDataBuffer, int startIndex, out int latestIndex, List<float> numbers)
         {
+#if DEBUG
+            //string substr = new string(pathDataBuffer, startIndex, 50);
+#endif
             latestIndex = startIndex;
             //parse coordinate
             int j = pathDataBuffer.Length;
