@@ -477,7 +477,7 @@ namespace PixelFarm.CpuBlit.Rasterization
 
             if (_filling_rule == FillingRule.EvenOdd)
             {
-                cover &= AA_SCALE2;
+                cover &= AA_MASK2;
                 if (cover > AA_SCALE)
                 {
                     cover = AA_SCALE2 - cover;
