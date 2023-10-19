@@ -217,7 +217,7 @@ namespace PaintLab.Svg
             _visualSpec = visualSpec;
             _vgVisualDoc = vgVisualDoc;
         }
-         
+
         public VgVisualDoc VgVisualDoc => _vgVisualDoc;
 
         public SvgElement DomElem { get; set; }//*** its dom element(optional)
@@ -650,6 +650,8 @@ namespace PaintLab.Svg
             VgVisualElement filterElem = null;
             ICoordTransformer prevTx = args._currentTx; //backup
             ICoordTransformer currentTx = args._currentTx;
+            FillingRule prevFillRule = FillingRule.NonZero;//default
+            bool hasSpecificFillingRule = false;
 
             bool hasClip = false;
             bool newFontReq = false;
@@ -725,6 +727,24 @@ namespace PaintLab.Svg
                     }
                 }
 
+
+                if (_visualSpec.FillRule != SvgFillRule.NoneZero)
+                {
+                    prevFillRule = p.FillingRule;
+                    hasSpecificFillingRule = true;
+                    switch (_visualSpec.FillRule)
+                    {
+                        case SvgFillRule.EvenOdd:
+                            p.FillingRule = FillingRule.EvenOdd;
+                            break;
+                        case SvgFillRule.NoneZero:
+                            p.FillingRule = FillingRule.NonZero;
+                            break;
+                    }
+
+                }
+
+
                 if (_visualSpec.HasFillColor)
                 {
                     if (_visualSpec.ResolvedFillBrush != null)
@@ -732,8 +752,7 @@ namespace PaintLab.Svg
                         GeometryGradientBrush geoBrush = _visualSpec.ResolvedFillBrush as GeometryGradientBrush;
                         if (geoBrush == null)
                         {
-                            VgVisualElement vgVisualElem = _visualSpec.ResolvedFillBrush as VgVisualElement;
-                            if (vgVisualElem != null)
+                            if (_visualSpec.ResolvedFillBrush is VgVisualElement vgVisualElem)
                             {
                                 if (vgVisualElem.VisualSpec is SvgRadialGradientSpec)
                                 {
@@ -769,9 +788,8 @@ namespace PaintLab.Svg
 
                                     _visualSpec.ResolvedFillBrush = geoBrush;
                                 }
-                                else if (vgVisualElem.VisualSpec is SvgLinearGradientSpec)
+                                else if (vgVisualElem.VisualSpec is SvgLinearGradientSpec linearGrSpec)
                                 {
-                                    SvgLinearGradientSpec linearGrSpec = (SvgLinearGradientSpec)vgVisualElem.VisualSpec;
 
 #if DEBUG
                                     if (linearGrSpec.Transform != null)
@@ -827,6 +845,7 @@ namespace PaintLab.Svg
                     else
                     {
                         p.FillColor = _visualSpec.FillColor;
+                        
                     }
                 }
 
@@ -1025,7 +1044,7 @@ namespace PaintLab.Svg
                                             else
                                             {
 
-                                                 
+
                                                 SmoothingMode prev_smooth = p.SmoothingMode;
                                                 //p.RenderQuality = RenderQuality.Fast;
                                                 p.DrawImage(this.ImageBinder.LocalImage, _imgX, _imgY, currentTx);
@@ -1459,6 +1478,10 @@ namespace PaintLab.Svg
             if (enableMaskMode)
             {
                 p.EnableMask = false;
+            }
+            if (hasSpecificFillingRule)
+            {
+                p.FillingRule = prevFillRule;
             }
         }
         public void AddChildElement(VgVisualElementBase vgVisElem)
