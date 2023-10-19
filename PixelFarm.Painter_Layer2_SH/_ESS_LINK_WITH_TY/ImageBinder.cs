@@ -76,6 +76,8 @@ namespace PixelFarm.Drawing
         /// </summary>
         public string ImageSource { get; set; }
 
+        public object ImageSource2 { get; set; }
+
         /// <summary>
         /// current loading/binding state
         /// </summary>
@@ -195,6 +197,23 @@ namespace PixelFarm.Drawing
         public override int ReferenceX => 0;
 
         public override int ReferenceY => 0;
+
+
+
+        Func<ImageBinder, int, int, ImageBinder> _cloneForNewSize;
+
+        public void SetCloneForNewSizeHandler(Func<ImageBinder, int, int, ImageBinder> cloneForNewSize)
+        {
+            _cloneForNewSize = cloneForNewSize;
+        }
+        public ImageBinder CloneForNewSize(int newW, int newH)
+        {
+            if (_cloneForNewSize != null)
+            {
+                return _cloneForNewSize(this, newW, newH);
+            }
+            return null;
+        }
 
         class NoImageImageBinder : ImageBinder
         {
