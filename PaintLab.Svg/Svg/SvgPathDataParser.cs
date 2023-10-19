@@ -472,11 +472,7 @@ namespace PaintLab.Svg
                         startCollectNumber = -1;
                         currentState = 0;//reset
                         step_no++;
-
-                        if (step_no == 7)
-                        {
-                            step_no = 0;//reset
-                        }
+                        if (step_no >= 7) { step_no = 0; } //reset
 
                     }
                     continue;
@@ -501,6 +497,8 @@ namespace PaintLab.Svg
                                     //single value
                                     numbers.Add(int.Parse(c.ToString()));
                                     step_no++;
+                                    if (step_no >= 7) { step_no = 0; }//reset
+
                                     continue;
                                 }
 
@@ -525,8 +523,11 @@ namespace PaintLab.Svg
 
                                     numbers.Add(numLexAccum.PopValueAsFloat());
                                     step_no++;
+                                    if (step_no >= 7) { step_no = 0; }//reset
+
                                     startCollectNumber = -1;
                                     currentState = 0;//reset
+ 
                                 }
                                 return;
                             }
@@ -559,6 +560,8 @@ namespace PaintLab.Svg
 
                                     numbers.Add(numLexAccum.PopValueAsFloat());
                                     step_no++;
+                                    if (step_no >= 7) { step_no = 0; }//reset
+
                                     startCollectNumber = -1;
                                     currentState = 0;//reset
                                 }
@@ -594,6 +597,8 @@ namespace PaintLab.Svg
                                     //numbers.Add(number); 
                                     numbers.Add(numLexAccum.PopValueAsFloat());
                                     step_no++;
+                                    if (step_no >= 7) { step_no = 0; }//reset
+
                                     currentState = 1;//negative
                                     startCollectNumber = latestIndex;
                                 }
@@ -611,7 +616,9 @@ namespace PaintLab.Svg
                                     //float.TryParse(str, out number);
                                     //numbers.Add(number); 
                                     numbers.Add(numLexAccum.PopValueAsFloat());
-                                    step_no++;
+                                    step_no++; 
+                                    if (step_no >= 7) { step_no = 0; }//reset
+
                                     startCollectNumber = -1;
                                     currentState = 0;//reset
                                 }
@@ -643,6 +650,8 @@ namespace PaintLab.Svg
                                     //numbers.Add(number); 
                                     numbers.Add(numLexAccum.PopValueAsFloat());
                                     step_no++;
+                                    if (step_no >= 7) { step_no = 0; }//reset
+
                                     currentState = 1;//negative
                                     startCollectNumber = latestIndex;
                                 }
@@ -652,6 +661,8 @@ namespace PaintLab.Svg
                             {
                                 numbers.Add(numLexAccum.PopValueAsFloat());
                                 step_no++;
+                                if (step_no >= 7) { step_no = 0; }//reset
+
                                 startCollectNumber = -1;
                                 currentState = 0;//reset
                                 latestIndex--;
@@ -668,6 +679,8 @@ namespace PaintLab.Svg
                                     //numbers.Add(number); 
                                     numbers.Add(numLexAccum.PopValueAsFloat());
                                     step_no++;
+                                    if (step_no >= 7) { step_no = 0; }//reset
+
                                     startCollectNumber = -1;
                                     currentState = 0;//reset
                                 }
@@ -722,6 +735,8 @@ namespace PaintLab.Svg
 
                                     numbers.Add(numLexAccum.PopValueAsFloat());
                                     step_no++;
+                                    if (step_no >= 7) { step_no = 0; }//reset
+
                                     startCollectNumber = -1;
                                     currentState = 0;//reset
                                 }
