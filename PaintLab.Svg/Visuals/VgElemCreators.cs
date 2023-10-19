@@ -244,6 +244,10 @@ namespace PaintLab.Svg
                                 }
                             }
                         }
+                        else
+                        {
+                            visualSpec.FillColor = Color.Transparent;
+                        }
                     }
                     return true;
                 case "mask":
