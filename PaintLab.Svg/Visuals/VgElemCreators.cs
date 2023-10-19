@@ -8,6 +8,7 @@ using LayoutFarm.WebDom;
 using LayoutFarm.WebDom.Parser;
 
 using static PaintLab.Svg.CommonValueParsingUtils;
+using LayoutFarm.Css;
 
 namespace PaintLab.Svg
 {
@@ -230,21 +231,16 @@ namespace PaintLab.Svg
                             {
                                 //eg. url(#aaa)
                                 SvgAttributeLink attrLink = ParseAttributeLink(attrValue);
-                                if (attrLink != null)
+                                if (visualSpec != null && attrLink != null)
                                 {
-
-                                    if (visualSpec != null)
-                                    {
-                                        visualSpec.FillPathLink = attrLink;
-                                    }
+                                    visualSpec.FillPathLink = attrLink;
                                 }
                             }
                             else
                             {
-
-                                if (visualSpec != null)
+                                if (visualSpec != null && CssValueParser.TryGetColor(attrValue, out CssColor color))
                                 {
-                                    visualSpec.FillColor = FromCssColor(CssValueParser.ParseCssColor(attrValue));
+                                    visualSpec.FillColor = FromCssColor(color);
                                 }
                             }
                         }
