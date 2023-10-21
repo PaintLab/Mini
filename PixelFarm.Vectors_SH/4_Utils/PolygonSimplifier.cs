@@ -30,11 +30,7 @@ using System.Collections.Generic;
 
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
-    //for .net 2.0
-    public delegate R Func<R>();
-    public delegate R Func<T, R>(T t);
-    public delegate R Func<T1, T2, R>(T1 t, T2 t2);
-    // 
+ 
 
     public class SimplificationHelpers
     {
