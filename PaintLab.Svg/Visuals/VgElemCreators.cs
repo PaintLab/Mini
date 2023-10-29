@@ -303,18 +303,22 @@ namespace PaintLab.Svg
                     return true;
                 case "stroke-opacity":
                     {
-
+                        //TODO: apply this to existing color
                     }
                     return true;
                 case "stroke-linecap":
-                    //set line-cap and line join again
-
+                    {
+                        //set line-cap and line join again
+                        visualSpec.StrokeLineCap = ParseStrokeLineCap(attrValue);
+                    }
                     return true;
                 case "stroke-linejoin":
-
+                    {
+                        visualSpec.StrokeLineJoin = ParseStrokeLineJoin(attrValue);
+                    }
                     return true;
                 case "stroke-miterlimit":
-
+                    //TODO:
                     return true;
                 case "transform":
                     {
@@ -429,6 +433,29 @@ namespace PaintLab.Svg
 
     static class CommonValueParsingUtils
     {
+        internal static StrokeLineCap ParseStrokeLineCap(string value)
+        {
+            switch (value)
+            {
+                //butt
+                default: return StrokeLineCap.Butt;
+                case "round": return StrokeLineCap.Round;
+                case "square": return StrokeLineCap.Square;
+            }
+        }
+        internal static StrokeLineJoin ParseStrokeLineJoin(string value)
+        {
+            //arcs | bevel |miter | miter-clip | round
+            switch (value)
+            {
+                //default
+                default: return StrokeLineJoin.Miter;
+                case "arcs": return StrokeLineJoin.Arcs;
+                case "bevel": return StrokeLineJoin.Bevel;
+                case "miter-clip": return StrokeLineJoin.MiterClip;
+                case "round":return StrokeLineJoin.Round;
+            }
+        }
         internal static Color FromCssColor(in LayoutFarm.Css.CssColor color)
         {
             return Color.FromArgb(color.A, color.R, color.G, color.B);

@@ -240,6 +240,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     v1);
 
                 _tmpVxs.GetVertex(0, out latest_moveX, out latest_moveY);
+
                 AppendVertices(output, _tmpVxs);
             }
             else

@@ -11,6 +11,24 @@ namespace PaintLab.Svg
     {
 
     }
+
+    public enum StrokeLineCap
+    {
+        //butt | round | square
+        //https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linecap
+        Butt,//detault
+        Round,
+        Square
+    }
+    public enum StrokeLineJoin
+    {
+        //arcs | bevel |miter | miter-clip | round
+        Miter,//default
+        Arcs,
+        Bevel,
+        MiterClip,
+        Round
+    }
     public abstract class SvgVisualSpec : SvgElemSpec
     {
         Color _fillColor = Color.Black;
@@ -56,6 +74,9 @@ namespace PaintLab.Svg
             }
         }
 
+        public StrokeLineCap StrokeLineCap { get; set; }
+        public StrokeLineJoin StrokeLineJoin { get; set; }
+
         public float[] StrokeDashArray { get; set; }
         public string Class { get; set; }
         public float Opacity
@@ -86,8 +107,7 @@ namespace PaintLab.Svg
         public object ResolvedFillBrush { get; set; }//TODO: review here 
         public object ResolvedMask { get; set; }
         public object ResolvedFilter { get; set; }
-
-
+        
 
     }
     public class SvgGroupSpec : SvgVisualSpec

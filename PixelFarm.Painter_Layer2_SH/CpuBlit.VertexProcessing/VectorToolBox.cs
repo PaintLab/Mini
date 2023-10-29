@@ -119,12 +119,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 Temp<Stroke>.SetNewHandler(() => new Stroke(1),
                     s =>
                     {
+                        //reset 
                         s.Width = 1;
                         s.LineCap = LineCap.Butt;
                         s.LineJoin = LineJoin.Miter;
                         s.StrokeSideForClosedShape = StrokeSideForClosedShape.Both;
                     }
-                    );//reset?
+                    );
             }
             return Temp<Stroke>.Borrow(out stroke);
         }

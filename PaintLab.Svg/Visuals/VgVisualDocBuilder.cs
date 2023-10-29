@@ -377,8 +377,9 @@ namespace PaintLab.Svg
             return vgVisElem;
         }
 
-        struct ReEvaluateArgs : LayoutFarm.Css.IHasEmHeight
-        {
+        readonly struct ReEvaluateArgs : LayoutFarm.Css.IHasEmHeight
+        {   
+            //TODO: review this class again
             public readonly float containerW;
             public readonly float containerH;
             public readonly float emHeight;
@@ -391,6 +392,7 @@ namespace PaintLab.Svg
             }
             public float GetEmHeight() => emHeight;
         }
+
         VgVisualElement CreateEllipse(VgVisualElement parentNode, SvgEllipseSpec ellipseSpec)
         {
 
@@ -399,10 +401,10 @@ namespace PaintLab.Svg
             using (Tools.BorrowVxs(out var v1))
             {
                 ReEvaluateArgs a = new ReEvaluateArgs(_containerWidth, _containerHeight, _emHeight); //temp fix 
-                double x = ConvertToPx(ellipseSpec.X, ref a);
-                double y = ConvertToPx(ellipseSpec.Y, ref a);
-                double rx = ConvertToPx(ellipseSpec.RadiusX, ref a);
-                double ry = ConvertToPx(ellipseSpec.RadiusY, ref a);
+                double x = ConvertToPx(ellipseSpec.X, a);
+                double y = ConvertToPx(ellipseSpec.Y, a);
+                double rx = ConvertToPx(ellipseSpec.RadiusX, a);
+                double ry = ConvertToPx(ellipseSpec.RadiusY, a);
 
                 ellipse.Set(x, y, rx, ry);////TODO: review here => temp fix for ellipse step  
 
@@ -421,10 +423,10 @@ namespace PaintLab.Svg
             using (Tools.BorrowVxs(out var v1))
             {
                 ReEvaluateArgs a = new ReEvaluateArgs(_containerWidth, _containerHeight, _emHeight); //temp fix
-                vgImg._imgX = ConvertToPx(imgspec.X, ref a);
-                vgImg._imgY = ConvertToPx(imgspec.Y, ref a);
-                vgImg._imgW = ConvertToPx(imgspec.Width, ref a);
-                vgImg._imgH = ConvertToPx(imgspec.Height, ref a);
+                vgImg._imgX = ConvertToPx(imgspec.X, a);
+                vgImg._imgY = ConvertToPx(imgspec.Y, a);
+                vgImg._imgW = ConvertToPx(imgspec.Width, a);
+                vgImg._imgH = ConvertToPx(imgspec.Height, a);
                 //
                 rectTool.SetRect(
                     vgImg._imgX,
@@ -625,9 +627,9 @@ namespace PaintLab.Svg
             using (Tools.BorrowVxs(out var v1))
             {
                 ReEvaluateArgs a = new ReEvaluateArgs(_containerWidth, _containerHeight, _emHeight); //temp fix
-                double x = ConvertToPx(cirSpec.X, ref a);
-                double y = ConvertToPx(cirSpec.Y, ref a);
-                double r = ConvertToPx(cirSpec.Radius, ref a);
+                double x = ConvertToPx(cirSpec.X, a);
+                double y = ConvertToPx(cirSpec.Y, a);
+                double r = ConvertToPx(cirSpec.Radius, a);
 
                 ellipse.Set(x, y, r, r);////TODO: review here => temp fix for ellipse step  
 
@@ -839,8 +841,8 @@ namespace PaintLab.Svg
             }
 
             ReEvaluateArgs a = new ReEvaluateArgs(_containerWidth, _containerHeight, _emHeight); //temp fix
-            textspec.ActualX = ConvertToPx(textspec.X, ref a);
-            textspec.ActualY = ConvertToPx(textspec.Y, ref a);
+            textspec.ActualX = ConvertToPx(textspec.X, a);
+            textspec.ActualY = ConvertToPx(textspec.Y, a);
             AssignAttributes(textspec);
 
             //text x,y
@@ -872,14 +874,14 @@ namespace PaintLab.Svg
                 {
                     ReEvaluateArgs a = new ReEvaluateArgs(_containerWidth, _containerHeight, _emHeight); //temp fix
                     roundRect.SetRect(
-                        ConvertToPx(rectSpec.X, ref a),
-                        ConvertToPx(rectSpec.Y, ref a) + ConvertToPx(rectSpec.Height, ref a),
-                        ConvertToPx(rectSpec.X, ref a) + ConvertToPx(rectSpec.Width, ref a),
-                        ConvertToPx(rectSpec.Y, ref a));
+                        ConvertToPx(rectSpec.X, a),
+                        ConvertToPx(rectSpec.Y, a) + ConvertToPx(rectSpec.Height, a),
+                        ConvertToPx(rectSpec.X, a) + ConvertToPx(rectSpec.Width, a),
+                        ConvertToPx(rectSpec.Y, a));
 
                     roundRect.SetRadius(
-                        ConvertToPx(rectSpec.CornerRadiusX, ref a),
-                        ConvertToPx(rectSpec.CornerRadiusY, ref a));
+                        ConvertToPx(rectSpec.CornerRadiusX, a),
+                        ConvertToPx(rectSpec.CornerRadiusY, a));
 
                     rect.VxsPath = roundRect.MakeVxs(v1).CreateTrim();
                 }
@@ -892,29 +894,29 @@ namespace PaintLab.Svg
                 {
                     ReEvaluateArgs a = new ReEvaluateArgs(_containerWidth, _containerHeight, _emHeight); //temp fix
                     rectTool.SetRect(
-                        ConvertToPx(rectSpec.X, ref a),
-                        ConvertToPx(rectSpec.Y, ref a) + ConvertToPx(rectSpec.Height, ref a),
-                        ConvertToPx(rectSpec.X, ref a) + ConvertToPx(rectSpec.Width, ref a),
-                        ConvertToPx(rectSpec.Y, ref a));
+                        ConvertToPx(rectSpec.X, a),
+                        ConvertToPx(rectSpec.Y, a) + ConvertToPx(rectSpec.Height, a),
+                        ConvertToPx(rectSpec.X, a) + ConvertToPx(rectSpec.Width, a),
+                        ConvertToPx(rectSpec.Y, a));
                     // 
 
                     rect.VxsPath = rectTool.MakeVxs(v1).CreateTrim();
                 }
-
-
             }
 
             AssignAttributes(rectSpec);
             return rect;
         }
 
-        static float ConvertToPx(LayoutFarm.Css.CssLength length, ref ReEvaluateArgs args)
+        static float ConvertToPx(LayoutFarm.Css.CssLength length, in ReEvaluateArgs args)
         {
+            //TODO: review here again
             return LayoutFarm.WebDom.Parser.CssValueParser.ConvertToPx(length, args.containerW, args);
         }
 
         VertexStore CreateVxsFromPathDefinition(char[] pathDefinition)
         {
+
             using (Tools.BorrowCurveFlattener(out var curveFlattener))
             using (Tools.BorrowVxs(out var v1, out var v2, out var v3))
             using (Tools.BorrowPathWriter(v1, out PathWriter pathWriter))

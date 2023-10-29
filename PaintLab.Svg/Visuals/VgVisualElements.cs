@@ -620,8 +620,8 @@ namespace PaintLab.Svg
         }
         //---------------------------
 
+        [ThreadStatic]
         static LineDashGenerator s_lineDashGen;
-
 
         public override void Paint(VgPaintArgs args)
         {
@@ -845,7 +845,7 @@ namespace PaintLab.Svg
                     else
                     {
                         p.FillColor = _visualSpec.FillColor;
-                        
+
                     }
                 }
 
@@ -859,6 +859,41 @@ namespace PaintLab.Svg
 
                 }
 
+                if (_visualSpec.StrokeLineCap != default)
+                {
+
+                    switch (_visualSpec.StrokeLineCap)
+                    {
+                        case StrokeLineCap.Square:
+                            p.LineCap = LineCap.Square;
+                            break;
+                        case StrokeLineCap.Round:
+                            p.LineCap = LineCap.Round;
+                            break;
+                        case StrokeLineCap.Butt:
+                            p.LineCap = LineCap.Butt;
+                            break;
+                    }
+                }
+                if (_visualSpec.StrokeLineJoin != default)
+                {
+                    switch (_visualSpec.StrokeLineJoin)
+                    {
+                        case StrokeLineJoin.MiterClip:
+                        case StrokeLineJoin.Arcs:
+                            //TODO:
+                            break;
+                        case StrokeLineJoin.Miter:
+                            p.LineJoin = LineJoin.Miter;
+                            break;
+                        case StrokeLineJoin.Round:
+                            //p.LineJoin = LineJoin.Round;
+                            break;
+                        case StrokeLineJoin.Bevel:
+                            p.LineJoin = LineJoin.Bevel;
+                            break;
+                    }
+                }
                 if (_visualSpec.HasStrokeWidth)
                 {
                     //temp fix
@@ -989,6 +1024,7 @@ namespace PaintLab.Svg
                         }
 
                         bool tryLoadOnce = false;
+
                     EVAL_STATE:
                         switch (this.ImageBinder.State)
                         {
@@ -1081,11 +1117,8 @@ namespace PaintLab.Svg
                                             }
                                         }
                                     }
-
-
                                 }
                                 break;
-
                         }
 
                     }
@@ -1094,8 +1127,7 @@ namespace PaintLab.Svg
                     {
                         //TODO: review here
                         //temp fix 
-                        SvgTextSpec textSpec = _visualSpec as SvgTextSpec;
-                        if (textSpec != null)
+                        if (_visualSpec is SvgTextSpec textSpec)
                         {
                             Color prevColor = p.FillColor;
                             if (textSpec.HasFillColor)
@@ -1232,6 +1264,34 @@ namespace PaintLab.Svg
                                         //vxs caching 
                                         _latestStrokeW = (float)p.StrokeWidth;
 
+                                        LineCap linecap = default;
+                                        switch (_visualSpec.StrokeLineCap)
+                                        {
+                                            case StrokeLineCap.Butt:
+                                                linecap = LineCap.Butt;
+                                                break;
+                                            case StrokeLineCap.Square:
+                                                linecap = LineCap.Square;
+                                                break;
+                                            case StrokeLineCap.Round:
+                                                linecap = LineCap.Round;
+                                                break;
+                                        }
+
+                                        LineJoin linejoin = default;
+                                        switch (_visualSpec.StrokeLineJoin)
+                                        {
+                                            case StrokeLineJoin.Miter:
+                                                linejoin = LineJoin.Miter;
+                                                break;
+                                            case StrokeLineJoin.Round:
+                                                linejoin = LineJoin.Round;
+                                                break;
+                                            case StrokeLineJoin.Bevel:
+                                                linejoin = LineJoin.Bevel;
+                                                break;
+                                        }
+
                                         if (_visualSpec.StrokeDashArray != null)
                                         {
                                             if (s_lineDashGen == null)
@@ -1247,7 +1307,6 @@ namespace PaintLab.Svg
                                             //TODO: review here//***
 
                                             p.StrokeWidth = _visualSpec.StrokeWidth.Number; // 3;
-
                                             p.LineDashGen = s_lineDashGen;
                                             p.Draw(vxs);//draw a dash-vxs path
                                             p.LineDashGen = tmp;//restore 
@@ -1258,6 +1317,8 @@ namespace PaintLab.Svg
                                             using (Tools.BorrowVxs(out var v1))
                                             using (Tools.BorrowStroke(out var stroke))
                                             {
+                                                stroke.LineJoin = linejoin;
+                                                stroke.LineCap = linecap;
                                                 stroke.Width = _latestStrokeW;
                                                 stroke.MakeVxs(VxsPath, v1);
                                                 _strokeVxs = v1.CreateTrim();
@@ -1467,6 +1528,10 @@ namespace PaintLab.Svg
             p.StrokeWidth = strokeW;
             args.Opacity = prevOpacity;
             args._currentTx = prevTx;
+
+
+            p.LineCap = default;
+            p.LineJoin = default;
             if (hasClip)
             {
                 p.SetClipRgn(null as VertexStore);
@@ -1483,6 +1548,7 @@ namespace PaintLab.Svg
             {
                 p.FillingRule = prevFillRule;
             }
+
         }
         public void AddChildElement(VgVisualElementBase vgVisElem)
         {
