@@ -168,19 +168,36 @@ namespace PixelFarm.CpuBlit
 
         public void MoveTo(double x0, double y0)
         {
-            if (_latest_moveTo_X != x0 || _latest_moveTo_Y != y0)
+            if (_myvxs.Count == 0)
             {
+                //first command
                 _latestSVGPathCmd = SvgPathCommand.MoveTo;
                 _myvxs.AddMoveTo(
-                    _latest_moveTo_X = _latest_x = x0,
-                    _latest_moveTo_Y = _latest_y = y0);
+                     _latest_moveTo_X = _latest_x = x0,
+                     _latest_moveTo_Y = _latest_y = y0);
             }
-            else if (_myvxs.Count == 0)
+            else
             {
-                _myvxs.AddMoveTo(
-                      _latest_moveTo_X = _latest_x = x0,
-                      _latest_moveTo_Y = _latest_y = y0);
-            }
+                if (_latestSVGPathCmd == SvgPathCommand.MoveTo)
+                {
+                    //consecutive moveto
+                    //replace
+                    if (_latest_moveTo_X != x0 || _latest_moveTo_Y != y0)
+                    {                 
+                        _myvxs.ReplaceVertex(
+                            _myvxs.Count,
+                            _latest_moveTo_X = _latest_x = x0,
+                            _latest_moveTo_Y = _latest_y = y0);
+                    }
+                }
+                else
+                {
+                    _latestSVGPathCmd = SvgPathCommand.MoveTo;
+                    _myvxs.AddMoveTo(
+                        _latest_moveTo_X = _latest_x = x0,
+                        _latest_moveTo_Y = _latest_y = y0);
+                }
+            }            
         }
         public void MoveToRel(double dx0, double dy0)
         {
