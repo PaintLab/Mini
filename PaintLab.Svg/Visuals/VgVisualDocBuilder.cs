@@ -212,6 +212,17 @@ namespace PaintLab.Svg
 
                 parentNode.AddChildElement(vgVisElem);
                 int childCount = elem.ChildCount;
+                for (int i = childCount - 1; i > 0; --i)
+                {
+                    SvgElement child = elem.GetChild(i);
+                    if (child.WellknowElemName == WellknownSvgElementName.Defs)
+                    {
+                        CreateSvgVisualElement(vgVisElem, child);
+                        elem.RemoveChildAt(i);
+                    }
+                }
+                BuildDefinitionNodes();
+                childCount = elem.ChildCount;
                 for (int i = 0; i < childCount; ++i)
                 {
                     CreateSvgVisualElement(vgVisElem, elem.GetChild(i));
@@ -275,6 +286,7 @@ namespace PaintLab.Svg
                                 }
                             }
                             break;
+                        case WellknownSvgElementName.LinearGradient:
                         case WellknownSvgElementName.Filter:
                         case WellknownSvgElementName.Ellipse:
                         case WellknownSvgElementName.Rect:
@@ -323,7 +335,6 @@ namespace PaintLab.Svg
                 }
                 else
                 {
-
                 }
             }
             if (spec.MaskPathLink != null)
@@ -378,7 +389,7 @@ namespace PaintLab.Svg
         }
 
         readonly struct ReEvaluateArgs : LayoutFarm.Css.IHasEmHeight
-        {   
+        {
             //TODO: review this class again
             public readonly float containerW;
             public readonly float containerH;

@@ -204,7 +204,7 @@ namespace PaintLab.Svg
         public int ChildCount => _childNodes == null ? 0 : _childNodes.Count;
 
         public SvgElement GetChild(int index) => _childNodes[index];
-
+        public void RemoveChildAt(int index) => _childNodes.RemoveAt(index);
         public SvgElemSpec ElemSpec => _elemSpec;
 #if DEBUG
         public override string ToString()

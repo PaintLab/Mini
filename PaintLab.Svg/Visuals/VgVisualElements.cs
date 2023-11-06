@@ -754,11 +754,10 @@ namespace PaintLab.Svg
                         {
                             if (_visualSpec.ResolvedFillBrush is VgVisualElement vgVisualElem)
                             {
-                                if (vgVisualElem.VisualSpec is SvgRadialGradientSpec)
+                                //TODO: review here
+                                //we should resolve this in some state before Paint
+                                if (vgVisualElem.VisualSpec is SvgRadialGradientSpec svgRadialGrdSpec)
                                 {
-                                    //TODO: review here
-                                    //we should resolve this in some state before Paint
-                                    SvgRadialGradientSpec svgRadialGrdSpec = (SvgRadialGradientSpec)vgVisualElem.VisualSpec;
                                     int stopListCount = svgRadialGrdSpec.StopList.Count;
                                     ColorStop[] colorStops = new ColorStop[stopListCount];
                                     for (int i = 0; i < stopListCount; ++i)

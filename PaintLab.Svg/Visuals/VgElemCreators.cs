@@ -453,7 +453,7 @@ namespace PaintLab.Svg
                 case "arcs": return StrokeLineJoin.Arcs;
                 case "bevel": return StrokeLineJoin.Bevel;
                 case "miter-clip": return StrokeLineJoin.MiterClip;
-                case "round":return StrokeLineJoin.Round;
+                case "round": return StrokeLineJoin.Round;
             }
         }
         internal static Color FromCssColor(in LayoutFarm.Css.CssColor color)
@@ -874,7 +874,19 @@ namespace PaintLab.Svg
                         throw new NotSupportedException();
                     }
                     break;
-
+                case "gradientUnits":
+                    {
+                        switch (attrValue)
+                        {
+                            case "userSpaceOnUse":
+                                _spec.GradientUnits = GradientUnits.UserSpaceOnUse;
+                                break;
+                            case "objectBoundingBox":
+                                _spec.GradientUnits = GradientUnits.ObjectBoundingBox;
+                                break;
+                        }
+                    }
+                    break;
                 case "x1":
                     _spec.X1 = ParseGenericLength(attrValue);
                     break;

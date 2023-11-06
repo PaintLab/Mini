@@ -107,7 +107,7 @@ namespace PaintLab.Svg
         public object ResolvedFillBrush { get; set; }//TODO: review here 
         public object ResolvedMask { get; set; }
         public object ResolvedFilter { get; set; }
-        
+
 
     }
     public class SvgGroupSpec : SvgVisualSpec
@@ -251,7 +251,17 @@ namespace PaintLab.Svg
         public CssLength Y1 { get; set; }
         public CssLength X2 { get; set; }
         public CssLength Y2 { get; set; }
+        public GradientUnits GradientUnits { get; set; }
     }
+
+    //https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/gradientUnits
+    public enum GradientUnits : byte
+    {
+        //userSpaceOnUse | objectBoundingBox
+        UserSpaceOnUse,
+        ObjectBoundingBox
+    }
+
 
     public class SvgRadialGradientSpec : SvgVisualSpec
     {
