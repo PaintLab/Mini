@@ -7,6 +7,7 @@ using PixelFarm.Drawing;
 using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.VertexProcessing;
 using LayoutFarm.WebDom;
+using LayoutFarm.Css;
 
 namespace PaintLab.Svg
 {
@@ -890,9 +891,20 @@ namespace PaintLab.Svg
                         ConvertToPx(rectSpec.X, a) + ConvertToPx(rectSpec.Width, a),
                         ConvertToPx(rectSpec.Y, a));
 
+                    CssLength rx = rectSpec.CornerRadiusX;
+                    CssLength ry = rectSpec.CornerRadiusY;
+                    if (rx.IsEmpty)
+                    {
+                        rx = ry;
+                    }
+                    if (ry.IsEmpty)
+                    {
+                        ry = rx;
+                    }
+
                     roundRect.SetRadius(
-                        ConvertToPx(rectSpec.CornerRadiusX, a),
-                        ConvertToPx(rectSpec.CornerRadiusY, a));
+                        ConvertToPx(rx, a),
+                        ConvertToPx(ry, a));
 
                     rect.VxsPath = roundRect.MakeVxs(v1).CreateTrim();
                 }
