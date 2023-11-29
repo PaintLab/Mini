@@ -293,11 +293,11 @@ namespace PixelFarm.CpuBlit
         }
 
 
-        static double DegToRad(double degree)
+        public static double DegToRad(double degree)
         {
             return degree * (Math.PI / 180d);
         }
-        static double RadToDeg(double degree)
+        public static double RadToDeg(double degree)
         {
             return degree * (180d / Math.PI);
         }
@@ -349,7 +349,12 @@ namespace PixelFarm.CpuBlit
             mat.Scale(s, s);
             return mat;
         }
-
+        public static AffineMat GetSkewYMat(double y)
+        {
+            AffineMat mat = s_Iden;//copy
+            mat.Skew(0, y);
+            return mat;
+        }
 
     }
 }
