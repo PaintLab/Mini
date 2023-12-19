@@ -321,7 +321,9 @@ namespace Msdfgen
             }
 
             _corners = corners;
+#if DEBUG
             _flattenEdges = flattenEdges;
+#endif
             EdgeOfNextContours = segOfNextContours;
             CornerOfNextContours = cornerOfNextContours;
         }
