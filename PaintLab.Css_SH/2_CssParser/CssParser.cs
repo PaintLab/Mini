@@ -160,8 +160,10 @@ namespace LayoutFarm.WebDom.Parser
         CssParseState _parseState;
         CssDocument _cssDocument;
         Stack<CssAtMedia> _mediaStack = new Stack<CssAtMedia>();
+        
         CssAtMedia _currentAtMedia;
         CssRuleSet _currentRuleSet;
+
         CssAttributeSelectorExpression _currentSelectorAttr;
         CssSimpleElementSelector _currentSelectorExpr;
         CssPropertyDeclaration _currentProperty;
@@ -185,13 +187,14 @@ namespace LayoutFarm.WebDom.Parser
                 switch (mb.MemberKind)
                 {
                     case WebDom.CssDocMemberKind.RuleSet:
+                    case WebDom.CssDocMemberKind.Page:
                         EvaluateRuleSet((WebDom.CssRuleSet)mb);
                         break;
                     case WebDom.CssDocMemberKind.Media:
                         EvaluateMedia((WebDom.CssAtMedia)mb);
                         break;
                     default:
-                    case WebDom.CssDocMemberKind.Page:
+                    
                         throw new NotSupportedException();
                 }
             }
@@ -394,27 +397,27 @@ namespace LayoutFarm.WebDom.Parser
                                 break;
                             case CssTokenName.Star:
                                 {
+                                    //TODO:
                                 }
                                 break;
-
                             case CssTokenName.RAngle:
                                 {
+                                    //TODO:
                                 }
                                 break;
                             case CssTokenName.Plus:
-                                {
+                                {//TODO:
                                 }
                                 break;
                             case CssTokenName.Tile:
                                 {
+                                    //TODO:
                                 }
                                 break;
-                            //----------------------------------------------------
                             default:
                                 {
                                     throw new NotSupportedException();
                                 }
-                                break;
                         }
                     }
                     break;
@@ -428,10 +431,35 @@ namespace LayoutFarm.WebDom.Parser
                                     _parseState = CssParseState.MoreBlockName;
                                 }
                                 break;
+                            case CssTokenName.Number:
+                                {
+                                    string tt = new string(_textBuffer, start, len);
+                                    _parseState = CssParseState.ExpectPropertyUnit;
+                                }
+                                break;
                             default:
                                 {
                                     throw new NotSupportedException();
                                 }
+                        }
+                    }
+                    break;
+                case CssParseState.ExpectPropertyUnit:
+                    {
+                        switch (tkname)
+                        {
+                            case CssTokenName.NumberUnit:
+                                {
+                                    //append number unit
+                                    string tt = new string(_textBuffer, start, len);
+                                    _parseState = CssParseState.ExpectPropertyValue;
+                                }
+                                break;
+                            default:
+                                {
+
+                                }
+                                break;
                         }
                     }
                     break;
@@ -765,6 +793,9 @@ namespace LayoutFarm.WebDom.Parser
                                     _currentSelectorExpr = null;
                                     switch (iden)
                                     {
+                                        case "page":
+                                            _parseState = CssParseState.Page;
+                                            break;
                                         case "media":
                                             {
                                                 _parseState = CssParseState.MediaList;
@@ -774,6 +805,7 @@ namespace LayoutFarm.WebDom.Parser
                                                     _mediaStack.Push(_currentAtMedia);
                                                 }
 
+                                                //begin new media list
                                                 _cssDocument.Add(_currentAtMedia = new CssAtMedia());
                                             }
                                             break;
@@ -782,16 +814,10 @@ namespace LayoutFarm.WebDom.Parser
                                                 _parseState = CssParseState.ExpectImportURL;
                                             }
                                             break;
-                                        case "page":
-                                            {
-                                                throw new NotSupportedException();
-                                            }
-                                            break;
                                         default:
                                             {
                                                 throw new NotSupportedException();
                                             }
-                                            break;
                                     }
                                 }
                                 break;
@@ -822,6 +848,20 @@ namespace LayoutFarm.WebDom.Parser
                                 {
                                     //begin rule set part
                                     _parseState = CssParseState.Init;
+                                }
+                                break;
+                        }
+                    }
+                    break;
+                case CssParseState.Page:
+                    {
+                        switch (tkname)
+                        {
+                            case CssTokenName.LBrace:
+                                {
+                                    _parseState = CssParseState.BlockBody;
+                                    _currentRuleSet = new CssAtPage();
+                                    _cssDocument.Add(_currentRuleSet);
                                 }
                                 break;
                         }

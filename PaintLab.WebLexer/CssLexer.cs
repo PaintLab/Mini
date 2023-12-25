@@ -494,6 +494,7 @@ namespace LayoutFarm.WebDom.Parser
         BlockBody,
         AfterPropertyName,
         ExpectPropertyValue,
+        ExpectPropertyUnit,
         ExpectValueOfHexColor,
         AfterPropertyValue,
         Comment,
@@ -509,5 +510,7 @@ namespace LayoutFarm.WebDom.Parser
         ExpectImportURL,
         ExpectedFuncParameter,
         AfterFuncParameter,
+        Page,
+
     }
 }

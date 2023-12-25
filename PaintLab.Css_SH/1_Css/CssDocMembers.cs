@@ -39,7 +39,10 @@ namespace LayoutFarm.WebDom
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(_elementSelector.ToString());
+            if (_elementSelector != null)
+            {
+                sb.Append(_elementSelector.ToString());
+            }
             sb.Append('{');
             int j = _decls.Count;
             for (int i = 0; i < j; ++i)
@@ -192,14 +195,20 @@ namespace LayoutFarm.WebDom
         }
     }
 
-    public class CssAtPage : CssDocMember
+    public class CssAtPage : CssRuleSet
     {
-        public string PseudoPage;
-        List<CssPropertyDeclaration> _decls = new List<CssPropertyDeclaration>();
-        public void AddCssCodeProperty(CssPropertyDeclaration property)
+        public CssAtPage()
         {
-            _decls.Add(property);
+
         }
         public override CssDocMemberKind MemberKind => CssDocMemberKind.Page;
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("@page ");
+            sb.Append(base.ToString());
+            return sb.ToString();
+        }
     }
 }
