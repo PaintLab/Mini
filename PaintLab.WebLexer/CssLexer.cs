@@ -3,372 +3,337 @@
 using System;
 using System.Collections.Generic;
 
+
 namespace LayoutFarm.WebDom.Parser
 {
     public delegate void CssLexerEmitHandler(CssTokenName tkname, int startIndex, int len);
+
+    /// <summary>
+    /// event driven parser
+    /// </summary>
     public class CssLexer
     {
-        int _appendLength = 0;
-        int _startIndex = 0;
-        CssLexerEmitHandler _emitHandler;
-        char _latestEscapeChar;
-        bool _isCollectionWhitespace;
+        readonly CssLexerEmitHandler _emitHandler;
         public CssLexer(CssLexerEmitHandler emitHandler)
         {
             _emitHandler = emitHandler;
         }
+
+#if DEBUG
+        char[] _cssSourceBuffer;
+#endif
+        void Emit(int start, int len, CssTokenName tk)
+        {
+            _emitHandler(tk, start, len);
+        }
         public void Lex(char[] cssSourceBuffer)
         {
-            //----------------------
-            //clear previous result
-            _appendLength = 0;
-            _startIndex = 0;
-            _latestEscapeChar = '\0';
-            //----------------------
 
-            CssLexState lexState = CssLexState.Init;
+#if DEBUG
+            _cssSourceBuffer = cssSourceBuffer;
+#endif
+
             int j = cssSourceBuffer.Length;
-            for (int i = 0; i < j; ++i)
+            for (int i = 0; i < j;)
             {
                 char c = cssSourceBuffer[i];
-#if DEBUG
-                // Console.Write(c);
-#endif
-                //-------------------------------------- 
-                switch (lexState)
+                CssTokenName terminalTokenName = GetTerminalTokenName(c);
+                switch (terminalTokenName)
                 {
                     default:
+                        throw new NotSupportedException();
+                    //single token
+                    case CssTokenName.RAngle:
                         {
-                            throw new NotSupportedException();
-                        }
-                    case CssLexState.Init:
-                        {
-                            //-------------------------------------- 
-                            //1. first name
-                            CssTokenName terminalTokenName = GetTerminalTokenName(c);
-                            //--------------------------------------  
-                            switch (terminalTokenName)
+                            //>, >=
+                            if (i < j - 1)
                             {
-                                default:
-                                    {
-                                        Emit(terminalTokenName, i);
-                                    }
-                                    break;
-                                case CssTokenName.Colon:
-                                    {
-                                        if (i < j - 1)
-                                        {
-                                            char c1 = cssSourceBuffer[i + 1];
-                                            if (c1 == ':')
-                                            {
-                                                i++;
-                                                Emit(CssTokenName.DoubleColon, i);
-                                                continue;
-                                            }
-                                        }
-                                        Emit(terminalTokenName, i);
-                                    }
-                                    break;
-                                case CssTokenName.DoubleQuote:
-                                    {
-                                        _latestEscapeChar = '"';
-                                        lexState = CssLexState.CollectString;
-                                    }
-                                    break;
-                                case CssTokenName.Quote:
-                                    {
-                                        _latestEscapeChar = '\'';
-                                        lexState = CssLexState.CollectString;
-                                    }
-                                    break;
-                                case CssTokenName.Divide:
-                                    {
-                                        //is open comment or not
-                                        if (i < j - 1)
-                                        {
-                                            if (cssSourceBuffer[i + 1] == '*')
-                                            {
-                                                i++;
-                                                //Emit(CssTokenName.LComment, i);
-                                                lexState = CssLexState.Comment;
-                                                continue;
-                                            }
-                                        }
-                                        Emit(CssTokenName.Divide, i);
-                                    }
-                                    break;
-                                case CssTokenName.Sharp:
-                                    {
-                                        AppendBuffer(i);
-                                        lexState = CssLexState.Iden;
-                                    }
-                                    break;
-                                case CssTokenName.Dot:
-                                    {
-                                        if (i < j - 1)
-                                        {
-                                            char c1 = cssSourceBuffer[i + 1];
-                                            if (char.IsNumber(c1))
-                                            {
-                                                AppendBuffer(i);
-                                                i++;
-                                                AppendBuffer(i);
-                                                lexState = CssLexState.Number;
-                                                continue;
-                                            }
-                                        }
-                                        Emit(terminalTokenName, i);
-                                    }
-                                    break;
-                                case CssTokenName.Minus:
-                                    {
-                                        //as iden
-                                        AppendBuffer(i);
-                                        lexState = CssLexState.Iden;
-                                    }
-                                    break;
-                                case CssTokenName.Unknown:
-                                    {
-                                        //this is not terminal  
-                                        AppendBuffer(i);
-                                        if (char.IsNumber(c))
-                                        {
-                                            lexState = CssLexState.Number;
-                                        }
-                                        else
-                                        {
-                                            lexState = CssLexState.Iden;
-                                        }
-                                    }
-                                    break;
-                                case CssTokenName.Whitespace:
-                                case CssTokenName.Newline:
-                                    {
-                                        _isCollectionWhitespace = true;
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-                    case CssLexState.CollectString:
-                        {
-                            if (c == _latestEscapeChar)
-                            {
-                                //exit collect string 
-                                lexState = CssLexState.Init;
-                                EmitBuffer(i, CssTokenName.LiteralString);
+                                //look ahead
+                                char c2 = cssSourceBuffer[i + 1];
+                                if (c2 == '=')
+                                {
+                                    //emit as double colon
+                                    i += 2;
+                                    Emit(i, 2, CssTokenName.GreaterOrEqual);
+                                }
+                                else
+                                {
+                                    Emit(i, 1, CssTokenName.RAngle);
+                                    i++;
+                                }
                             }
                             else
                             {
-                                AppendBuffer(i);
+                                //emit
+                                //last one
+                                Emit(i, 1, CssTokenName.RAngle);
+                                i++;
                             }
                         }
                         break;
-                    case CssLexState.Comment:
+                    case CssTokenName.LAngle: //<
                         {
-                            if (c == '*')
+                            //<
+                            //<=
+                            if (i < j - 1)
                             {
-                                if (i < j - 1)
+                                //look ahead
+                                char c2 = cssSourceBuffer[i + 1];
+                                if (c2 == '=')
                                 {
-                                    char c1 = cssSourceBuffer[i + 1];
-                                    if (c1 == '/')
-                                    {
-                                        i++;
-                                        //Emit(CssTokenName.RComment, i);
-                                        lexState = CssLexState.Init;
-                                        continue;
-                                    }
+                                    //emit as double colon
+                                    i += 2;
+                                    Emit(i, 2, CssTokenName.LessorOrEqual);
                                 }
-                            }
-                            //skip comment?
-                        }
-                        break;
-                    case CssLexState.Iden:
-                        {
-                            CssTokenName terminalTokenName = GetTerminalTokenName(c);
-                            switch (terminalTokenName)
-                            {
-                                case CssTokenName.Whitespace:
-                                case CssTokenName.Newline:
-                                    {
-                                        EmitBuffer(i, CssTokenName.Iden);
-                                        lexState = CssLexState.Init;
-                                    }
-                                    break;
-                                case CssTokenName.Divide:
-                                    {
-                                        //is open comment or not
-                                        throw new NotSupportedException();
-                                    }
-                                case CssTokenName.Star:
-                                    {
-                                        //is close comment or not 
-                                        throw new NotSupportedException();
-                                    }
-                                case CssTokenName.Minus:
-                                    {
-                                        //iden can contains minus 
-                                        AppendBuffer(i);
-                                    }
-                                    break;
-                                default:
-                                    {
-                                        //flush exising buffer
-                                        EmitBuffer(i, CssTokenName.Iden);
-                                        Emit(terminalTokenName, i);
-                                        lexState = CssLexState.Init;
-                                    }
-                                    break;
-                                case CssTokenName.Unknown:
-                                    {
-                                        //this is not terminal 
-                                        AppendBuffer(i);
-                                        lexState = CssLexState.Iden;
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-                    case CssLexState.Number:
-                        {
-                            if (char.IsNumber(c))
-                            {
-                                AppendBuffer(i);
-                                continue;
-                            }
-                            //---------------------------------------------------------- 
-                            CssTokenName terminalTokenName = GetTerminalTokenName(c);
-                            switch (terminalTokenName)
-                            {
-                                case CssTokenName.Whitespace:
-                                case CssTokenName.Newline:
-                                    {
-                                        if (_appendLength > 0)
-                                        {
-                                            EmitBuffer(i, CssTokenName.Number);
-                                        }
-
-                                        lexState = CssLexState.Init;
-                                    }
-                                    break;
-                                case CssTokenName.Divide:
-                                    {
-                                        //is open comment or not
-                                        throw new NotSupportedException();
-                                    }
-                                case CssTokenName.Star:
-                                    {   //is close comment or not 
-                                        throw new NotSupportedException();
-                                    }
-                                case CssTokenName.Dot:
-                                    {
-                                        //after number
-                                        if (i < j - 1)
-                                        {
-                                            char c1 = cssSourceBuffer[i + 1];
-                                            if (char.IsNumber(c1))
-                                            {
-                                                AppendBuffer(i);
-                                                i++;
-                                                AppendBuffer(i);
-                                                lexState = CssLexState.Number;
-                                                continue;
-                                            }
-                                        }
-                                        EmitBuffer(i, CssTokenName.Number);
-                                        Emit(terminalTokenName, i);
-                                    }
-                                    break;
-                                default:
-                                    {
-                                        //flush exising buffer
-                                        EmitBuffer(i, CssTokenName.Number);
-                                        Emit(terminalTokenName, i);
-                                        lexState = CssLexState.Init;
-                                    }
-                                    break;
-                                case CssTokenName.Unknown:
-                                    {
-                                        EmitBuffer(i, CssTokenName.Number);
-                                        //iden after number may be unit of number*** 
-                                        AppendBuffer(i);
-                                        lexState = CssLexState.UnitAfterNumber;
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-                    case CssLexState.UnitAfterNumber:
-                        {
-                            if (char.IsLetter(c))
-                            {
-                                AppendBuffer(i);
+                                else
+                                {
+                                    Emit(i, 1, CssTokenName.LAngle);
+                                    i++;
+                                }
                             }
                             else
                             {
-                                //terminate
-                                //TODO: fix this  ....1.348625e-002 
-
-
-                                EmitBuffer(i, CssTokenName.NumberUnit);
-                                //-------------------------------------------
-                                CssTokenName terminalTokenName = GetTerminalTokenName(c);
-                                switch (terminalTokenName)
-                                {
-                                    case CssTokenName.Whitespace:
-                                    case CssTokenName.Newline:
-                                        {
-                                        }
-                                        break;
-                                    default:
-                                        {
-                                            Emit(terminalTokenName, i);
-                                        }
-                                        break;
-                                }
-                                lexState = CssLexState.Init;
+                                //emit
+                                //last one
+                                Emit(i, 1, CssTokenName.LAngle);
+                                i++;
                             }
+
+                        }
+                        break;
+                    case CssTokenName.Tile:
+                    case CssTokenName.Sharp:
+                    case CssTokenName.At:
+                    case CssTokenName.LBrace:
+                    case CssTokenName.RBrace:
+                    case CssTokenName.LBracket:
+                    case CssTokenName.RBracket:
+                    case CssTokenName.LParen:
+                    case CssTokenName.RParen:
+                    case CssTokenName.OpEq:
+                    case CssTokenName.SemiColon:
+                    case CssTokenName.Comma:
+                    case CssTokenName.Plus:
+                    case CssTokenName.Star:
+                        {
+                            //emit
+                            Emit(i, 1, terminalTokenName);
+                            i += 1;
+                        }
+                        break;
+                    case CssTokenName.Colon:
+                        {
+                            //single colon or double colon
+                            if (i < j - 1)
+                            {
+                                //look ahead
+                                char c2 = cssSourceBuffer[i + 1];
+                                if (c2 == ':')
+                                {
+                                    //emit as double colon
+                                    i += 2;
+                                    Emit(i, 2, CssTokenName.DoubleColon);
+                                }
+                                else
+                                {
+                                    Emit(i, 1, CssTokenName.Colon);
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                //emit
+                                //last one
+                                Emit(i, 1, CssTokenName.Colon);
+                                i++;
+                            }
+                        }
+                        break;
+                    case CssTokenName.Dot:
+                        {
+                            //after dot may be iden or number
+                            //we look head
+                            if (i < j - 1)
+                            {
+                                char c2 = cssSourceBuffer[i + 1];
+                                if (char.IsNumber(c2))
+                                {
+                                    //parse as number
+                                    i++;
+                                    ReadIntNumberLiteral(cssSourceBuffer, i, out int len);
+                                    Emit(i - 1, len + 1, CssTokenName.Number);
+                                    i += len;
+
+                                    //number may has concat number unit after the number value
+                                    if (i < j - 1)
+                                    {
+                                        char c3 = cssSourceBuffer[i];
+                                        if (char.IsLetter(c3))
+                                        {
+                                            ReadIden(cssSourceBuffer, i, out int len2);
+                                            //emit numbder with unit
+                                            Emit(i, len2, CssTokenName.NumberUnit);
+                                            i += len2;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    Emit(i, 1, CssTokenName.Dot);
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                //end 
+                                //Emit
+                                Emit(i, 1, CssTokenName.Dot);
+                                i++;
+                            }
+                        }
+                        break;
+                    case CssTokenName.Quote:
+                        {
+                            ReadStringLiteral(cssSourceBuffer, '\'', i, out int len);
+                            Emit(i - 1, len, CssTokenName.LiteralString);
+
+                            i += len;
+                            //Emit
+                        }
+                        break;
+                    case CssTokenName.DoubleQuote:
+                        {
+                            //collect string literal
+                            ReadStringLiteral(cssSourceBuffer, '"', i, out int len);
+                            Emit(i - 1, len, CssTokenName.LiteralString);
+                            i += len;
+                            //Emit
+                        }
+                        break;
+                    case CssTokenName.Newline:
+                    case CssTokenName.Whitespace:
+                        {
+                            ReadWhtiespace(cssSourceBuffer, i, out int len);
+                            Emit(i, len, CssTokenName.Whitespace);
+                            i += len;
+                            //Emit 
+                        }
+                        break;
+                    case CssTokenName.Unknown:
+                        {
+                            //read iden include number
+                            ReadIden(cssSourceBuffer, i, out int len);
+                            Emit(i, len, CssTokenName.Iden);
+                            i += len;
+                            //emit iden
+                        }
+                        break;
+                    case CssTokenName.Minus:
+                        {
+                            //read iden include number
+                            //after minus
+                            if (i < j - 1)
+                            {
+                                char c2 = cssSourceBuffer[i + 1];
+                                if (c2 == '-' || char.IsLetter(c2) || c2 == '_')
+                                {
+                                    ReadIden(cssSourceBuffer, i, out int len);
+                                    Emit(i, len, CssTokenName.Iden);
+                                    i += len;
+                                }
+                                else
+                                {
+                                    //read as minus
+                                    Emit(i, 1, CssTokenName.Iden);
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                Emit(i, 1, CssTokenName.Iden);
+                                i++;
+                            }
+
+                            //emit iden
                         }
                         break;
                 }
             }
-            if (_appendLength > 0)
+        }
+        static void ReadIden(char[] buffer, int startAt, out int len)
+        {
+            len = 0;
+            for (int i = startAt; i < buffer.Length; ++i)
             {
-                switch (lexState)
+                char c = buffer[i];
+                if (char.IsLetterOrDigit(c) || c == '-' || c == '_')
                 {
-                    case CssLexState.UnitAfterNumber:
-                        EmitBuffer(cssSourceBuffer.Length - 1, CssTokenName.NumberUnit);
-                        break;
-                    case CssLexState.Number:
-                        EmitBuffer(cssSourceBuffer.Length - 1, CssTokenName.Number);
-                        break;
-                    case CssLexState.Iden:
-                    default:
-                        EmitBuffer(cssSourceBuffer.Length - 1, CssTokenName.Iden);
-                        break;
+                    //collect
+                    len++;
+                }
+                else
+                {
+                    break;
                 }
             }
         }
-        void AppendBuffer(int i)
+        static void ReadWhtiespace(char[] buffer, int startAt, out int len)
         {
-            if (_appendLength == 0)
+            len = 0;
+            for (int i = startAt; i < buffer.Length; ++i)
             {
-                _startIndex = i;
+                char c = buffer[i];
+                if (char.IsWhiteSpace(c))
+                {
+                    //collect
+                    len++;
+                }
+                else
+                {
+                    break;
+                }
             }
-            _appendLength++;
+            //read until end?
+
         }
-        void EmitBuffer(int i, CssTokenName tokenName)
+        static void ReadIntNumberLiteral(char[] buffer, int startAt, out int len)
         {
-            //flush existing buffer
-            if (_appendLength > 0)
+            len = 0;
+            for (int i = startAt; i < buffer.Length; ++i) //**+1
             {
-                _emitHandler(tokenName, _startIndex, _appendLength);
+                char c = buffer[i];
+                if (char.IsNumber(c))
+                {
+                    len++;
+                }
+                else
+                {
+                    break;
+                }
             }
-            _appendLength = 0;
         }
-        void Emit(CssTokenName tkname, int i)
+        static void ReadStringLiteral(char[] buffer, char escapeWith, int startAt, out int len)
         {
-            _emitHandler(tkname, i, 1);
+            len = 1;
+            for (int i = startAt + 1; i < buffer.Length; ++i) //**+1
+            {
+                char c = buffer[i];
+                if (c == '\\')
+                {
+
+                }
+
+                if (c == escapeWith)
+                {
+                    //break here
+                    len++;
+                    break;
+                }
+                else
+                {
+                    len++;
+                }
+            }
         }
 
         static CssTokenName GetTerminalTokenName(char c)
@@ -429,15 +394,8 @@ namespace LayoutFarm.WebDom.Parser
             //----------------------------------- 
         }
     }
-    public enum CssLexState
-    {
-        Init,
-        Comment,
-        Iden,
-        CollectString,
-        Number,
-        UnitAfterNumber
-    }
+
+
 
     public enum CssTokenName
     {
@@ -468,6 +426,10 @@ namespace LayoutFarm.WebDom.Parser
         RBrace,
         LAngle, //<
         RAngle,  //>
+
+        LessorOrEqual, //<=
+        GreaterOrEqual, //>=
+
         Iden,
         Number,
         NumberUnit,

@@ -6,152 +6,6 @@ using System.Collections.Generic;
 
 namespace LayoutFarm.WebDom.Parser
 {
-    //class CompactCssStyle
-    //{
-    //    public Dictionary<string, string> KeyValues;
-    //    public string Name { get; set; }
-    //}
-    //class CompactCssParser
-    //{
-    //    char[] _buff;
-    //    int _index;
-    //    void ReadEntireCurlyBracket()
-    //    {
-    //        int j = _buff.Length;
-
-    //        for (int i = _index; i < j; ++i)
-    //        {
-    //            char c = _buff[i];
-    //            if (c == '}')
-    //            {
-    //                _index = i;//accept and stop
-    //                return;
-    //            }
-    //        }
-    //        //all are whitespace
-    //        _index = j;
-    //    }
-    //    void ReadUntilEndOfWhitespace()
-    //    {
-    //        int j = _buff.Length;
-
-    //        for (int i = _index; i < j; ++i)
-    //        {
-    //            char c = _buff[i];
-    //            if (char.IsWhiteSpace(c))
-    //            {
-    //                continue;
-    //            }
-    //            else
-    //            {
-    //                _index = i - 1;//stop
-    //                return;
-    //            }
-    //        }
-    //        //all are whitespace
-    //        _index = j;
-    //    }
-    //    void ReadIden()
-    //    {
-    //        int j = _buff.Length;
-    //        for (int i = _index; i < j; ++i)
-    //        {
-    //            char c = _buff[i];
-    //            if (char.IsLetterOrDigit(c))
-    //            {
-    //                continue;
-    //            }
-    //            else
-    //            {
-    //                _index = i - 1;//stop
-    //                return;
-    //            }
-    //        }
-    //        //all are whitespace
-    //        _index = j;
-    //    }
-
-    //    Dictionary<string, string> ParseCssKeyValuePair(string cssKeyValueContent)
-    //    {
-    //        //
-    //        cssKeyValueContent = cssKeyValueContent.Trim();
-    //        string[] key_values = cssKeyValueContent.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-    //        Dictionary<string, string> kv_dict = new Dictionary<string, string>();
-    //        for (int i = 0; i < key_values.Length; ++i)
-    //        {
-    //            string k_v = key_values[i];
-    //            string[] k_n_v = k_v.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-    //            kv_dict[k_n_v[0].Trim()] = k_n_v[1].Trim();
-    //        }
-    //        return kv_dict;
-
-    //    }
-
-    //    public List<CompactCssStyle> ParseStyleElementContent(string compactCss)
-    //    {
-    //        _buff = compactCss.ToCharArray();
-    //        _index = 0;
-
-    //        int j = _buff.Length;
-    //        int state = 0;
-
-    //        List<CompactCssStyle> styles = new List<CompactCssStyle>();
-
-    //        CompactCssStyle cssStyle = null;
-
-    //        for (int i = 0; i < j; ++i)
-    //        {
-    //            char c = _buff[i];
-    //            switch (state)
-    //            {
-    //                case 0:
-    //                    {
-    //                        if (char.IsWhiteSpace(c))
-    //                        {
-    //                            _index = i + 1;
-    //                            ReadUntilEndOfWhitespace();
-    //                            i = _index;
-    //                            //
-    //                        }
-    //                        else if (char.IsLetter(c))
-    //                        {
-    //                            //read iden
-    //                            _index = i + 1;
-    //                            ReadIden();
-
-    //                            int len = _index - i + 1;
-    //                            cssStyle = new CompactCssStyle();
-    //                            cssStyle.Name = new string(_buff, i, len);
-    //                            styles.Add(cssStyle);
-
-    //                            i = _index;//update
-    //                        }
-    //                        else if (c == '.')
-    //                        {
-    //                            //follow by iden
-
-    //                        }
-    //                        else if (c == '{')
-    //                        {
-    //                            _index = i + 1;
-    //                            ReadEntireCurlyBracket();
-    //                            int len = _index - i - 1;
-    //                            //inside this range is css-key-value pair
-    //                            cssStyle.KeyValues = ParseCssKeyValuePair(new string(_buff, i + 1, len));
-
-    //                            i = _index;
-    //                        }
-    //                    }
-    //                    break;
-    //            }
-    //        }
-    //        return styles;
-    //    }
-    //    public Dictionary<string, string> ParseStyleAttributeValue(string compactCss)
-    //    {
-    //        return ParseCssKeyValuePair(compactCss);
-    //    }
-    //}
 
     public class CssParser
     {
@@ -160,7 +14,7 @@ namespace LayoutFarm.WebDom.Parser
         CssParseState _parseState;
         CssDocument _cssDocument;
         Stack<CssAtMedia> _mediaStack = new Stack<CssAtMedia>();
-        
+
         CssAtMedia _currentAtMedia;
         CssRuleSet _currentRuleSet;
 
@@ -194,7 +48,7 @@ namespace LayoutFarm.WebDom.Parser
                         EvaluateMedia((WebDom.CssAtMedia)mb);
                         break;
                     default:
-                    
+
                         throw new NotSupportedException();
                 }
             }
@@ -227,6 +81,8 @@ namespace LayoutFarm.WebDom.Parser
 
         void LexerEmitHandler(CssTokenName tkname, int start, int len)
         {
+            if (tkname == CssTokenName.Whitespace) { return; }
+
             switch (_parseState)
             {
                 default:
@@ -414,6 +270,8 @@ namespace LayoutFarm.WebDom.Parser
                                     //TODO:
                                 }
                                 break;
+                            case CssTokenName.Whitespace:
+                                break;
                             default:
                                 {
                                     throw new NotSupportedException();
@@ -439,6 +297,7 @@ namespace LayoutFarm.WebDom.Parser
                                 break;
                             default:
                                 {
+                                    string tt = new string(_textBuffer, start, len);
                                     throw new NotSupportedException();
                                 }
                         }
@@ -596,6 +455,7 @@ namespace LayoutFarm.WebDom.Parser
                         {
                             _parseState = CssParseState.ExpectPropertyValue;
                         }
+
                         else
                         {
                             throw new NotSupportedException();
